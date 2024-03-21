@@ -1,11 +1,10 @@
-const models = require('../models/index')
 'use strict';
 const {
   Model,
   DataTypes
 } = require('sequelize');
 module.exports = (sequelize) => {
-  class Message extends Model {
+  class AssignedRoles extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -15,39 +14,39 @@ module.exports = (sequelize) => {
       // define association here
     }
   }
-  Message.init({
-    id: {
+  AssignedRoles.init({
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
     },
-    emitter: {
+    role_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
     },
-    receiver: {
-      type: DataTypes.INTEGER,
+    created_at: {
       allowNull: false,
+      type: DataTypes.DATE
     },
-    text: {
-      type: DataTypes.STRING,
+    updated_at: {
       allowNull: false,
+      type: DataTypes.DATE
     },
-    read: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      default: false
-    },
+    deleted_at: {
+      allowNull: true,
+      type: DataTypes.DATE
+    }
   }, {
     sequelize,
-    modelName: 'Message',
-    tableName: 'messages',
+    modelName: 'AssignedRoles',
+    tableName: 'assigned_roles',
     timestamps: true,
     paranoid: true,
     deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
-  return Message;
+  return AssignedRoles;
 };

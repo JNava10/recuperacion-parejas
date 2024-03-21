@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Preference extends Model {
+  class EventAssistant extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,11 +13,18 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Preference.init({
-    id: DataTypes.INTEGER
+  EventAssistant.init({
+    user: DataTypes.INTEGER,
+    event: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Preference',
+    modelName: 'EventAssistant',
+    tableName: 'event_assistants',
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deleted_at',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
-  return Preference;
+  return EventAssistant;
 };

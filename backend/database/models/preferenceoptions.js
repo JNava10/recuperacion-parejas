@@ -1,8 +1,9 @@
 'use strict';
 const {
-  Model
+  Model,
+  DataTypes
 } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize) => {
   class PreferenceOptions extends Model {
     /**
      * Helper method for defining associations.
@@ -14,10 +15,26 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   PreferenceOptions.init({
-    id: DataTypes.INTEGER
+    preference: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+      autoIncrement: false,
+      allowNull: false,
+    },
+    option_name: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      unique: true
+    },
+    option_value: {
+      allowNull: false,
+      type: DataTypes.NUMBER,
+      unique: true
+    },
   }, {
     sequelize,
-    modelName: 'PreferenceOptions',
+    modelName: 'PreferenceOption',
+    tableName: 'preference_options'
   });
   return PreferenceOptions;
 };

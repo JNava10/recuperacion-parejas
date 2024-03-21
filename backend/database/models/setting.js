@@ -1,10 +1,9 @@
 'use strict';
 const {
-  Model,
-  DataTypes
+  Model, DataTypes
 } = require('sequelize');
-module.exports = (sequelize) => {
-  class MessageFile extends Model {
+module.exports = (sequelize, DataTypes) => {
+  class Setting extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,25 +13,27 @@ module.exports = (sequelize) => {
       // define association here
     }
   }
-  MessageFile.init({
+  Setting.init({
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       primaryKey: true,
-      autoIncrement: true
-    },
-    message: {
-      type: DataTypes.INTEGER,
+      autoIncrement: false,
       allowNull: false,
     },
-    file_link: {
+    name: {
+      allowNull: false,
       type: DataTypes.STRING,
+      unique: true
+    },
+    value: {
       allowNull: false,
+      type: DataTypes.STRING,
+      unique: true
     },
   }, {
     sequelize,
-    modelName: 'MessageFile',
-    tableName: 'message_files'
+    modelName: 'Setting',
+    tableName: 'settings'
   });
-  return MessageFile;
+  return Setting;
 };

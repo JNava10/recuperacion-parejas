@@ -5,55 +5,39 @@ const {DataTypes} = require("sequelize");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable(models.User.tableName, {
+    await queryInterface.createTable(models.Event.tableName, {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true
       },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      first_surname: {
+      description: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      second_surname: {
+      author: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      nickname: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-      },
-      enabled: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        unique: true,
-        defaultValue: false
       },
       pic_url: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      last_login: {
-        type: DataTypes.DATE,
-        allowNull: true,
+      summary_url: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
-      connected: {
-        type: DataTypes.BOOLEAN,
+      latitude: {
+        type: DataTypes.DECIMAL(10, 8),
+        allowNull: false,
+      },
+      longitude: {
+        type: DataTypes.DECIMAL(11, 8),
         allowNull: false,
       },
       created_at: {
@@ -71,6 +55,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable(models.User.tableName);
+    await queryInterface.dropTable(models.Event.tableName);
   }
 };

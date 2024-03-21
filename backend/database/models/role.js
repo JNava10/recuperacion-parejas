@@ -1,8 +1,10 @@
+const models = require('../models/index')
 'use strict';
 const {
-  Model
+  Model,
+  DataTypes
 } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize) => {
   class Role extends Model {
     /**
      * Helper method for defining associations.
@@ -14,10 +16,25 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Role.init({
-    id: DataTypes.INTEGER
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   }, {
     sequelize,
     modelName: 'Role',
+    tableName: 'roles',
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deleted_at',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
   return Role;
 };

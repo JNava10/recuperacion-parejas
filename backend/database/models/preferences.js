@@ -1,11 +1,10 @@
-const models = require('../models/index')
 'use strict';
 const {
   Model,
   DataTypes
 } = require('sequelize');
 module.exports = (sequelize) => {
-  class Message extends Model {
+  class Preference extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -15,39 +14,26 @@ module.exports = (sequelize) => {
       // define association here
     }
   }
-  Message.init({
+  Preference.init({
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
     },
-    emitter: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    receiver: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    text: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    read: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      default: false
-    },
   }, {
     sequelize,
-    modelName: 'Message',
-    tableName: 'messages',
+    modelName: 'Preference',
+    tableName: 'preferences',
     timestamps: true,
     paranoid: true,
     deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
-  return Message;
+  return Preference;
 };
