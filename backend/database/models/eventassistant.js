@@ -1,7 +1,8 @@
 'use strict';
 const {
-  Model
+  Model, DataTypes
 } = require('sequelize');
+const models = require("./index");
 module.exports = (sequelize, DataTypes) => {
   class EventAssistant extends Model {
     /**
@@ -14,8 +15,40 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   EventAssistant.init({
-    user: DataTypes.INTEGER,
-    event: DataTypes.INTEGER
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    user: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      references: {
+        model: models.User,
+        key: 'id'
+      }
+    },
+    event: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      references: {
+        model: models.Event,
+        key: 'id'
+      }
+    },
+    created_at: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updated_at: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    deleted_at: {
+      allowNull: true,
+      type: DataTypes.DATE
+    },
   }, {
     sequelize,
     modelName: 'EventAssistant',

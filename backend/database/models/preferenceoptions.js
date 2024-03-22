@@ -11,26 +11,19 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsTo(models.Preference)
+
     }
   }
   PreferenceOptions.init({
     preference: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: false,
       allowNull: false,
     },
-    option_name: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      unique: true
-    },
-    option_value: {
-      allowNull: false,
-      type: DataTypes.NUMBER,
-      unique: true
-    },
+    option_name: DataTypes.STRING,
+    option_value: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'PreferenceOption',

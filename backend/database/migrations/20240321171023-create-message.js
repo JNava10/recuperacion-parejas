@@ -13,10 +13,22 @@ module.exports = {
       emitter: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.User.tableName
+          },
+          key: 'id'
+        }
       },
       receiver: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.User.tableName
+          },
+          key: 'id'
+        }
       },
       text: {
         type: DataTypes.STRING,

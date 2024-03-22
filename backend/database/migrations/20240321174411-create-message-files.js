@@ -13,6 +13,12 @@ module.exports = {
       message: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.Message.tableName
+          },
+          key: 'id'
+        }
       },
       file_link: {
         type: DataTypes.STRING,

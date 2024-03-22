@@ -11,7 +11,20 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+
+      // Una preferencia solo puede tener un valor en caso de ser numerica.
+      this.belongsToMany(models.User, {
+        through: models.UserPreference,
+        as: 'users',
+      });
+
+      // Una preferencia solo puede tener un valor en caso de ser numerica.
+      this.hasOne(models.PreferenceValue,  {
+        foreignKey: {
+          name: 'preference',
+          as: 'values'
+        }
+      });
     }
   }
   Preference.init({

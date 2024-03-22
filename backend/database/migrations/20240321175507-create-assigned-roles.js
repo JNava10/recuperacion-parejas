@@ -3,16 +3,28 @@ const {DataTypes} = require("sequelize");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable(models.Preference.tableName, {
-      user_id: {
+    await queryInterface.createTable(models.AssignedRole.tableName, {
+      user: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
+        references: {
+          model: {
+            tableName: 'users'
+          },
+          key: 'id'
+        },
       },
-      role_id: {
+      role: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
+        references: {
+          model: {
+            tableName: 'roles'
+          },
+          key: 'id'
+        },
       },
       created_at: {
         allowNull: false,
@@ -29,6 +41,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable(models.Preference.tableName);
+    await queryInterface.dropTable(models.AssignedRole.tableName);
   }
 };

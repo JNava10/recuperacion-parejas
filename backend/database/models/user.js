@@ -11,7 +11,32 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsToMany(models.Role, {
+        through: models.AssignedRole,
+        foreignKey: 'user',
+        as: 'roles'
+      });
+
+      this.belongsToMany(models.Event, {
+        through: models.EventAssistant,
+        foreignKey: 'user',
+        as: 'events'
+      });
+
+      this.hasMany(models.Message, {
+        foreignKey: 'user',
+        as: 'messages',
+      });
+
+      this.belongsToMany(models.User, {
+        through: models.Friendship,
+        as: 'friendships',
+      });
+
+      this.belongsToMany(models.Preference, {
+        through: models.UserPreference,
+        as: 'preferences',
+      });
     }
   }
   User.init({

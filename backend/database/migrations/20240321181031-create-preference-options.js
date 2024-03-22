@@ -5,10 +5,16 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(models.PreferenceOption.tableName, {
       preference: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: false,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.Preference.tableName
+          },
+          key: 'id'
+        }
       },
       option_name: {
         allowNull: false,

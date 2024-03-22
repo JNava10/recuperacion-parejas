@@ -8,11 +8,23 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true
+        references: {
+          model: {
+            tableName: models.User.tableName
+          },
+          key: 'id'
+        }
       },
       preference: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.Preference.tableName
+          },
+          key: 'id'
+        }
       },
       value: {
         allowNull: false,

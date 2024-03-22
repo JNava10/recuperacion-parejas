@@ -7,10 +7,22 @@ module.exports = {
       requesting_user: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.User.tableName
+          },
+          key: 'id'
+        }
       },
       requested_user: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: {
+            tableName: models.User.tableName
+          },
+          key: 'id'
+        }
       },
       accepted: {
         type: DataTypes.BOOLEAN,

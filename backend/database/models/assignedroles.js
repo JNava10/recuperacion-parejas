@@ -4,7 +4,7 @@ const {
   DataTypes
 } = require('sequelize');
 module.exports = (sequelize) => {
-  class AssignedRoles extends Model {
+  class AssignedRole extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,12 +14,11 @@ module.exports = (sequelize) => {
       // define association here
     }
   }
-  AssignedRoles.init({
+  AssignedRole.init({
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
     },
     role_id: {
       type: DataTypes.INTEGER,
@@ -40,7 +39,7 @@ module.exports = (sequelize) => {
     }
   }, {
     sequelize,
-    modelName: 'AssignedRoles',
+    modelName: 'AssignedRole',
     tableName: 'assigned_roles',
     timestamps: true,
     paranoid: true,
@@ -48,5 +47,5 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
-  return AssignedRoles;
+  return AssignedRole;
 };
