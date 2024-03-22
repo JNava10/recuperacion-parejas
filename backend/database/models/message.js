@@ -14,7 +14,8 @@ module.exports = (sequelize) => {
     static associate(models) {
       this.belongsTo(models.User);
       this.hasMany(models.MessageFile, {
-        foreignKey: 'message'
+        foreignKey: 'message',
+        as: 'files'
       })
     }
   }

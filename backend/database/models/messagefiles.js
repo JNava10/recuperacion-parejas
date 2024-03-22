@@ -17,18 +17,10 @@ module.exports = (sequelize) => {
   MessageFile.init({
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       primaryKey: true,
-      autoIncrement: true
     },
-    message: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    file_link: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+    message: DataTypes.INTEGER,
+    file_link: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'MessageFile',
