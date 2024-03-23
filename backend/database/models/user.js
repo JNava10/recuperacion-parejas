@@ -75,7 +75,6 @@ module.exports = (sequelize) => {
     enabled: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      unique: true,
       defaultValue: false
     },
     pic_url: {
