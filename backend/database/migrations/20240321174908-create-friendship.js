@@ -6,6 +6,7 @@ module.exports = {
     await queryInterface.createTable(models.Friendship.tableName, {
       requesting_user: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false,
         references: {
           model: {
@@ -16,6 +17,7 @@ module.exports = {
       },
       requested_user: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false,
         references: {
           model: {
@@ -29,6 +31,18 @@ module.exports = {
         allowNull: false,
         defaultValue: false
       },
+      created_at: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      updated_at: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      deleted_at: {
+        allowNull: true,
+        type: DataTypes.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {

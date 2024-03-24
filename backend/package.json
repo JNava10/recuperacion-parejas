@@ -7,7 +7,7 @@
     "migrate": "npx sequelize-cli db:migrate",
     "seed": "npx sequelize-cli db:seed:all",
     "rollback": "npx sequelize-cli db:migrate:undo:all",
-    "refresh": "npm run migrate && npm run seed && npm run rollback",
+    "refresh": "npm run rollback && npm run migrate && npm run seed",
     "serve": "nodemon app/app"
   },
   "keywords": [],
@@ -23,6 +23,7 @@
     "express": "^4.19.1",
     "express-fileupload": "^1.5.0",
     "mysql2": "^3.9.2",
+    "pdf-puppeteer": "^1.1.11",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.6.2",
     "socket.io": "^4.7.5",

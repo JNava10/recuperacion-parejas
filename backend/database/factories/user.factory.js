@@ -1,7 +1,7 @@
 require('dotenv').config()
 const {fakerES} = require('@faker-js/faker');
-const models = require('../models/index');
 const {hashPassword} = require("../../helpers/common.helper");
+const models = require("../models");
 
 const get = async (number) => {
     const users = [];
@@ -22,7 +22,9 @@ const get = async (number) => {
             nickname: nickname,
             password: password,
             pic_url: picUrl,
-            email: email.toLowerCase()
+            email: email.toLowerCase(),
+            created_at: new Date(),
+            updated_at: new Date()
         }
 
         users.push(user);

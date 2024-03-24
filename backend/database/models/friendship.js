@@ -17,11 +17,11 @@ module.exports = (sequelize) => {
   Friendship.init({
     requesting_user: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true
     },
     requested_user: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true
     },
     accepted: {
       type: DataTypes.BOOLEAN,
@@ -31,7 +31,12 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Friendship',
-    tableName: 'friendships'
+    tableName: 'friendships',
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deleted_at',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
   return Friendship;
 };
