@@ -13,10 +13,12 @@ module.exports = {
     const userFields = await models.User.findAll({attributes: ['id']});
     const eventFields = await models.Event.findAll({attributes: ['id']});
 
-    for (const eventField in eventFields) {
+    for (const i in eventFields) {
       const userId = getRandomItem(userFields).id
-      models.EventAssistant.create({
-        event: eventField.id,
+      const eventId = eventFields[i].id;
+
+      await models.EventAssistant.create({
+        event: eventId,
         user: userId,
         created_at: new Date(),
         updated_at: new Date()

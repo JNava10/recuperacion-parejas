@@ -3,7 +3,7 @@ const {fakerES} = require('@faker-js/faker');
 const models = require('../models/index');
 const {hashPassword} = require("../../helpers/common.helper");
 
-const get = (names) => {
+const make = (names) => {
     const roles = [];
 
     names.forEach(nameData => {
@@ -21,5 +21,5 @@ const get = (names) => {
 }
 
 module.exports = {
-    get
+    get: make
 }

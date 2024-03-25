@@ -15,12 +15,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   EventAssistant.init({
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
-    },
     user: {
       allowNull: false,
       type: DataTypes.INTEGER,

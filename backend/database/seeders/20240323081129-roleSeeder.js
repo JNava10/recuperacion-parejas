@@ -1,7 +1,7 @@
 'use strict';
 
 const models = require('../models/index');
-const {roleNames} = require("../../constants/auth.constants");
+const {roleNames} = require("../../constants/seed.constants");
 const roleFactory = require("../factories/role.factory");
 
 /** @type {import('sequelize-cli').Migration} */

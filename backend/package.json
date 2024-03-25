@@ -8,6 +8,7 @@
     "seed": "npx sequelize-cli db:seed:all",
     "rollback": "npx sequelize-cli db:migrate:undo:all",
     "refresh": "npm run rollback && npm run migrate && npm run seed",
+    "refresh-debug": "npm run rollback && npm run migrate && npx sequelize-cli db:seed:all --debug",
     "serve": "nodemon app/app"
   },
   "keywords": [],

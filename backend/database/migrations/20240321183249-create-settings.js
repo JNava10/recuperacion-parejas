@@ -7,19 +7,30 @@ module.exports = {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: false,
+        autoIncrement: true,
         allowNull: false,
       },
       name: {
         allowNull: false,
         type: DataTypes.STRING,
-        unique: true
+      },
+      description: {
+        allowNull: true,
+        type: DataTypes.STRING,
       },
       value: {
         allowNull: false,
         type: DataTypes.STRING,
-        unique: true
       },
+      type: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: {
+            tableName: models.SettingType.tableName
+          },
+          key: 'id'
+        }
+      }
     });
   },
   async down(queryInterface, Sequelize) {

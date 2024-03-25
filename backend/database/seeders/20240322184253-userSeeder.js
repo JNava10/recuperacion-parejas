@@ -9,6 +9,8 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     const users = await userFactory.get(3)
 
+    console.log(users);
+
     await queryInterface.bulkInsert(models.User.tableName, users, {});
 
     const userFields = await models.User.findAll({attributes: ['id']});

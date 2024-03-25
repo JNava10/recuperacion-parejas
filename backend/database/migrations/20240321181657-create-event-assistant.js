@@ -4,12 +4,6 @@ const {DataTypes} = require("sequelize");
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(models.EventAssistant.tableName, {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
-      },
       user: {
         allowNull: false,
         type: DataTypes.INTEGER,
