@@ -2,7 +2,6 @@ require('dotenv').config()
 const models = require('../models/index');
 const {settingTypes} = require("../../constants/seed.constants");
 
-
 const makeMany = async (settings) => {
     const typeIds = await models.SettingType.findAll();
     const makedSettings = [];

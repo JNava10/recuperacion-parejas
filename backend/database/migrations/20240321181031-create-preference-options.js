@@ -6,7 +6,6 @@ module.exports = {
     await queryInterface.createTable(models.PreferenceOption.tableName, {
       preference: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         autoIncrement: false,
         allowNull: false,
         references: {
@@ -19,12 +18,10 @@ module.exports = {
       option_name: {
         allowNull: false,
         type: DataTypes.STRING,
-        unique: true
       },
       option_value: {
         allowNull: false,
         type: DataTypes.INTEGER,
-        unique: true
       },
     });
   },

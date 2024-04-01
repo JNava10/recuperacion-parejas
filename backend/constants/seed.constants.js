@@ -1,4 +1,5 @@
 const {faker} = require('@faker-js/faker');
+const Preference = require("../classes/preference");
 
 // Información sobre los roles del sistema.
 const roleNames = {
@@ -46,10 +47,44 @@ const defaultSettings = [
         type: settingTypes.number,
         default: 400
     },
-]
+];
+
+// Preferencias creadas por defecto al iniciar el sistema. Luego se podrán agregar más si así se quiere.
+
+// Preferencias que podrá elegir el usuario
+
+const defaultPreferences = {
+    likeSports: {
+        name: 'deportista',
+        description: 'Gusto por las personas que hacen deporte.'
+    },
+
+    children: {
+        name: 'hijos',
+        description: 'Preferencia a la hora de querer o tener hijos.',
+        options: ['Quiero hijos', 'Tengo hijos', 'No tengo, pero quiero hijos', 'No quiero hijos.']
+    },
+
+    likePolitics: {
+        name: 'politico',
+        description: 'Gusto por los aficionados a la politica.',
+    },
+
+    likeArt: {
+        name: 'artista',
+        description: 'Gusto por las personas que tienen una afición artistica.'
+    },
+
+    interestScope: {
+        name: 'interés en',
+        description: 'Gusto según genero preferido.',
+        options: ['Hombre', 'Mujer', 'Ambos']
+    },
+}
 
 module.exports = {
     roleNames,
     settingTypes,
-    defaultSettings
+    defaultSettings,
+    defaultPreferences
 }

@@ -19,7 +19,6 @@ module.exports = {
 
       const settingsInserted =  await queryInterface.bulkInsert(models.Setting.tableName, settings, {})  === 1;
 
-
     }
   },
 

@@ -30,14 +30,25 @@ module.exports = (sequelize) => {
   Preference.init({
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       primaryKey: true,
       autoIncrement: true
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
+    description: {
+      type: DataTypes.STRING,
+    },
+    created_at: {
+      type: DataTypes.DATE
+    },
+    updated_at: {
+      type: DataTypes.DATE
+    },
+    deleted_at: {
+      type: DataTypes.DATE
+    }
+
   }, {
     sequelize,
     modelName: 'Preference',

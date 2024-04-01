@@ -6,9 +6,9 @@ const {getRandomItem} = require("../../helpers/common.helper");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const event = await eventFactory.get(3)
+    const events = await eventFactory.get(3)
 
-    await queryInterface.bulkInsert(models.Event.tableName, event, {});
+    await queryInterface.bulkInsert(models.Event.tableName, events, {});
 
     const userFields = await models.User.findAll({attributes: ['id']});
     const eventFields = await models.Event.findAll({attributes: ['id']});
