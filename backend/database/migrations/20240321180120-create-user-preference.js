@@ -28,7 +28,7 @@ module.exports = {
       },
       value: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.INTEGER
       },
     });
   },

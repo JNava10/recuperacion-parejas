@@ -10,7 +10,16 @@ const getRandomItem = (array) => {
     return array[index];
 }
 
+const getRandomFromRange = (min, max) => {
+    // Sacado de la pagina oficial de Mozilla.
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+}
+
 module.exports = {
     hashPassword,
-    getRandomItem
+    getRandomItem,
+    getRandomFromRange
 }

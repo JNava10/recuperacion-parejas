@@ -10,7 +10,9 @@ const make = async (preferences) => {
     for (const i in preferences) {
         const preference = preferences[i];
 
-        if (preference.options) {
+        console.log(preference)
+
+        if (preference.options.length > 0) {
             // Usando findOne no funciona, por algún motivo.
             const result = await models.sequelize.query(`SELECT id FROM preferences WHERE name = :name`,
                 {

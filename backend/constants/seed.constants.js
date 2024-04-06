@@ -1,5 +1,6 @@
 const {faker} = require('@faker-js/faker');
 const Preference = require("../classes/preference");
+const DefaultPreference = require("../classes/defaultPreference");
 
 // Información sobre los roles del sistema.
 const roleNames = {
@@ -22,6 +23,7 @@ const settingTypes = {
 };
 
 // Valores que alteran el funcionamiento del sistema, que pueden ser configurados por un Administrador.
+// TODO: Cambiar objetos dentro del array de formato JSON a instancias de clase.
 const defaultSettings = [
     {
         name: 'Foto de perfil por defecto',
@@ -54,32 +56,28 @@ const defaultSettings = [
 // Preferencias que podrá elegir el usuario
 
 const defaultPreferences = {
-    likeSports: {
-        name: 'deportista',
-        description: 'Gusto por las personas que hacen deporte.'
-    },
+    likeSports: new DefaultPreference(
+        'deportista',
+        'Gusto por las personas que hacen deporte.'
+    ),
 
-    children: {
-        name: 'hijos',
-        description: 'Preferencia a la hora de querer o tener hijos.',
-        options: ['Quiero hijos', 'Tengo hijos', 'No tengo, pero quiero hijos', 'No quiero hijos.']
-    },
+    children: new DefaultPreference('hijos',
+        'Preferencia a la hora de querer o tener hijos.',
+        ['Quiero hijos', 'Tengo hijos', 'No tengo, pero quiero hijos', 'No quiero hijos.']
+    ),
 
-    likePolitics: {
-        name: 'politico',
-        description: 'Gusto por los aficionados a la politica.',
-    },
+    likePolitics: new DefaultPreference('politico',
+        'Gusto por los aficionados a la politica.'
+    ),
 
-    likeArt: {
-        name: 'artista',
-        description: 'Gusto por las personas que tienen una afición artistica.'
-    },
+    likeArt: new DefaultPreference('artista',
+        'Gusto por las personas que tienen una afición artistica.'
+    ),
 
-    interestScope: {
-        name: 'interés en',
-        description: 'Gusto según genero preferido.',
-        options: ['Hombre', 'Mujer', 'Ambos']
-    },
+    interestScope: new DefaultPreference('interés en',
+        'Gusto según genero preferido.',
+        ['Hombre', 'Mujer', 'Ambos']
+    ),
 }
 
 module.exports = {
