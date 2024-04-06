@@ -6,13 +6,10 @@ class Server {
 
     constructor() {
         this.app = express();
-        this.authPath = `${process.env.API_ROOT_ENDPOINT}/auth`;
+        this.authPath = `/${process.env.API_ROOT_ENDPOINT}/auth`;
 
-        //Middlewares
         this.middlewares();
-
         this.routes();
-
     }
 
     middlewares() {
@@ -25,8 +22,8 @@ class Server {
     }
 
     listen() {
-        this.app.listen(process.env.PORT, () => {
-            console.log(`Servidor escuchando en: ${process.env.PORT}`);
+        this.app.listen(process.env.HOST_PORT, () => {
+            console.log(`Endpoint de la API: ${process.env.HOST_URL}:${process.env.HOST_PORT}/${process.env.API_ROOT_ENDPOINT}`);
         })
     }
 }
