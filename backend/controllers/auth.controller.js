@@ -11,6 +11,8 @@ class AuthController {
 
         const user = await UserQuery.findUserByEmail(email);
 
+        console.log('User:', user);
+
         if (!user) {
             return res.status(200).json(
                 new StdResponse(
@@ -19,7 +21,8 @@ class AuthController {
                 )
             )
         }
-        const passwordsMatch = compare(password, user.password);
+        
+        const passwordsMatch = await compare(password, user.password);
 
         if (!passwordsMatch) {
             return res.status(200).json(
