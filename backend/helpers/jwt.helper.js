@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const {response, request} = require('express')
+const StdResponse = require("../classes/stdResponse");
 
-const validarJWT = (req , res , next) => {
+const validateToken = (req , res , next) => {
     const token = req.header('x-token');
 
     if (!token){
@@ -9,16 +9,17 @@ const validarJWT = (req , res , next) => {
     }
 
     try {
-        
-        const {uid} = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
-        req.dniToken = uid;
-        console.log(uid);
-        console.log(token);
+        const {userId, userEmail} = jwt.verify(token, process.env.PRIVATE_KEY);
+        req.payload = {userId, userEmail};
         next();
-        
-    }catch(error){
-        console.log(error);
-        res.status(401).json({'msg':'Token no válido.'});
+    } catch(error){
+        console.error(error);
+        res.status(401).json(
+            new StdResponse(
+                'No se ha podido verificar el token correctamente.',
+                {auth: false}
+            )
+        );
     }
 }
 
@@ -27,5 +28,6 @@ const generateToken = (userId, userEmail) => {
 }
 
 module.exports = {
-    generateToken
+    generateToken,
+    validateToken
 }
