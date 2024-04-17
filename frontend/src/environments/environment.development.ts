@@ -1,5 +1,3 @@
 export const environment = {
-  apiHost: 'localhost',
-  apiPort: '8080',
-  apiRootEndpoint: 'api'
+  apiUrl: `http://localhost:8080/api`
 };

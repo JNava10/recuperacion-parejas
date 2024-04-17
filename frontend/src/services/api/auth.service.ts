@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
-import {LoginResponse, LoginResponseData} from "../../interfaces/auth/login";
+import {LoginRequest, LoginResponse, LoginResponseData} from "../../interfaces/auth/login";
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +13,14 @@ export class AuthService {
 
   apiUrl = environment.apiUrl;
 
-  sendLoginData(email: string, password: string) {
+  sendLoginData(email: string, password: string): Observable<LoginResponseData> {
     try {
-      let data: LoginResponseData | null;
+      const body: LoginRequest = {email, password}
 
-      if (!email || !password) throw new Error('Los datos a mandar no están definidos.');
-
-      const body = {email, password}
-
-
-      this.http.post(`${this.apiUrl}/auth/login`, body).subscribe((res: LoginResponse)  => {
-        data = res.data
-      })
+      return this.http.post<LoginResponseData>(`${this.apiUrl}/auth/login`, body)
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 }

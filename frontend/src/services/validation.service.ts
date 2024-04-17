@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AbstractControl} from "@angular/forms";
+import {AbstractControl, ValidatorFn} from "@angular/forms";
 import * as regex from "../utils/const/regex.constants";
 
 @Injectable({
@@ -16,6 +16,7 @@ export class ValidationService {
 
   isPassword(control: AbstractControl) {
     const valid = regex.PASSWORD_REGEX.test(control.value);
+    console.log(valid)
     return valid ? { isStrengthPassword: { value: control.value } } : null;
   }
 }
