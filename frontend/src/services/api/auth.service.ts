@@ -13,11 +13,11 @@ export class AuthService {
 
   apiUrl = environment.apiUrl;
 
-  sendLoginData(email: string, password: string): Observable<LoginResponseData> {
+  sendLoginData(email: string, password: string): Observable<LoginResponse> {
     try {
       const body: LoginRequest = {email, password}
 
-      return this.http.post<LoginResponseData>(`${this.apiUrl}/auth/login`, body)
+      return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, body)
     } catch (error) {
       console.error(error);
       throw error;

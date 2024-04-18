@@ -9,9 +9,9 @@ class AuthController {
         const email = req.body.email;
         const password = req.body.password;
 
-        const user = await UserQuery.findUserByEmail(email);
+        console.log('Body:', req.body)
 
-        console.log('User:', user);
+        const user = await UserQuery.findUserByEmail(email);
 
         if (!user) {
             return res.status(200).json(
@@ -34,6 +34,8 @@ class AuthController {
         }
 
         const token = generateToken(user.id, user.email);
+
+        console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
 
         return res.status(200).json(
             new StdResponse(

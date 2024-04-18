@@ -8,11 +8,31 @@ const roleNames = {
         name: 'admin', // Sería mejor idea introducir la estructura de estos objetos en una clase... (No estoy seguro)
         displayName: 'Admin'
     },
-    noAdmin: {
+    member: {
         name: 'member',
         displayName: 'Miembro'
     }
 }
+
+// Usuarios por defecto
+const customUsers = [
+    {
+        email: 'juannr2002@gmail.com',
+        name: 'Juan',
+        firstSurname: 'Navarrete',
+        secondSurname: 'Rivero',
+        nickname: 'nava',
+        roles:  [roleNames.admin.name]
+    },
+    {
+        email: 'jnava26@gmail.com',
+        name: 'Juan',
+        firstSurname: 'Navarrete',
+        secondSurname: 'Rivero',
+        nickname: 'nava2',
+        roles:  [roleNames.member.name]
+    }
+]
 
 // Tipos de configuración. Cada tipo es equivalente a un tipo de input HTML.
 const settingTypes = {
@@ -84,5 +104,6 @@ module.exports = {
     roleNames,
     settingTypes,
     defaultSettings,
-    defaultPreferences
+    defaultPreferences,
+    customUsers
 }

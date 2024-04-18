@@ -7,6 +7,7 @@ class UserQuery {
      * @returns {Promise<Model|null>}
      */
     static findUserByEmail = async (email) => {
+        console.log('Query email', email)
         return await models.User.findOne({where: {email: email}});
     }
 

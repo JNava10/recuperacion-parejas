@@ -19,7 +19,7 @@ export class ValidationService {
   isPassword = () => {
     return (control: AbstractControl): ValidationErrors | null => {
       const valid = regex.EMAIL_REGEX.test(control.value);
-      return valid ? { isEmail: { value: control.value } } : null;
+      return valid ? { password: { value: control.value } } : null;
     };
   }
 }

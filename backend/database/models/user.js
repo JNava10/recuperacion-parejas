@@ -88,6 +88,18 @@ module.exports = (sequelize) => {
     connected: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+    },
+    created_at: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updated_at: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    deleted_at: {
+      allowNull: true,
+      type: DataTypes.DATE
     }
   }, {
     sequelize,
@@ -95,9 +107,9 @@ module.exports = (sequelize) => {
     tableName: 'users',
     timestamps: true,
     paranoid: true,
-    deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
   });
   return User;
 };
