@@ -3,15 +3,29 @@
 const userFactory = require('../factories/user.factory');
 const {getRandomItem} = require("../../helpers/common.helper");
 const {fr} = require("@faker-js/faker");
+const {customUsers} = require("../../constants/seed.constants");
+const {createCustom} = require("../factories/user.factory");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const users = await userFactory.get(3)
+    const factoryUserList = await userFactory.get(3);
+    const customUserList = [];
 
-    console.log(users);
+    for (const customUser of customUsers) {
+      const user = await createCustom(
+          customUser.name,
+          customUser.firstSurname,
+          customUser.secondSurname,
+          customUser.nickname,
+          customUser.email
+      );
 
-    await queryInterface.bulkInsert(models.User.tableName, users, {});
+      customUserList.push(user)
+    }
+
+    // Con el spread operator podemos crear un array a partir de la copia de las dos listas de usuarios, para insertar todas de golpe.
+    await queryInterface.bulkInsert(models.User.tableName, [...factoryUserList, ...customUserList], {});
 
     const userFields = await models.User.findAll({attributes: ['id']});
 

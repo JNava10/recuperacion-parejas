@@ -2,6 +2,8 @@ require('dotenv').config()
 const {fakerES} = require('@faker-js/faker');
 const {hashPassword} = require("../../helpers/common.helper");
 const models = require("../models");
+const {roleNames} = require("../../constants/seed.constants");
+const UserSeed = require("../../classes/UserSeed");
 
 const get = async (number) => {
     const users = [];
@@ -15,17 +17,15 @@ const get = async (number) => {
         const email = `${nickname}@gmail.com`;
         const password = await hashPassword(process.env.DEFAULT_PASSWORD);
 
-        const user = {
-            name: name,
-            first_surname: firstSurname,
-            second_surname: lastSurname,
-            nickname: nickname,
-            password: password,
-            pic_url: picUrl,
-            email: email.toLowerCase(),
-            created_at: new Date(),
-            updated_at: new Date()
-        }
+        const user = new UserSeed(
+            name,
+            firstSurname,
+            lastSurname,
+            nickname,
+            password,
+            picUrl,
+            email,
+        );
 
         users.push(user);
     }
@@ -33,6 +33,31 @@ const get = async (number) => {
     return Promise.all(users)
 }
 
+/**
+ *
+ * @returns {Promise<UserSeed>}
+ * @param name
+ * @param firstSurname
+ * @param lastSurname
+ * @param nickname
+ * @param email
+ */
+const createCustom = async (name, firstSurname, lastSurname, nickname, email) => {
+    const picUrl = process.env.DEFAULT_PROFILE_PIC_URL;
+    const password = await hashPassword(process.env.DEFAULT_PASSWORD);
+
+    return new UserSeed(
+        name,
+        firstSurname,
+        lastSurname,
+        nickname,
+        password,
+        picUrl,
+        email,
+    );
+}
+
 module.exports = {
-    get
+    get,
+    createCustom
 }
