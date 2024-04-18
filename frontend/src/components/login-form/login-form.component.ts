@@ -56,6 +56,6 @@ export class LoginFormComponent {
 
   private handleToken = async (token: string) => {
     this.storageService.save('token', token);
-    await this.router.navigate(['/']);
+    await this.router.navigate(['/dashboard']);
   }
 }
