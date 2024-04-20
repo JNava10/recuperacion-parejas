@@ -2,7 +2,7 @@
 const models = require('../models/index');
 const typeFactory = require("../factories/settingType.factory");
 const settingFactory = require("../factories/setting.factory");
-const {settingTypes, defaultSettings} = require("../../constants/seed.constants");
+const {settingTypes, defaultSettings} = require("../../constants/seed.const");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

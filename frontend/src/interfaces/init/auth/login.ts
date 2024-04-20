@@ -1,4 +1,4 @@
-import {LoginRequest, LoginResponse, LoginResponseData} from "../../auth/login";
+import {LoginRequest, LoginResponse, LoginResponseData} from "../../api/auth/login";
 
 const loginRequest: LoginRequest = {
   email: '',
