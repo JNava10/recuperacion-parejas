@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
-import {LoginRequest, LoginResponse, LoginResponseData} from "../../interfaces/auth/login";
+import {LoginRequest, LoginResponse, LoginResponseData} from "../../interfaces/api/auth/login";
 import {Observable} from "rxjs";
 
 @Injectable({

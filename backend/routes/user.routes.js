@@ -5,6 +5,6 @@ const {validateToken} = require("../helpers/jwt.helper");
 const {isMD5} = require("validator");
 const router = Router();
 
-router.post('/find', UserController.findUser);
+router.post('/member/search', UserController.findUser);
 
 module.exports = router;
