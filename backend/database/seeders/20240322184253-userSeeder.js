@@ -3,7 +3,7 @@
 const userFactory = require('../factories/user.factory');
 const {getRandomItem} = require("../../helpers/common.helper");
 const {fr} = require("@faker-js/faker");
-const {customUsers} = require("../../constants/seed.constants");
+const {customUsers} = require("../../constants/seed.const");
 const {createCustom} = require("../factories/user.factory");
 
 /** @type {import('sequelize-cli').Migration} */

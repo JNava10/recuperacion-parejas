@@ -2,7 +2,7 @@ require('dotenv').config()
 const {fakerES} = require('@faker-js/faker');
 const {hashPassword} = require("../../helpers/common.helper");
 const models = require("../models");
-const {roleNames} = require("../../constants/seed.constants");
+const {roleNames} = require("../../constants/seed.const");
 const UserSeed = require("../../classes/UserSeed");
 
 const get = async (number) => {

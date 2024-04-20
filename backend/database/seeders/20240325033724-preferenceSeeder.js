@@ -4,7 +4,7 @@ const preferenceFactory = require('../factories/preference.factory');
 const valueFactory = require('../factories/preferenceValue.factory');
 const optionFactory = require('../factories/preferenceOption.factory');
 const userPreferenceFactory = require('../factories/userPreference.factory');
-const {defaultPreferences} = require('../../constants/seed.constants');
+const {defaultPreferences} = require('../../constants/seed.const');
 const {QueryTypes} = require("sequelize");
 
 /** @type {import('sequelize-cli').Migration} */

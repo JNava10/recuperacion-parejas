@@ -1,6 +1,6 @@
 const StdResponse = require("../classes/stdResponse");
 const UserQuery = require("../database/query/user.query");
-const {roleNames} = require("../constants/seed.constants");
+const {roleNames} = require("../constants/seed.const");
 
 const isAdmin = async (req, res, next) => {
     if (!req.payload) return res.status(400).json(
