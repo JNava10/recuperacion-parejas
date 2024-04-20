@@ -35,7 +35,7 @@ class UserQuery {
     }
 
     static findUserLikeFullname = async (input) => {
-        return await models.sequelize.query(findUserByFullname,  {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
+        return await models.sequelize.query(findUserByFullname, {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
     };
 }
 

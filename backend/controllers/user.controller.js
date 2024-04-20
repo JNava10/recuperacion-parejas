@@ -7,10 +7,11 @@ const StdResponse = require("../classes/stdResponse");
 class UserController {
     static findUser = async (req, res) => {
         const inputSearch = req.body.input;
+        const inputIsOneWord = inputSearch.split(" ").length > 1;
 
         let results;
 
-        if (inputSearch.split(" ").length > 1) results = await UserQuery.findUserLikeFullname(inputSearch);
+        if (inputIsOneWord) results = await UserQuery.findUserLikeFullname(inputSearch);
         else results = await UserQuery.findUserByNickOrName(inputSearch);
 
         return res.status(200).json(
