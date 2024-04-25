@@ -11,6 +11,7 @@ const validateToken = (req , res , next) => {
     try {
         const {userId, userEmail} = jwt.verify(token, process.env.PRIVATE_KEY);
         req.payload = {userId, userEmail};
+        console.log(req.payload)
         next();
     } catch(error){
         console.error(error);

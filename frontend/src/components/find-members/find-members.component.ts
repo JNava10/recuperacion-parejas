@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from "../../services/api/user.service";
-import {SearchResponse, User} from "../../interfaces/api/user/search";
+import {SearchResponse} from "../../interfaces/api/user/search";
 import {AvatarComponent} from "../avatar/avatar.component";
+import {Route, Router} from "@angular/router";
+import {User} from "../../interfaces/api/user/user";
 
 @Component({
   selector: 'app-find-members',
@@ -15,7 +17,7 @@ import {AvatarComponent} from "../avatar/avatar.component";
   styleUrl: './find-members.component.css'
 })
 export class FindMembersComponent {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   members?: User[];
   timeout?: NodeJS.Timeout;
@@ -32,6 +34,10 @@ export class FindMembersComponent {
   private handleInputValue = (value: string) => {
     if (value.length < 1 || value == " ") return;
     this.userService.searchMember(value).subscribe(this.showResults)
+  }
+
+  handleMemberSelection = async (member: User) => {
+    await this.router.navigate(['chat', {id: member.id}]);
   }
 
   private showResults = (body: SearchResponse) => {

@@ -1,4 +1,5 @@
 import {ApiResponse} from "../apiResponse";
+import {User} from "./user";
 
 export interface SearchResponse extends ApiResponse {
   data: {
@@ -7,15 +8,3 @@ export interface SearchResponse extends ApiResponse {
   }
 }
 
-export interface User {
-  id: number
-  email: string
-  name: string
-  first_surname: string
-  second_surname: string
-  nickname: string
-  pic_url: string
-  last_login: any
-  connected: boolean
-  created_at: string
-}

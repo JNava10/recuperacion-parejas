@@ -1,6 +1,10 @@
+
 const models = require('../models/index');
 const {findUserByNameOrNick, findUserByFullname} = require("../../constants/sql.const");
-const {QueryTypes} = require("sequelize");
+const {QueryTypes, Op} = require("sequelize");
+const QuerySuccess = require("../../classes/QuerySuccess");
+const QueryError = require("../../classes/QueryError");
+const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
 
 class UserQuery {
     /**
@@ -36,6 +40,50 @@ class UserQuery {
 
     static findUserLikeFullname = async (input) => {
         return await models.sequelize.query(findUserByFullname, {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
+    };
+
+    static findChatMessages = async (emitter, receiver) => {
+        try {
+            const query = await models.User.findOne({
+                where: {id: emitter},
+                include: {
+                    model: models.Message,
+                    where: {
+                        // Deben obtenerse los mensajes de ambos, por ello se obtienen los mensajes de uno u otros, independientemente de si son emisores o receptores.
+                        [Op.or]: [
+                            {[Op.and]: {emitter: emitter, receiver: receiver}},
+                            {[Op.and]: {emitter: receiver, receiver: emitter}}
+                        ]
+                    },
+                    as: 'messages'
+                }
+            });
+
+            return new QuerySuccess(true, query);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static pushMessage = async (emitter, receiver, text) => {
+        try {
+            const data = {
+                emitter,
+                receiver,
+                text,
+                read: false,
+                created_at: new Date(),
+                updated_at: new Date(),
+
+            };
+
+            const query = await models.Message.create(data);
+
+            return new QuerySuccess(true, query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
     };
 }
 

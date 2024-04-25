@@ -39,6 +39,18 @@ module.exports = {
         allowNull: false,
         default: false
       },
+      created_at: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      updated_at: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      deleted_at: {
+        allowNull: true,
+        type: DataTypes.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {
