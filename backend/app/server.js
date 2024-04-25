@@ -1,6 +1,8 @@
 const express = require('express');
 // const body_parser = require('body-parser');
 const cors = require('cors');
+const {events} = require("../constants/socket.const");
+const SocketController = require("../controllers/socket.controller");
 
 class Server {
 
@@ -8,14 +10,23 @@ class Server {
         this.app = express();
         this.authPath = `/${process.env.API_ROOT_ENDPOINT}/auth`;
         this.userPath = `/${process.env.API_ROOT_ENDPOINT}/user`;
+        this.server = require('http').createServer(this.app);
+        this.io = require('socket.io')(this.server, {
+            cors: {
+                origin: "http://localhost:4200",
+                methods: '*'
+            }
+        });
 
         this.middlewares();
         this.routes();
+        this.sockets();
     }
 
     middlewares() {
         this.app.use(cors());
         this.app.use(express.json());
+        this.app.use(express.static('public'));
     }
 
     routes(){
@@ -24,10 +35,15 @@ class Server {
     }
 
     listen() {
-        this.app.listen(process.env.HOST_PORT, () => {
-            console.log(`Endpoint de la API: ${process.env.HOST_URL}:${process.env.HOST_PORT}/${process.env.API_ROOT_ENDPOINT}`);
+        this.server.listen(process.env.HOST_PORT, () => {
+            console.log(`Endpoint de la API y Socket.io: ${process.env.HOST_URL}:${process.env.HOST_PORT}/${process.env.API_ROOT_ENDPOINT}`);
         })
     }
+
+    sockets(){
+        this.io.on('connection', SocketController.onConnect);
+    }
+
 }
 
 module.exports = Server;

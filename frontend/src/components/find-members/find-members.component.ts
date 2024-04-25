@@ -18,7 +18,7 @@ export class FindMembersComponent {
   constructor(private userService: UserService) {}
 
   members?: User[];
-  timeout?: number;
+  timeout?: NodeJS.Timeout;
 
   searchInput = new FormControl('');
 
