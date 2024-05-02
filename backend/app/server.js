@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const {events} = require("../constants/socket.const");
 const SocketController = require("../controllers/socket.controller");
+const {verifyToken} = require("../helpers/jwt.helper");
+const {authMiddleware} = require("../middlewares/socket.middleware");
 
 class Server {
 
@@ -41,6 +43,7 @@ class Server {
     }
 
     sockets(){
+        this.io.use(authMiddleware);
         this.io.on('connection', SocketController.onConnect);
     }
 

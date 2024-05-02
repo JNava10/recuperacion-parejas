@@ -11,12 +11,6 @@ import {SocketService} from "../../services/socket.service";
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
-  constructor(private socketService: SocketService) {
-  }
-
-  ngOnInit(): void {
-    this.socketService.sendMessage();
-  }
+export class DashboardComponent {
 
 }

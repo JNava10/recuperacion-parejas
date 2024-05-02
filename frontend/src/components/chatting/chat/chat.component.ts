@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MessageInputComponent} from "../message-input/message-input.component";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -7,6 +7,7 @@ import {User} from "../../../interfaces/api/user/user";
 import {ChatService} from "../../../services/api/chat.service";
 import {ChatMessages, Message, MessageUser} from "../../../interfaces/api/chat/message";
 import {MessagesComponent} from "../messages/messages.component";
+import {SocketService} from "../../../services/socket.service";
 
 @Component({
   selector: 'app-chat',
@@ -20,7 +21,7 @@ import {MessagesComponent} from "../messages/messages.component";
   styleUrl: './chat.component.css'
 })
 export class ChatComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private chatService: ChatService) {}
+  constructor(private route: ActivatedRoute, private chatService: ChatService, private socketService: SocketService) {}
 
   partnerId?: number
   partner?: MessageUser
@@ -45,4 +46,12 @@ export class ChatComponent implements OnInit {
 
     console.log(this.messages, this.partner)
   }
+
+  sendMessage = (text: string) => {
+    this.socketService.sendMessage(text, this.partner!.id!);
+  }
+
+  handleNewMessage = (text: string) => {
+    this.sendMessage(text)
+  };
 }
