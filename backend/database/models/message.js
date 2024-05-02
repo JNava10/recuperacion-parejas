@@ -12,7 +12,17 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.User);
+      this.belongsTo(models.User, {
+        as: 'userEmitter',
+        targetKey: 'id',
+        foreignKey: 'emitter'
+      })
+
+      this.belongsTo(models.User, {
+        as: 'receivedMessages',
+        foreignKey: 'receiver'
+      })
+
       this.hasMany(models.MessageFile, {
         foreignKey: 'message',
         as: 'files'

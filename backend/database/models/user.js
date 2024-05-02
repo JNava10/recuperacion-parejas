@@ -23,17 +23,15 @@ module.exports = (sequelize) => {
         as: 'events'
       });
 
-      this.belongsToMany(models.User, {
-        through: models.Message,
+      this.hasMany(models.Message, {
         foreignKey: 'emitter',
-        as: 'sendedMessages',
-      });
+        as: 'sendedMessages'
+      })
 
-      this.belongsToMany(models.User, {
-        through: models.Message,
-        foreignKey: 'receiver',
-        as: 'receivedMessages',
-      });
+      // this.hasMany(models.Message, {
+      //   foreignKey: 'receiver',
+      //   as: 'receivedMessages'
+      // })
 
       this.belongsToMany(models.User, {
         through: models.Friendship,

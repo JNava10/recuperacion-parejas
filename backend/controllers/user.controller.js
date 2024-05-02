@@ -34,7 +34,7 @@ class UserController {
         const receiverId = req.params.receiver;
         const emitterId = req.payload.userId;
 
-        const result = await UserQuery.findChatMessages(emitterId, receiverId)
+        const result = await UserQuery.findRecentChatMessages(emitterId, receiverId)
 
         if (result instanceof QuerySuccess) return res.status(200).json(
             new StdResponse(

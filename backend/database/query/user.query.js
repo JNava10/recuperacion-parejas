@@ -42,24 +42,27 @@ class UserQuery {
         return await models.sequelize.query(findUserByFullname, {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
     };
 
-    static findChatMessages = async (emitter, receiver) => {
+    static findRecentChatMessages = async (emitter, receiver) => {
         try {
-            const query = await models.User.findOne({
-                where: {id: emitter},
-                include: {
-                    model: models.Message,
-                    where: {
+
+            const emitterUser = await models.User.findOne({where: {id: emitter}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
+            const receiverUser = await models.User.findOne({where: {id: receiver}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
+
+            const messages = await models.Message.findAll({
+                where: {
+                    [Op.and]: [
                         // Deben obtenerse los mensajes de ambos, por ello se obtienen los mensajes de uno u otros, independientemente de si son emisores o receptores.
-                        [Op.or]: [
-                            {[Op.and]: {emitter: emitter, receiver: receiver}},
-                            {[Op.and]: {emitter: receiver, receiver: emitter}}
-                        ]
-                    },
-                    as: 'messages'
-                }
+                        {
+                            [Op.or]: [
+                                {emitter: emitter, receiver: receiver},
+                                {emitter: receiver, receiver: emitter},
+                            ]
+                        },
+                    ]
+                },
             });
 
-            return new QuerySuccess(true, query);
+            return new QuerySuccess(true, {emitterUser, receiverUser, messages});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
