@@ -31,13 +31,26 @@ class RoomController {
         const uuid = getUniqueId();
         const users = new Set();
 
-        this.socket.join(uuid);
-
-        users.add(this.userId);
-
         RoomController.rooms.set(uuid, users);
 
         return uuid;
+    }
+
+    leaveRoom = (uuid) => {
+        const userId = this.socket.user.userId;
+
+        this.socket.leave(uuid);
+
+        const roomUsers = RoomController.getRoom(uuid);
+
+        roomUsers.delete(userId);
+        RoomController.rooms.set(uuid, roomUsers);
+
+        console.log(`Usuario ${this.socket.user.userId} ha salido de la room ${uuid}`);
+
+        if (roomUsers.size === 0) {
+            RoomController.deleteRoom(uuid)
+        }
     }
 
     leaveAllRooms = () => {
@@ -45,12 +58,16 @@ class RoomController {
         const userRooms = rooms.filter(([uuid, users]) => users.has(this.socket.user.userId))
 
         userRooms.forEach(([roomUuid, roomUsers]) => {
-            this.socket.leave(roomUuid);
-            console.log(`Usuario ${this.socket.user.userId} saliendo de la room ${roomUuid}`)
+            this.leaveRoom(roomUuid)
         });
     }
 
+    static getRoom(uuid) {
+        return RoomController.rooms.get(uuid);
+    }
+
     joinRoom = (uuid) => {
+        console.log(`Metiendo al usuario ${this.socket.user.userId} en ${uuid}`)
         this.socket.join(uuid);
 
         const roomUsers = RoomController.rooms.get(uuid);
@@ -73,13 +90,23 @@ class RoomController {
 
         const roomUuid = firstRoomFree[0];
 
+        console.log(roomUuid)
+
         this.joinRoom(roomUuid)
 
-        return firstRoomFree;
+        return roomUuid;
     }
 
     findChatRoom = (receiverId) => {
-        return RoomController.rooms.find(room => room.users.includes(this.socket.user.userId) && room.users.includes(receiverId));
+        const rooms = [...RoomController.rooms.entries()];
+
+        const chatRoom = rooms.find(([uuid, users]) => users.has(this.socket.user.userId) && users.has(receiverId));
+
+        return chatRoom[0] // La primera posicion es el ID de la room.
+    }
+
+    static deleteRoom = (uuid) => {
+        RoomController.rooms.delete(uuid);
     }
 }
 

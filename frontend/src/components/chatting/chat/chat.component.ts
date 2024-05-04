@@ -41,7 +41,11 @@ export class ChatComponent implements OnInit {
       this.partnerId = Number(params.get('id')!);
     });
 
-    this.socketService.listenMessages((message: Message) => this.pushMessage(message));
+    this.socketService.listenMessages((message: Message) => {
+      console.log(message)
+      this.pushMessage(message)
+    });
+
     this.socketService.joinChat(this.partnerId!)
     this.chatService.getMessages(this.partnerId!).subscribe(this.getMessages);
 

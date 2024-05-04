@@ -44,7 +44,7 @@ class Server {
 
     sockets(){
         this.io.use(authMiddleware);
-        this.io.on('connection', SocketController.onConnect);
+        this.io.on('connection', (socket) => SocketController.onConnect(socket, this.io));
     }
 
 }

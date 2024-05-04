@@ -8,8 +8,6 @@ const authMiddleware = (socket, next) => {
 
     socket.user = user // Metemos el token en el objeto de socket.io para poder sacar el ID despues.
 
-    console.log(socket.user)
-
     next();
 };
 

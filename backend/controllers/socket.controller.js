@@ -1,12 +1,15 @@
-const {events} = require("../constants/socket.const");
 const MessageQuery = require("../database/query/message.query");
 const RoomController = require("./room.controller");
 
 class SocketController {
-    static onConnect = (socket) => {
+    static io;
+
+    static onConnect = (socket, io) => {
+        SocketController.io = io;
+
         socket.on('disconnect', () => SocketController.onDisconnect(socket))
         socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
-        socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params))
+        socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
         socket.on('leave-chat', async (params) => await SocketController.onLeaveChat(socket, params))
     }
 
@@ -23,9 +26,12 @@ class SocketController {
         const roomController = new RoomController(socket);
 
         const inserted = await MessageQuery.pushMessage(socket.user.userId, params.idToSend, params.text);
-        const room = roomController.findChatRoom(params.idToSend);
+        const roomUuid = roomController.findChatRoom(params.idToSend);
 
-        if (inserted) socket.to(room.uuid).emit('msg', inserted.query);
+        if (inserted) {
+            console.log(`Enviando mensaje a la room ${roomUuid}`)
+            SocketController.io.to(roomUuid).emit('msg', inserted.query)
+        }
     }
 
     static onJoinChat = async (socket, params) => {
@@ -34,15 +40,17 @@ class SocketController {
 
         const room = roomController.joinUserFreeRoom(params.receiverId);
 
-        if (!room) uuid = roomController.createRoom()
+        if (!room) {
+            uuid = roomController.createRoom()
+            roomController.joinRoom(uuid)
+        }
+
+        console.log('rooms socket', SocketController.io.sockets.adapter.rooms)
 
         socket.emit('join-chat', {joined: true, uuid});
-
-        console.log(RoomController.rooms)
     }
 
-    static onLeaveChat = async (socket, params) => {
-    }
+    static onLeaveChat = async (socket, params) => {}
 }
 
 module.exports = SocketController
