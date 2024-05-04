@@ -25,7 +25,6 @@ export class SocketService {
 
   joinChat = (receiverId: number) => {
     this.socket.emit('join-chat', {receiverId});
-    console.log('Se ha entrado al chat con ID', receiverId);
   }
 
   leaveChat = (uuid: string) => {

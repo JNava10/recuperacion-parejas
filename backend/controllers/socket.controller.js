@@ -26,12 +26,17 @@ class SocketController {
         const roomController = new RoomController(socket);
 
         const inserted = await MessageQuery.pushMessage(socket.user.userId, params.idToSend, params.text);
-        const roomUuid = roomController.findChatRoom(params.idToSend);
+        let roomUuid;
+        roomUuid = roomController.findChatRoom(params.idToSend);
 
-        if (inserted) {
-            console.log(`Enviando mensaje a la room ${roomUuid}`)
-            SocketController.io.to(roomUuid).emit('msg', inserted.query)
+        if (inserted && !roomUuid) {
+            roomUuid = roomController.getUserFreeRoom(socket.user.userId);
+        } else if (!inserted) {
+            return false
         }
+
+        console.log(`Enviando mensaje a la room ${roomUuid}`);
+        SocketController.io.to(roomUuid).emit('msg', inserted.query)
     }
 
     static onJoinChat = async (socket, params) => {
@@ -47,7 +52,7 @@ class SocketController {
 
         console.log('rooms socket', SocketController.io.sockets.adapter.rooms)
 
-        socket.emit('join-chat', {joined: true, uuid});
+        socket.emit('join-chat', {joined: true});
     }
 
     static onLeaveChat = async (socket, params) => {}

@@ -1,6 +1,7 @@
 const {events} = require("../constants/socket.const");
 const MessageQuery = require("../database/query/message.query");
 const { v4: getUniqueId } = require('uuid');
+const {fa} = require("@faker-js/faker");
 
 // Las Rooms son 'salas' que incluye Socket.io para poder enviar peticiones a usuarios especificos. Esto es genial para hacer un chat.
 // La idea que se ha planteado es que sea el backend el que se encargue de manejar estas rooms.
@@ -97,12 +98,25 @@ class RoomController {
         return roomUuid;
     }
 
+    getUserFreeRoom = (userFindingId) => {
+        const rooms = [...RoomController.rooms.entries()];
+        const firstRoomFree = rooms.find(([uuid, users]) => users.has(userFindingId))
+
+        if (!firstRoomFree) return false;
+
+        return firstRoomFree[0];
+    }
+
     findChatRoom = (receiverId) => {
         const rooms = [...RoomController.rooms.entries()];
 
         const chatRoom = rooms.find(([uuid, users]) => users.has(this.socket.user.userId) && users.has(receiverId));
 
-        return chatRoom[0] // La primera posicion es el ID de la room.
+        if (chatRoom) {
+            return chatRoom[0] // La primera posicion es el ID de la room.
+        } else {
+            return false;
+        }
     }
 
     static deleteRoom = (uuid) => {

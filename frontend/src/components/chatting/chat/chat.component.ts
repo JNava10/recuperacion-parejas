@@ -35,6 +35,7 @@ export class ChatComponent implements OnInit {
   emitter?: MessageUser
   receiver?: MessageUser
   roomUuid?: string
+  joined = false;
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -49,7 +50,7 @@ export class ChatComponent implements OnInit {
     this.socketService.joinChat(this.partnerId!)
     this.chatService.getMessages(this.partnerId!).subscribe(this.getMessages);
 
-    this.socketService.listenJoinChat((params: ChatJoin) => this.handleJoining(params))
+    this.socketService.listenJoinChat((params: ChatJoin) => this.handleJoining(params));
   }
 
   private getMessages = (body: ChatMessages) => {
@@ -72,7 +73,7 @@ export class ChatComponent implements OnInit {
 
   handleJoining = (params: ChatJoin) => {
     if (params.joined) {
-      this.roomUuid = params.uuid
+      this.joined = params.joined
       console.log('uuid', this.roomUuid)
     }
   }
