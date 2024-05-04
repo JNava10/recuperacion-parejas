@@ -5,6 +5,7 @@ const {compare} = require("bcrypt");
 const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
+const {findRecentChatMessages} = require("../database/query/message.query");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -34,7 +35,7 @@ class UserController {
         const receiverId = req.params.receiver;
         const emitterId = req.payload.userId;
 
-        const result = await UserQuery.findRecentChatMessages(emitterId, receiverId)
+        const result = await findRecentChatMessages(emitterId, receiverId)
 
         if (result instanceof QuerySuccess) return res.status(200).json(
             new StdResponse(

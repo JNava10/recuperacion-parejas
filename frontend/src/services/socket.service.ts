@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 import {environment} from "../environments/environment.development";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {StorageService} from "./storage.service";
+import {Message} from "../interfaces/api/chat/message";
 @Injectable({
   providedIn: 'root'
 })
@@ -22,7 +23,21 @@ export class SocketService {
     console.log('Mensaje enviado al usuario con ID', idToSend);
   }
 
-  emitWithToken = (data: any) => {
+  joinChat = (receiverId: number) => {
+    this.socket.emit('join-chat', {receiverId});
+    console.log('Se ha entrado al chat con ID', receiverId);
+  }
 
+  leaveChat = (uuid: string) => {
+
+    this.socket.emit('leave-chat', {uuid});
+  }
+
+  listenMessages = (callback: Function) => {
+    this.socket.on('msg', (inserted) => callback(inserted));
+  }
+
+  listenJoinChat = (callback: Function) => {
+    this.socket.on('join-chat', (inserted) => callback(inserted));
   }
 }

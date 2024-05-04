@@ -15,7 +15,4 @@ export class ChatService {
   getMessages = (partnerId: number) => {
     return this.http.get<ChatMessages>(`${environment.apiUrl}/user/member/messages/${partnerId}`, {params: {...sendTokenParam}});
   }
-
-
-
 }
