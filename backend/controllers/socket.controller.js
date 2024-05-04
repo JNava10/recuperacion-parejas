@@ -52,6 +52,18 @@ class SocketController {
 
         console.log('rooms socket', SocketController.io.sockets.adapter.rooms)
 
+        const unreadedMessages = await MessageQuery.getUnreadedMessages(socket.user.userId, params.receiverId);
+        const readedMessages = [];
+
+        if (unreadedMessages.query.length > 0) {
+            unreadedMessages.query.forEach(message => {
+                MessageQuery.markMessageAsReaded(message.id);
+                readedMessages.push(message.id);
+            });
+
+            socket.emit('message-read', {readedMessages});
+        }
+
         socket.emit('join-chat', {joined: true});
     }
 

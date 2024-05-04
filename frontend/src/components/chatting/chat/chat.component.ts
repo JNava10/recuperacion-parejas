@@ -8,7 +8,7 @@ import {ChatService} from "../../../services/api/chat.service";
 import {ChatMessages, Message, MessageUser} from "../../../interfaces/api/chat/message";
 import {MessagesComponent} from "../messages/messages.component";
 import {SocketService} from "../../../services/socket.service";
-import {ChatJoin} from "../../../interfaces/socket/chat";
+import {ChatJoin, MessagesRead} from "../../../interfaces/socket/chat";
 import {StorageService} from "../../../services/storage.service";
 
 @Component({
@@ -31,7 +31,7 @@ export class ChatComponent implements OnInit {
   partner?: MessageUser
   self?: MessageUser
 
-  messages: Message[] = [];
+  messages: Map<number, Message> = new Map();
   emitter?: MessageUser
   receiver?: MessageUser
   roomUuid?: string
@@ -54,7 +54,10 @@ export class ChatComponent implements OnInit {
   }
 
   private getMessages = (body: ChatMessages) => {
-    this.messages = body.data.query.messages;
+    body.data.query.messages.forEach(message => {
+      this.messages.set(message.id, message)
+    });
+
     this.partner = body.data.query.receiverUser;
     this.self = body.data.query.emitterUser;
   }
@@ -64,7 +67,7 @@ export class ChatComponent implements OnInit {
   }
 
   pushMessage = (message: Message) => {
-    this.messages.push(message)
+    this.messages.set(message.id, message)
   }
 
   handleNewMessage = (text: string) => {
@@ -75,6 +78,14 @@ export class ChatComponent implements OnInit {
     if (params.joined) {
       this.joined = params.joined
       console.log('uuid', this.roomUuid)
+    }
+  }
+
+  handleMessagesRead = (params: MessagesRead) => {
+    if (params.messages) {
+      params.messages.forEach(messageId => {
+
+      })
     }
   }
 }

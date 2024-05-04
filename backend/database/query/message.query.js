@@ -52,6 +52,36 @@ class MessageQuery {
             return new QueryError(false, e)
         }
     };
+
+    static getUnreadedMessages = async (emitter, receiver) => {
+        try {
+            const query = await models.Message.findAll({
+                where: {
+                    [Op.and]: [
+                        {emitter},
+                        {receiver},
+                        {read: false}
+                    ]
+                }, attributes: ['id']
+            });
+
+            return new QuerySuccess(true, query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static markMessageAsReaded = async (id) => {
+        try {
+            const query = await models.Message.update({read: true}, {where: {id}});
+
+            return new QuerySuccess(true, query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+
 }
 
 module.exports = MessageQuery;

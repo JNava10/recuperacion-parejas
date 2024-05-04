@@ -14,7 +14,8 @@ import {PartnerMessageBubbleComponent} from "../partner-message-bubble/partner-m
   styleUrl: './messages.component.css'
 })
 export class MessagesComponent {
-  @Input() messages?: Message[];
+  @Input() messages: Map<number, Message> = new Map();
+
   @Input() self?: MessageUser;
   @Input() partner?: MessageUser;
 

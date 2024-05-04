@@ -39,4 +39,9 @@ export class SocketService {
   listenJoinChat = (callback: Function) => {
     this.socket.on('join-chat', (inserted) => callback(inserted));
   }
+
+  listenReadMessages = (callback: Function) => {
+    this.socket.on('join-chat', (inserted) => callback(inserted));
+  }
+
 }
