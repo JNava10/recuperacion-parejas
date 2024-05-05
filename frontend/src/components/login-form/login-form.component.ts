@@ -3,7 +3,7 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {ValidationService} from "../../services/validation.service";
 import {AuthService} from "../../services/api/auth.service";
 import {NgIf} from "@angular/common";
-import {FormErrorComponent} from "../messages/form-error/form-error.component";
+// import {FormErrorComponent} from "../messages/form-error/form-error.component";
 import {MessageService} from "primeng/api";
 import {MessagesModule} from "primeng/messages";
 import {StorageService} from "../../services/storage.service";
@@ -15,7 +15,7 @@ import {Router} from "@angular/router";
   imports: [
     ReactiveFormsModule,
     NgIf,
-    FormErrorComponent,
+    // FormErrorComponent,
     MessagesModule,
   ],
   providers: [MessageService],

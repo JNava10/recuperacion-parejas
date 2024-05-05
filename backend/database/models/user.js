@@ -24,9 +24,14 @@ module.exports = (sequelize) => {
       });
 
       this.hasMany(models.Message, {
-        foreignKey: 'user',
-        as: 'messages',
-      });
+        foreignKey: 'emitter',
+        as: 'sendedMessages'
+      })
+
+      // this.hasMany(models.Message, {
+      //   foreignKey: 'receiver',
+      //   as: 'receivedMessages'
+      // })
 
       this.belongsToMany(models.User, {
         through: models.Friendship,
@@ -110,7 +115,6 @@ module.exports = (sequelize) => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
-    defaultScope: {attributes: {exclude: ['password']}}
   });
   return User;
 };

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FindMembersComponent} from "../../components/find-members/find-members.component";
+import {SocketService} from "../../services/socket.service";
 
 @Component({
   selector: 'app-dashboard',
