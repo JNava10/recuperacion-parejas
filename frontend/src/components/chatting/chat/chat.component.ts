@@ -25,8 +25,6 @@ import {StorageService} from "../../../services/storage.service";
 export class ChatComponent implements OnInit {
   constructor(private route: ActivatedRoute, private chatService: ChatService, private socketService: SocketService) { }
 
-
-
   partnerId?: number
   partner?: MessageUser
   self?: MessageUser
@@ -43,14 +41,15 @@ export class ChatComponent implements OnInit {
     });
 
     this.socketService.listenMessages((message: Message) => {
-      console.log(message)
       this.pushMessage(message)
+      this.socketService.sendMessageRead(this.partnerId!);
     });
 
     this.socketService.joinChat(this.partnerId!)
     this.chatService.getMessages(this.partnerId!).subscribe(this.getMessages);
 
     this.socketService.listenJoinChat((params: ChatJoin) => this.handleJoining(params));
+    this.socketService.listenReadMessages((params: MessagesRead) => this.handleMessagesRead(params));
   }
 
   private getMessages = (body: ChatMessages) => {
@@ -82,9 +81,17 @@ export class ChatComponent implements OnInit {
   }
 
   handleMessagesRead = (params: MessagesRead) => {
-    if (params.messages) {
-      params.messages.forEach(messageId => {
+    console.log('Hay mensajes no leidos')
 
+    if (params.messages) {
+      console.log('a')
+
+      params.messages.forEach(messageId => {
+        const message = this.messages.get(messageId);
+
+        message!.read = true;
+
+        this.messages.set(messageId, message!);
       })
     }
   }

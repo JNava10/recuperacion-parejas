@@ -11,6 +11,7 @@ class SocketController {
         socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
         socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
         socket.on('leave-chat', async (params) => await SocketController.onLeaveChat(socket, params))
+        socket.on('message-read', async (params) => await SocketController.onMessageRead(socket, params))
     }
 
     static onDisconnect = (socket) => {
@@ -37,6 +38,26 @@ class SocketController {
 
         console.log(`Enviando mensaje a la room ${roomUuid}`);
         SocketController.io.to(roomUuid).emit('msg', inserted.query)
+    }
+
+    static onMessageRead = async (socket, params) => {
+        const roomController = new RoomController(socket);
+        const receiverId =  params.receiverId;
+
+        const unreadedMessages = await MessageQuery.getUnreadedMessages(socket.user.userId, receiverId);
+        const readedMessages = [];
+        const roomUuid = roomController.findChatRoom(receiverId);
+
+        console.log('Hay mensajes leidos')
+
+        if (unreadedMessages.query.length > 0) {
+            unreadedMessages.query.forEach(message => {
+                MessageQuery.markMessageAsReaded(message.id);
+                readedMessages.push(message.id);
+            });
+
+            this.io.to(roomUuid).emit('message-read', {messages: readedMessages});
+        }
     }
 
     static onJoinChat = async (socket, params) => {

@@ -27,9 +27,8 @@ export class SocketService {
     this.socket.emit('join-chat', {receiverId});
   }
 
-  leaveChat = (uuid: string) => {
-
-    this.socket.emit('leave-chat', {uuid});
+  sendMessageRead = (receiverId: number) => {
+    this.socket.emit('message-read', {receiverId});
   }
 
   listenMessages = (callback: Function) => {
@@ -41,7 +40,6 @@ export class SocketService {
   }
 
   listenReadMessages = (callback: Function) => {
-    this.socket.on('join-chat', (inserted) => callback(inserted));
+    this.socket.on('message-read', (inserted) => callback(inserted));
   }
-
 }
