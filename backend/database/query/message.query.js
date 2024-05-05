@@ -58,8 +58,8 @@ class MessageQuery {
             const query = await models.Message.findAll({
                 where: {
                     [Op.and]: [
-                        {emitter},
-                        {receiver},
+                        {emitter: emitter},
+                        {receiver: receiver},
                         {read: false}
                     ]
                 }, attributes: ['id']

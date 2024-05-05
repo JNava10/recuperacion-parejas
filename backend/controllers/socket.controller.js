@@ -44,7 +44,10 @@ class SocketController {
         const roomController = new RoomController(socket);
         const receiverId =  params.receiverId;
 
-        const unreadedMessages = await MessageQuery.getUnreadedMessages(socket.user.userId, receiverId);
+        const unreadedMessages = await MessageQuery.getUnreadedMessages(params.receiverId, socket.user.userId);
+
+        console.log(socket.user, receiverId)
+
         const readedMessages = [];
         const roomUuid = roomController.findChatRoom(receiverId);
 
@@ -73,8 +76,10 @@ class SocketController {
 
         console.log('rooms socket', SocketController.io.sockets.adapter.rooms)
 
-        const unreadedMessages = await MessageQuery.getUnreadedMessages(socket.user.userId, params.receiverId);
+        const unreadedMessages = await MessageQuery.getUnreadedMessages(params.receiverId, socket.user.userId);
         const readedMessages = [];
+
+        console.log(unreadedMessages.query.length)
 
         if (unreadedMessages.query.length > 0) {
             unreadedMessages.query.forEach(message => {
@@ -82,7 +87,9 @@ class SocketController {
                 readedMessages.push(message.id);
             });
 
-            socket.emit('message-read', {readedMessages});
+            console.log(`Hay mensajes no leidos`, readedMessages);
+
+            this.io.to(uuid).emit('message-read', {messages: readedMessages});
         }
 
         socket.emit('join-chat', {joined: true});

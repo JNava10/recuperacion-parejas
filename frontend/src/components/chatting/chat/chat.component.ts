@@ -81,7 +81,7 @@ export class ChatComponent implements OnInit {
   }
 
   handleMessagesRead = (params: MessagesRead) => {
-    console.log('Hay mensajes no leidos')
+    console.log('Se han leido tus mensajes enviados anteriormente')
 
     if (params.messages) {
       console.log('a')
