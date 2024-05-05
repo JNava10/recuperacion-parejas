@@ -73,7 +73,7 @@ class RoomController {
 
         const roomUsers = RoomController.rooms.get(uuid);
 
-        roomUsers.add(this.socket.user.userId)
+        roomUsers.add(this.socket.user.userId);
 
         RoomController.rooms.set(uuid, roomUsers);
     }
@@ -81,26 +81,24 @@ class RoomController {
     joinUserFreeRoom = (userFindingId) => {
         if (userFindingId === this.socket.user.userId) {
             console.warn('No puedes incluirte a ti mismo.');
-            return false
+            return false;
         }
 
         const rooms = [...RoomController.rooms.entries()];
-        const firstRoomFree = rooms.find(([uuid, users]) => users.has(userFindingId))
+        const firstRoomFree = rooms.find(([uuid, users]) => users.has(userFindingId));
 
         if (!firstRoomFree) return false;
 
         const roomUuid = firstRoomFree[0];
 
-        console.log(roomUuid)
-
-        this.joinRoom(roomUuid)
+        this.joinRoom(roomUuid);
 
         return roomUuid;
     }
 
     getUserFreeRoom = (userFindingId) => {
         const rooms = [...RoomController.rooms.entries()];
-        const firstRoomFree = rooms.find(([uuid, users]) => users.has(userFindingId))
+        const firstRoomFree = rooms.find(([uuid, users]) => users.has(userFindingId));
 
         if (!firstRoomFree) return false;
 

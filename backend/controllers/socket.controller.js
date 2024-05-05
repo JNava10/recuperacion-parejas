@@ -44,17 +44,13 @@ class SocketController {
         const roomController = new RoomController(socket);
         const receiverId =  params.receiverId;
 
-        const unreadedMessages = await MessageQuery.getUnreadedMessages(params.receiverId, socket.user.userId);
-
-        console.log(socket.user, receiverId)
+        const unreadMessages = await MessageQuery.getUnreadedMessages(params.receiverId, socket.user.userId);
 
         const readedMessages = [];
         const roomUuid = roomController.findChatRoom(receiverId);
 
-        console.log('Hay mensajes leidos')
-
-        if (unreadedMessages.query.length > 0) {
-            unreadedMessages.query.forEach(message => {
+        if (unreadMessages.query.length > 0) {
+            unreadMessages.query.forEach(message => {
                 MessageQuery.markMessageAsReaded(message.id);
                 readedMessages.push(message.id);
             });
@@ -67,19 +63,17 @@ class SocketController {
         const roomController = new RoomController(socket);
         let uuid;
 
-        const room = roomController.joinUserFreeRoom(params.receiverId);
+        uuid = roomController.joinUserFreeRoom(params.receiverId);
 
-        if (!room) {
-            uuid = roomController.createRoom()
-            roomController.joinRoom(uuid)
+        if (!uuid) {
+            uuid = roomController.createRoom();
+            roomController.joinRoom(uuid);
         }
 
-        console.log('rooms socket', SocketController.io.sockets.adapter.rooms)
+        console.log('rooms socket', SocketController.io.sockets.adapter.rooms);
 
         const unreadedMessages = await MessageQuery.getUnreadedMessages(params.receiverId, socket.user.userId);
         const readedMessages = [];
-
-        console.log(unreadedMessages.query.length)
 
         if (unreadedMessages.query.length > 0) {
             unreadedMessages.query.forEach(message => {
@@ -87,9 +81,11 @@ class SocketController {
                 readedMessages.push(message.id);
             });
 
-            console.log(`Hay mensajes no leidos`, readedMessages);
+            console.log(uuid);
 
             this.io.to(uuid).emit('message-read', {messages: readedMessages});
+
+            console.log('Se ha emitido la lectura de los mensajes:', {messages: readedMessages});
         }
 
         socket.emit('join-chat', {joined: true});

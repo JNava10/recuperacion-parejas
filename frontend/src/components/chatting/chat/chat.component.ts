@@ -51,7 +51,6 @@ export class ChatComponent implements OnInit {
     this.socketService.listenJoinChat((params: ChatJoin) => this.handleJoining(params));
     this.socketService.listenReadMessages((params: MessagesRead) => this.handleMessagesRead(params));
   }
-
   private getMessages = (body: ChatMessages) => {
     body.data.query.messages.forEach(message => {
       this.messages.set(message.id, message)
@@ -81,9 +80,8 @@ export class ChatComponent implements OnInit {
   }
 
   handleMessagesRead = (params: MessagesRead) => {
-    console.log('Se han leido tus mensajes enviados anteriormente')
-
     if (params.messages) {
+      console.log('Se han leido tus mensajes enviados anteriormente', params.messages);
       console.log('a')
 
       params.messages.forEach(messageId => {

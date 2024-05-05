@@ -32,14 +32,14 @@ export class SocketService {
   }
 
   listenMessages = (callback: Function) => {
-    this.socket.on('msg', (inserted) => callback(inserted));
+    this.socket.on('msg', (params) => callback(params));
   }
 
   listenJoinChat = (callback: Function) => {
-    this.socket.on('join-chat', (inserted) => callback(inserted));
+    this.socket.on('join-chat', (params) => callback(params));
   }
 
   listenReadMessages = (callback: Function) => {
-    this.socket.on('message-read', (inserted) => callback(inserted));
+    this.socket.on('message-read', (params) => callback(params));
   }
 }
