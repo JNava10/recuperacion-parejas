@@ -4,9 +4,32 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "migrate": "npx sequelize-cli db:migrate",
+    "seed": "npx sequelize-cli db:seed:all",
+    "rollback": "npx sequelize-cli db:migrate:undo:all",
+    "refresh": "npm run rollback && npm run migrate && npm run seed",
+    "refresh-debug": "npm run rollback && npm run migrate && npx sequelize-cli db:seed:all --debug",
+    "serve": "nodemon app/app"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@cloudinary/url-gen": "^1.19.0",
+    "@faker-js/faker": "^8.4.1",
+    "bcrypt": "^5.1.1",
+    "cloudinary": "^2.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.1",
+    "express-fileupload": "^1.5.0",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.2",
+    "pdf-puppeteer": "^1.1.11",
+    "sequelize": "^6.37.1",
+    "sequelize-cli": "^6.6.2",
+    "socket.io": "^4.7.5",
+    "uuid": "^9.0.1"
+  }
 }
