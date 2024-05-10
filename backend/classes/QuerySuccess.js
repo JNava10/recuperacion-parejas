@@ -1,6 +1,7 @@
 class QuerySuccess {
-    constructor(executed, query = null) {
+    constructor(executed, message, query = null) {
         this.executed = executed;
+        this.message = message;
         this.query = query;
     }
 }
