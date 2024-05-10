@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {Component, EventEmitter, Output} from '@angular/core';
+import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {CalendarModule} from "primeng/calendar";
 import {CreateEventValues} from "../../../interfaces/forms/events/events";
 import {EventService} from "../../../services/api/event.service";
@@ -18,10 +18,12 @@ export class CreateEventComponent {
   constructor(private eventService: EventService) {
   }
 
+  @Output() created = new EventEmitter<boolean>();
+
   createEventForm = new FormGroup({
-    name: new FormGroup(''),
-    description: new FormGroup(''),
-    scheduledDate: new FormGroup('')
+    name: new FormControl(''),
+    description: new FormControl(''),
+    scheduledDate: new FormControl('')
   })
 
   handleCreateForm = () => {
@@ -29,11 +31,15 @@ export class CreateEventComponent {
     const event: CreateEventValues = {
       name: formData.name!,
       description: formData.description!,
-      scheduledDate: formData.scheduledDate!
+      scheduledDate: formData.scheduledDate!,
+      picUrl: "https://cdn-9.motorsport.com/images/amp/YpNpMWJ0/s1000/ferrari-f1-75-con-paraspruzzi.jpg",
+      summaryUrl: "https://www.fia.com/sites/default/files/fia_2024_formula_1_technical_regulations_-_issue_1_-_2023-04-25.pdf" ,
+      latitude: 10.1,
+      longitude: 10.2
     }
 
     this.eventService.createEvent(event).subscribe(body => {
-      body.data.query
+      this.created.emit(body.data.executed)
     })
   };
 }

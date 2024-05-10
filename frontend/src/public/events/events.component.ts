@@ -13,5 +13,9 @@ import {FormsModule} from "@angular/forms";
   styleUrl: './events.component.css'
 })
 export class EventsComponent {
+  creating = false;
 
+  handleEventCreated = (created: boolean) => {
+
+  };
 }
