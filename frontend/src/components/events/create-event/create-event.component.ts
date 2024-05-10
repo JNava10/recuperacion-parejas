@@ -6,6 +6,7 @@ import {EventService} from "../../../services/api/event.service";
 import {} from "googlemaps";
 import MapMouseEvent = google.maps.MapMouseEvent;
 import * as regex from '../../../utils/const/regex.constants';
+import {NgIf} from "@angular/common";
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -17,7 +18,8 @@ let latLng = {
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CalendarModule
+    CalendarModule,
+    NgIf
   ],
   templateUrl: './create-event.component.html',
   styleUrl: './create-event.component.css'
@@ -26,6 +28,7 @@ export class CreateEventComponent implements OnInit {
   constructor(private eventService: EventService) {}
   ngOnInit(): void {
     this.initMap()
+
   }
 
   static modalId = "create-event-modal";
@@ -38,9 +41,9 @@ export class CreateEventComponent implements OnInit {
   center: google.maps.LatLngLiteral = latLng;
 
   createEventForm = new FormGroup({
-    name: new FormControl('', [
-      Validators.required, Validators.pattern(regex.createEvent.name)
-    ]),
+    name: new FormControl('', {validators: [
+        Validators.required, Validators.pattern(regex.createEvent.name),
+      ], updateOn: "submit"}),
     description: new FormControl('', [
       Validators.required, Validators.pattern(regex.createEvent.description)
     ]),
@@ -48,7 +51,7 @@ export class CreateEventComponent implements OnInit {
       Validators.required, Validators.pattern(regex.createEvent.scheduledDate)
     ]),
     latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
-  });
+  }, {updateOn: "submit"});
 
   initMap(): void {
     this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
@@ -75,7 +78,6 @@ export class CreateEventComponent implements OnInit {
   @Output() created = new EventEmitter<boolean>();
 
   handleCreateForm = (mouseEvent: MouseEvent) => {
-    console.log(this.createEventForm.value.scheduledDate)
     const validations = {
       name: regex.createEvent.name.test(this.createEventForm.value.name!),
       description: regex.createEvent.description.test(this.createEventForm.value.description!),
@@ -88,7 +90,6 @@ export class CreateEventComponent implements OnInit {
     const createBtn = mouseEvent.target as Element;
 
     createBtn.setAttribute('data-modal-hide', CreateEventComponent.modalId);
-
 
     const formData = this.createEventForm.value;
     const event: CreateEventValues = {
