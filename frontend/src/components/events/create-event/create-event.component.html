@@ -11,7 +11,7 @@
     <label for="scheduledDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha del evento</label>
     <div class="relative max-w-sm">
       <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none dark:text-gray-500"><i class="fa-solid fa-calendar-days"></i></div>
-      <input datepicker datepicker-autohide type="text" formControlName="scheduledDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+      <input datepicker datepicker-autohide type="text" id="scheduledDate" formControlName="scheduledDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Selecciona una fecha">
     </div>
   </div>
   <div id="map" style="width:100%;height:400px"></div>
@@ -28,5 +28,5 @@
     </label>
   </div>
 
-  <button type="submit" data-modal-hide="create-event-modal" (click)="handleCreateForm()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Crear evento</button>
+  <button type="submit" (click)="handleCreateForm($event)" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Crear evento</button>
 </form>

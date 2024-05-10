@@ -5,6 +5,7 @@ import {CreateEventValues} from "../../../interfaces/forms/events/events";
 import {EventService} from "../../../services/api/event.service";
 import {} from "googlemaps";
 import MapMouseEvent = google.maps.MapMouseEvent;
+import * as regex from '../../../utils/const/regex.constants';
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -27,6 +28,8 @@ export class CreateEventComponent implements OnInit {
     this.initMap()
   }
 
+  static modalId = "create-event-modal";
+
   private mapMarker?: google.maps.Marker;
 
   // Esto es necesario para poder mostrar el mapa.
@@ -36,15 +39,15 @@ export class CreateEventComponent implements OnInit {
 
   createEventForm = new FormGroup({
     name: new FormControl('', [
-      Validators.required, Validators.pattern(/[A-Za-z]{1,18}$/)
+      Validators.required, Validators.pattern(regex.createEvent.name)
     ]),
     description: new FormControl('', [
-      Validators.required, Validators.pattern(/[A-Za-z]{1,18}$/)
+      Validators.required, Validators.pattern(regex.createEvent.description)
     ]),
     scheduledDate: new FormControl('', [
-      Validators.required, Validators.pattern(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$/)
+      Validators.required, Validators.pattern(regex.createEvent.scheduledDate)
     ]),
-    latLng: new FormControl({lat: 0, lng: 0})
+    latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
   });
 
   initMap(): void {
@@ -66,14 +69,27 @@ export class CreateEventComponent implements OnInit {
         map: this.map,
         title: `Lugar del evento`,
       });
-
-      console.log(this.createEventForm.value.latLng);
     });
   }
 
   @Output() created = new EventEmitter<boolean>();
 
-  handleCreateForm = () => {
+  handleCreateForm = (mouseEvent: MouseEvent) => {
+    console.log(this.createEventForm.value.scheduledDate)
+    const validations = {
+      name: regex.createEvent.name.test(this.createEventForm.value.name!),
+      description: regex.createEvent.description.test(this.createEventForm.value.description!),
+      scheduledDate: regex.createEvent.scheduledDate.test(this.createEventForm.value.scheduledDate!),
+    }
+
+    console.table(validations)
+    if (!this.createEventForm.valid) return
+
+    const createBtn = mouseEvent.target as Element;
+
+    createBtn.setAttribute('data-modal-hide', CreateEventComponent.modalId);
+
+
     const formData = this.createEventForm.value;
     const event: CreateEventValues = {
       name: formData.name!,

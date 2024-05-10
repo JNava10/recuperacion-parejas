@@ -18,4 +18,5 @@ export class EventsComponent {
   handleEventCreated = (created: boolean) => {
 
   };
+    protected readonly CreateEventComponent = CreateEventComponent;
 }
