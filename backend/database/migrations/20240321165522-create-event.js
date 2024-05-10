@@ -32,6 +32,10 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      scheduled_event: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
       latitude: {
         type: DataTypes.DECIMAL(10, 8),
         allowNull: false,
