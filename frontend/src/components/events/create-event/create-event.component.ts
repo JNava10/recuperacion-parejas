@@ -1,8 +1,14 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {CalendarModule} from "primeng/calendar";
 import {CreateEventValues} from "../../../interfaces/forms/events/events";
 import {EventService} from "../../../services/api/event.service";
+import {} from 'googlemaps';
+
+let latLng = {
+  "lat": 38.69293623181963,
+  "lng": -4.108717751788397
+};
 
 @Component({
   selector: 'app-create-event',
@@ -14,8 +20,29 @@ import {EventService} from "../../../services/api/event.service";
   templateUrl: './create-event.component.html',
   styleUrl: './create-event.component.css'
 })
-export class CreateEventComponent {
-  constructor(private eventService: EventService) {
+export class CreateEventComponent implements OnInit {
+  constructor(private eventService: EventService) {}
+
+  ngOnInit(): void {
+    this.initMap()
+  }
+
+  // Esto es necesario para poder mostrar el mapa.
+  @ViewChild('map') mapElement: any;
+  map?: google.maps.Map;
+  center: google.maps.LatLngLiteral = latLng;
+
+  initMap(): void {
+    this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
+      center: this.center,
+      zoom: 8
+    });
+
+    this.map.addListener("click", (mapsMouseEvent) => {
+      const latLng = mapsMouseEvent.latLng.toJSON();
+
+      console.log(latLng)
+    });
   }
 
   @Output() created = new EventEmitter<boolean>();
@@ -23,8 +50,9 @@ export class CreateEventComponent {
   createEventForm = new FormGroup({
     name: new FormControl(''),
     description: new FormControl(''),
-    scheduledDate: new FormControl('')
-  })
+    scheduledDate: new FormControl(''),
+    latLng: new FormControl({lat: 0, lng: 0})
+  });
 
   handleCreateForm = () => {
     const formData = this.createEventForm.value;
