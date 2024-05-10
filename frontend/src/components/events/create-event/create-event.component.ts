@@ -1,9 +1,10 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {CalendarModule} from "primeng/calendar";
 import {CreateEventValues} from "../../../interfaces/forms/events/events";
 import {EventService} from "../../../services/api/event.service";
-import {} from 'googlemaps';
+import {} from "googlemaps";
+import MapMouseEvent = google.maps.MapMouseEvent;
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -22,15 +23,29 @@ let latLng = {
 })
 export class CreateEventComponent implements OnInit {
   constructor(private eventService: EventService) {}
-
   ngOnInit(): void {
     this.initMap()
   }
+
+  private mapMarker?: google.maps.Marker;
 
   // Esto es necesario para poder mostrar el mapa.
   @ViewChild('map') mapElement: any;
   map?: google.maps.Map;
   center: google.maps.LatLngLiteral = latLng;
+
+  createEventForm = new FormGroup({
+    name: new FormControl('', [
+      Validators.required, Validators.pattern(/[A-Za-z]{1,18}$/)
+    ]),
+    description: new FormControl('', [
+      Validators.required, Validators.pattern(/[A-Za-z]{1,18}$/)
+    ]),
+    scheduledDate: new FormControl('', [
+      Validators.required, Validators.pattern(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$/)
+    ]),
+    latLng: new FormControl({lat: 0, lng: 0})
+  });
 
   initMap(): void {
     this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
@@ -38,21 +53,25 @@ export class CreateEventComponent implements OnInit {
       zoom: 8
     });
 
-    this.map.addListener("click", (mapsMouseEvent) => {
+    // Al hacer click, bindeamos la latitud y longitud del evento al del formulario.
+    this.map.addListener("click", (mapsMouseEvent: MapMouseEvent) => {
+      if (this.mapMarker) this.mapMarker.setMap(null); // En caso de que esté el marcador, lo borramos.
+
       const latLng = mapsMouseEvent.latLng.toJSON();
 
-      console.log(latLng)
+      this.createEventForm.value.latLng = latLng;
+
+      this.mapMarker = new google.maps.Marker({
+        position: latLng,
+        map: this.map,
+        title: `Lugar del evento`,
+      });
+
+      console.log(this.createEventForm.value.latLng);
     });
   }
 
   @Output() created = new EventEmitter<boolean>();
-
-  createEventForm = new FormGroup({
-    name: new FormControl(''),
-    description: new FormControl(''),
-    scheduledDate: new FormControl(''),
-    latLng: new FormControl({lat: 0, lng: 0})
-  });
 
   handleCreateForm = () => {
     const formData = this.createEventForm.value;
