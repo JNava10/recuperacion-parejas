@@ -3,11 +3,11 @@ import {ApiResponse} from "../apiResponse";
 export interface CreateEventResponse extends ApiResponse {
   data: {
     executed: true
-    query: Event
+    query: EventItem
   }
 }
 
-export interface Event {
+export interface EventItem {
   id: number
   name: string
   description: string
@@ -23,6 +23,6 @@ export interface Event {
 export interface GetAllEventsResponse {
   data: {
     executed: true
-    query: Event[]
+    query: EventItem[]
   }
 }
