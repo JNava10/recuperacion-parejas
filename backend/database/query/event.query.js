@@ -22,6 +22,16 @@ class CreateEvent {
             return new QueryError(false, e)
         }
     };
+
+    static getAllEvents = async () => {
+        try {
+            const query = await models.Event.findAll();
+
+            return new QuerySuccess(true, 'Se han obtenido los eventos correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = CreateEvent;

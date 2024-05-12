@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CreateEventComponent} from "../../components/events/create-event/create-event.component";
 import {FormsModule} from "@angular/forms";
+import {EventService} from "../../services/api/event.service";
+import {Event} from "../../interfaces/api/event/event";
+
 
 @Component({
   selector: 'app-events',
@@ -12,11 +15,14 @@ import {FormsModule} from "@angular/forms";
   templateUrl: './events.component.html',
   styleUrl: './events.component.css'
 })
-export class EventsComponent {
-  creating = false;
+export class EventsComponent implements OnInit {
+  constructor(private eventService: EventService) {
+  }
 
-  handleEventCreated = (created: boolean) => {
+  ngOnInit() {
+    this.eventService.getAllEvents().subscribe(body => this.events = body.data.query)
+  }
 
-  };
-    protected readonly CreateEventComponent = CreateEventComponent;
+  events: Event[] = [];
 }
+
