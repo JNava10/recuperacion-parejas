@@ -11,9 +11,25 @@ class EventController {
         const event = req.body;
         event.author = req.payload.userId;
 
-        console.log(event)
-
         const {message, executed, query, error} = await EventQuery.createEvent(event);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static getAllEvent = async (req, res) => {
+        const {message, executed, query, error} = await EventQuery.getAllEvents();
 
         if (executed) {
             return res.status(200).json(
