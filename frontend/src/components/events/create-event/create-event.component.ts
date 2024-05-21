@@ -1,12 +1,12 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {CalendarModule} from "primeng/calendar";
-import {CreateEventValues} from "../../../interfaces/forms/events/events";
 import {EventService} from "../../../services/api/event.service";
 import {} from "googlemaps";
 import MapMouseEvent = google.maps.MapMouseEvent;
 import * as regex from '../../../utils/const/regex.constants';
 import {NgIf} from "@angular/common";
+import {EventItem} from "../../../interfaces/api/event/event";
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -26,9 +26,9 @@ let latLng = {
 })
 export class CreateEventComponent implements OnInit {
   constructor(private eventService: EventService) {}
+
   ngOnInit(): void {
     this.initMap()
-
   }
 
   static modalId = "create-event-modal";
@@ -42,14 +42,21 @@ export class CreateEventComponent implements OnInit {
 
   createEventForm = new FormGroup({
     name: new FormControl('', {validators: [
-        Validators.required, Validators.pattern(regex.createEvent.name),
+        Validators.required, Validators.pattern(regex.event.name),
       ], updateOn: "submit"}),
+
     description: new FormControl('', [
-      Validators.required, Validators.pattern(regex.createEvent.description)
+      Validators.required, Validators.pattern(regex.event.description)
     ]),
+
     scheduledDate: new FormControl('', [
-      Validators.required, Validators.pattern(regex.createEvent.scheduledDate)
+      Validators.required, Validators.pattern(regex.event.scheduledDate)
     ]),
+
+    scheduledTime: new FormControl('', [
+      Validators.required, Validators.pattern(regex.event.scheduledTime)
+    ]),
+
     latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
   }, {updateOn: "submit"});
 
@@ -79,9 +86,9 @@ export class CreateEventComponent implements OnInit {
 
   handleCreateForm = (mouseEvent: MouseEvent) => {
     const validations = {
-      name: regex.createEvent.name.test(this.createEventForm.value.name!),
-      description: regex.createEvent.description.test(this.createEventForm.value.description!),
-      scheduledDate: regex.createEvent.scheduledDate.test(this.createEventForm.value.scheduledDate!),
+      name: regex.event.name.test(this.createEventForm.value.name!),
+      description: regex.event.description.test(this.createEventForm.value.description!),
+      scheduledDate: regex.event.scheduledDate.test(this.createEventForm.value.scheduledDate!),
     }
 
     console.table(validations)
@@ -92,10 +99,12 @@ export class CreateEventComponent implements OnInit {
     createBtn.setAttribute('data-modal-hide', CreateEventComponent.modalId);
 
     const formData = this.createEventForm.value;
-    const event: CreateEventValues = {
+    const scheduledDateTime = `${formData.scheduledDate} ${formData.scheduledTime}`;
+
+    const event: EventItem = {
       name: formData.name!,
       description: formData.description!,
-      scheduledDate: formData.scheduledDate!,
+      scheduledDateTime: scheduledDateTime!,
       picUrl: "https://cdn-9.motorsport.com/images/amp/YpNpMWJ0/s1000/ferrari-f1-75-con-paraspruzzi.jpg",
       summaryUrl: "https://www.fia.com/sites/default/files/fia_2024_formula_1_technical_regulations_-_issue_1_-_2023-04-25.pdf" ,
       latitude: 10.1,

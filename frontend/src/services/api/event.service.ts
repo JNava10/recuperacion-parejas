@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {environment} from "../../environments/environment";
-import {CreateEventValues} from "../../interfaces/forms/events/events";
-import {CreateEventResponse, GetAllEventsResponse} from "../../interfaces/api/event/event";
+import {EventItem, EventResponse, GetAllEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {map, tap} from "rxjs";
 
@@ -14,8 +13,12 @@ export class EventService {
 
   constructor(private http: HttpClient) { }
 
-  createEvent = (event: CreateEventValues) => {
-    return this.http.post<CreateEventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
+  createEvent = (event: EventItem) => {
+    return this.http.post<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
+  }
+
+  editEvent = (event: EventItem) => {
+    return this.http.put<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
   }
 
   getAllEvents = () => {

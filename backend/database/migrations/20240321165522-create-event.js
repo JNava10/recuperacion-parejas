@@ -32,7 +32,7 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      scheduled_event: {
+      scheduled_date_time: {
         type: DataTypes.DATE,
         allowNull: false,
       },
