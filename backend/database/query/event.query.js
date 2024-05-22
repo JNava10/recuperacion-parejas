@@ -75,7 +75,7 @@ class CreateEvent {
 
     static getAvailableEvents = async () => {
         try {
-            const query = await models.Event.findAll({where: {scheduledDate: {[Op.gt]: new Date(Date.now())}}});
+            const query = await models.Event.findAll({where: {scheduledDateTime: {[Op.gt]: new Date(Date.now())}}});
 
             return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
         } catch (e) {

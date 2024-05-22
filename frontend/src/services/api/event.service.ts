@@ -25,7 +25,7 @@ export class EventService {
 
   getAvailableEvents = () => {
     return this.http.get<GetEventsResponse>(`${environment.apiUrl}/event/available`, {params: {...sendTokenParam}}).pipe(
-      tap(body => body.data.query)
+      map(body => body.data.query)
     )
   }
 

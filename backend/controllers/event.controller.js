@@ -123,6 +123,7 @@ class EventController {
                 new StdResponse(message,{executed, query})
             )
         } else if (!query) {
+            console.log(error)
             return res.status(500).json(
                 new StdResponse(message,{executed, error})
             )

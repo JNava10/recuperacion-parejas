@@ -1,3 +1,5 @@
 <section>
-  <app-available-event-list></app-available-event-list>
+  @if (eventsFetched) {
+    <app-available-event-list [events]="events"></app-available-event-list>
+  }
 </section>

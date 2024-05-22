@@ -10,6 +10,6 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'chat', component: ChatComponent },
   { path: 'events', component: EventsComponent },
-  { path: 'find-available-events', component: FindAvailableEventsComponent },
+  { path: 'available-events', component: FindAvailableEventsComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];
