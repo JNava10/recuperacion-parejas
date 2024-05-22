@@ -37,8 +37,8 @@ export class EditEventComponent implements OnInit {
   center: google.maps.LatLngLiteral = this.latLng;
 
   ngOnInit(): void {
-    console.log(this.event)
-    this.initMap()
+    this.initMap();
+    this.patchValues(this.event!);
   }
 
   // Esto es necesario para poder mostrar el mapa.
@@ -100,8 +100,23 @@ export class EditEventComponent implements OnInit {
       longitude: 10.2
     }
 
-    // this.eventService.editEvent(event).subscribe(body => {
-    //   this.edited.emit(body.data.executed)
-    // })
+    this.eventService.editEvent(event).subscribe(body => {
+      this.edited.emit(body.data.executed)
+    })
+  }
+
+  private patchValues = (event: EventItem) => {
+    const scheduledDateTime = new Date(event.scheduledDateTime!);
+    const scheduledDate = new DatePipe('en-US').transform(scheduledDateTime, 'YYYY-MM-dd')?.toString();
+    const scheduledTime = new DatePipe('en-US').transform(scheduledDateTime, 'hh:ss')?.toString();
+
+    console.log(scheduledDate)
+
+    this.editEventForm.patchValue({
+      name: event.name,
+      description: event.description,
+      scheduledTime: scheduledTime,
+      scheduledDate: scheduledDate,
+    });
   }
 }
