@@ -3,6 +3,7 @@ const models = require('../models/index');
 const {QueryTypes, Op} = require("sequelize");
 const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
+const {logger} = require("sequelize/lib/utils/logger");
 
 class CreateEvent {
     static createEvent = async (event) => {
@@ -25,9 +26,13 @@ class CreateEvent {
 
     static editEventDetails = async (eventDetails) => {
         try {
-            const {name, description, scheduledDate} = eventDetails;
+            const {name, description, scheduledDateTime} = eventDetails;
 
-            const query = await models.Event.update({name, description, scheduledDate}, {where: {id: eventDetails.id}});
+            const date = new Date(scheduledDateTime);
+
+            console.log(date)
+
+            const query = await models.Event.update({name, description, scheduledDateTime: date}, {where: {id: eventDetails.id}});
 
             return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
         } catch (e) {

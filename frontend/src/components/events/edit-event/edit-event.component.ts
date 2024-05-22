@@ -69,7 +69,7 @@ export class EditEventComponent implements OnInit {
     const {name, description, scheduledDate, scheduledTime} = this.editEventForm.value;
     if (!this.editEventForm.valid) return;
 
-    const scheduledDateTime = `${scheduledDate} ${scheduledTime}`;
+    const scheduledDateTime = new Date(`${scheduledDate} ${scheduledTime}`).toString();
 
     const eventDetails: EventItem = {
       name: name!,
@@ -77,7 +77,6 @@ export class EditEventComponent implements OnInit {
       scheduledDateTime: scheduledDateTime,
       id: this.event?.id
     }
-
 
     this.eventService.editEventDetails(eventDetails).subscribe(body => {
       this.edited.emit(body.data.executed)

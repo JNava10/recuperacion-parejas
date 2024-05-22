@@ -46,7 +46,7 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     scheduledDateTime: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     latitude: {
