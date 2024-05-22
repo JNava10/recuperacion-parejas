@@ -35,6 +35,18 @@ class CreateEvent {
         }
     };
 
+    static editEventPlace = async (eventPlace) => {
+        try {
+            const {longitude, latitude} = eventPlace;
+
+            const query = await models.Event.update({longitude, latitude}, {where: {id: eventPlace.id}});
+
+            return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getAllEvents = async () => {
         try {
             const query = await models.Event.findAll();

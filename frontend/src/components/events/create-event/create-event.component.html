@@ -18,10 +18,7 @@
     <span class="text-red-400" *ngIf="!this.createEventForm.get('scheduledDate')?.valid && form.submitted">Campo no valido</span>
   </div>
   <div class="flex">
-    <div class="w-full">
-      <div id="map" class="h-72 rounded-xl mr-3" formControlName="latLng"></div>
-      <span class="text-red-400" *ngIf="!this.createEventForm.get('latLng')?.valid && form.submitted">Campo no valido</span>
-    </div>
+    <app-map-event-marker></app-map-event-marker>
     <div>
       <div class="flex items-center justify-center">
         <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">

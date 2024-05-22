@@ -17,13 +17,18 @@ export class EventService {
     return this.http.post<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
   }
 
-  editEventDetails = (event: EventItem) => {
-    return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
-  }
-
   getAllEvents = () => {
     return this.http.get<GetAllEventsResponse>(`${environment.apiUrl}/event`, {params: {...sendTokenParam}}).pipe(
       tap(body => body.data)
     )
+  }
+
+
+  editEventDetails = (event: EventItem) => {
+    return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
+  }
+
+  editEventPlace = (event: EventItem) => {
+    return this.http.put<EventResponse>(`${environment.apiUrl}/event/place`, event, {params: {...sendTokenParam}})
   }
 }

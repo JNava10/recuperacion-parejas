@@ -7,6 +7,7 @@ import MapMouseEvent = google.maps.MapMouseEvent;
 import * as regex from '../../../utils/const/regex.constants';
 import {NgIf} from "@angular/common";
 import {EventItem} from "../../../interfaces/api/event/event";
+import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -19,24 +20,20 @@ let latLng = {
   imports: [
     ReactiveFormsModule,
     CalendarModule,
-    NgIf
+    NgIf,
+    MapEventMarkerComponent
   ],
   templateUrl: './create-event.component.html',
   styleUrl: './create-event.component.css'
 })
-export class CreateEventComponent implements OnInit {
+export class CreateEventComponent {
   constructor(private eventService: EventService) {}
-
-  ngOnInit(): void {
-    this.initMap()
-  }
 
   static modalId = "create-event-modal";
 
   private mapMarker?: google.maps.Marker;
 
   // Esto es necesario para poder mostrar el mapa.
-  @ViewChild('map') mapElement: any;
   map?: google.maps.Map;
   center: google.maps.LatLngLiteral = latLng;
 
@@ -59,28 +56,6 @@ export class CreateEventComponent implements OnInit {
 
     latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
   }, {updateOn: "submit"});
-
-  initMap(): void {
-    this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-      center: this.center,
-      zoom: 8
-    });
-
-    // Al hacer click, bindeamos la latitud y longitud del evento al del formulario.
-    this.map.addListener("click", (mapsMouseEvent: MapMouseEvent) => {
-      if (this.mapMarker) this.mapMarker.setMap(null); // En caso de que esté el marcador, lo borramos.
-
-      const latLng = mapsMouseEvent.latLng.toJSON();
-
-      this.createEventForm.value.latLng = latLng;
-
-      this.mapMarker = new google.maps.Marker({
-        position: latLng,
-        map: this.map,
-        title: `Lugar del evento`,
-      });
-    });
-  }
 
   @Output() created = new EventEmitter<boolean>();
 

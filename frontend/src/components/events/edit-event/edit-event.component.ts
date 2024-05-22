@@ -4,9 +4,11 @@ import * as regex from "../../../utils/const/regex.constants";
 import MapMouseEvent = google.maps.MapMouseEvent;
 import {DatePipe, NgIf} from "@angular/common";
 import {PaginatorModule} from "primeng/paginator";
-import {} from "googlemaps";
+import {GoogleMap, GoogleMapsModule} from '@angular/google-maps'
 import {EventItem} from "../../../interfaces/api/event/event";
 import {EventService} from "../../../services/api/event.service";
+import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 @Component({
   selector: 'app-edit-event',
@@ -15,7 +17,9 @@ import {EventService} from "../../../services/api/event.service";
     NgIf,
     PaginatorModule,
     ReactiveFormsModule,
-    DatePipe
+    DatePipe,
+    GoogleMap,
+    MapEventMarkerComponent
   ],
   templateUrl: './edit-event.component.html',
   styleUrl: './edit-event.component.css'
@@ -26,22 +30,19 @@ export class EditEventComponent implements OnInit {
 
   constructor(private eventService: EventService) {}
 
-  latLng = {
-    "lat": 38.69293623181963,
-    "lng": -4.108717751788397
-  };
-
-  private mapMarker?: google.maps.Marker;
-  @ViewChild('map') mapElement: any;
-  map?: google.maps.Map;
-  center: google.maps.LatLngLiteral = this.latLng;
-
   ngOnInit(): void {
-    this.initMap();
     this.patchValues(this.event!);
   }
 
-  // Esto es necesario para poder mostrar el mapa.
+  latLng: google.maps.LatLngLiteral = {
+    lat: 38.69293623181963,
+    lng: -4.108717751788397
+  };
+
+  private mapMarker?: google.maps.Marker;
+  map?: google.maps.Map;
+  center: google.maps.LatLngLiteral = this.latLng;
+
   editEventForm = new FormGroup({
     name: new FormControl(this.event?.name, {validators: [
         Validators.required, Validators.pattern(regex.event.name),
@@ -58,34 +59,13 @@ export class EditEventComponent implements OnInit {
     scheduledTime: new FormControl('', [
       Validators.required, Validators.pattern(regex.event.scheduledTime)
     ]),
-
-    latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
   }, {updateOn: "submit"});
 
-  initMap(): void {
-    this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-      center: this.center,
-      zoom: 8
-    });
-
-    // Al hacer click, bindeamos la latitud y longitud del evento al del formulario.
-    this.map.addListener("click", (mapsMouseEvent: MapMouseEvent) => {
-      if (this.mapMarker) this.mapMarker.setMap(null); // En caso de que esté el marcador, lo borramos.
-
-      const latLng = mapsMouseEvent.latLng.toJSON();
-
-      this.editEventForm.value.latLng = latLng;
-
-      this.mapMarker = new google.maps.Marker({
-        position: latLng,
-        map: this.map,
-        title: `Lugar del evento`,
-      });
-    });
-  }
+  editEventPlaceForm = new FormGroup({
+    latLng: new FormControl(this.latLng, [Validators.required])
+  }, {updateOn: "submit"});
 
   handleEditDetailsForm() {
-    console.log(this.editEventForm)
     const {name, description, scheduledDate, scheduledTime} = this.editEventForm.value;
     if (!this.editEventForm.valid) return;
 
@@ -115,5 +95,29 @@ export class EditEventComponent implements OnInit {
       scheduledTime: scheduledTime,
       scheduledDate: scheduledDate,
     });
+  }
+
+  setPlaceValue = (latLng: google.maps.LatLngLiteral) => {
+    this.editEventPlaceForm.setValue({latLng});
+  };
+
+  handleEditPlaceForm = () => {
+    if (!this.editEventPlaceForm.valid) return;
+
+    const {latLng} = this.editEventPlaceForm.value;
+
+    const eventDetails: EventItem = {id: this.event?.id, latitude: latLng?.lat, longitude: latLng?.lng};
+
+    this.eventService.editEventPlace(eventDetails).subscribe(body => {
+      this.edited.emit(body.data.executed);
+    });
+  };
+
+  getEventPos(): google.maps.LatLngLiteral | undefined {
+    if (this.event?.latitude && this.event?.longitude) {
+      return {lat: Number(this.event?.latitude), lng: Number(this.event?.longitude)}
+    }
+
+    else return undefined;
   }
 }
