@@ -18,13 +18,23 @@ import {EventCardComponent} from "../../app/components/events/event-card/event-c
   styleUrl: './events.component.css'
 })
 export class EventsComponent implements OnInit {
-  constructor(private eventService: EventService) {
-  }
+  constructor(private eventService: EventService) {}
+
+  eventsFetched = false;
 
   ngOnInit() {
-    this.eventService.getAllEvents().subscribe(body => this.events = body.data.query)
+    this.getAllEvents()
   }
 
   events: EventItem[] = [];
+
+  getAllEvents = () => {
+    if (this.events.length > 0) this.events = [];
+
+    this.eventService.getAllEvents().subscribe(body => {
+      this.events = body.data.query;
+      this.eventsFetched = true;
+    });
+  }
 }
 
