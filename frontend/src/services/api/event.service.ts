@@ -23,12 +23,15 @@ export class EventService {
     )
   }
 
-
   editEventDetails = (event: EventItem) => {
     return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
   }
 
   editEventPlace = (event: EventItem) => {
     return this.http.put<EventResponse>(`${environment.apiUrl}/event/place`, event, {params: {...sendTokenParam}})
+  }
+
+  deleteEvent = (event: EventItem) => {
+    return this.http.put<EventResponse>(`${environment.apiUrl}/event/${event.id}`, event, {params: {...sendTokenParam}})
   }
 }
