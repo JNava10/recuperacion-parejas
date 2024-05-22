@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {environment} from "../../environments/environment";
-import {EventItem, EventResponse, GetEventsResponse} from "../../interfaces/api/event/event";
+import {
+  EventItem,
+  EventResponse,
+  GetEventsResponse,
+  SubscribedToEventResponse,
+  SubscribeEventResponse
+} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {map, tap} from "rxjs";
 
@@ -47,7 +53,15 @@ export class EventService {
     )
   }
 
-  subscribeEvent(event: EventItem) {
-    return this.http.post<EventResponse>(`${environment.apiUrl}/event/susbcribe/${event.id}`, {params: {...sendTokenParam}})
+  getIfSuscribedToEvent = (id: number) => {
+    return this.http.get<SubscribedToEventResponse>(`${environment.apiUrl}/event/subscribed/${id}`, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
+  }
+
+  subscribeToEvent(event: EventItem) {
+    return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/subscribe/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
   }
 }

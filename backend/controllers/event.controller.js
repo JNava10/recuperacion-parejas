@@ -112,6 +112,7 @@ class EventController {
     };
 
     static getEvent = async (req, res) => {
+        console.log('a')
         const {message, executed, query, error} = await EventQuery.getEvent(req.params.id);
 
         if (executed) {
@@ -128,6 +129,25 @@ class EventController {
             )
         }
     };
+
+    static getIfSubscribedToEvent = async (req, res) => {
+        const {message, executed, query, error} = await EventQuery.getIfSubscribedToEvent(req.params.id, req.payload.userId);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
 
     static getAvailableEvents = async (req, res) => {
         const {message, executed, query, error} = await EventQuery.getAvailableEvents();

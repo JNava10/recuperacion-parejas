@@ -7,6 +7,13 @@ export interface EventResponse extends ApiResponse {
   }
 }
 
+export interface SubscribeEventResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
+}
+
 
 export interface EventItem {
   id?: number
@@ -26,5 +33,12 @@ export interface GetEventsResponse {
   data: {
     executed: true
     query: EventItem[]
+  }
+}
+
+export interface SubscribedToEventResponse {
+  data: {
+    executed: true
+    query: boolean
   }
 }

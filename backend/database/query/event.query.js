@@ -83,6 +83,16 @@ class CreateEvent {
         }
     };
 
+    static getIfSubscribedToEvent = async (event, user) => {
+        try {
+            const query = await models.EventAssistant.findOne({where: {user, event}}) !== null;
+
+            return new QuerySuccess(true, 'Se ha realizado la consulta correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getAvailableEvents = async (eventId, userId) => {
         try {
             const query = await models.Event.findAll({where: {scheduledDateTime: {[Op.gt]: new Date(Date.now())}}});
@@ -102,7 +112,7 @@ class CreateEvent {
                 updatedAt: new Date(),
             };
 
-            const query = await models.EventAssistant.create(eventAssistant);
+            const query = await models.EventAssistant.create(eventAssistant) !== null;
 
             return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
         } catch (e) {
