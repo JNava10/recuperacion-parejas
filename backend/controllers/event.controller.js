@@ -28,6 +28,28 @@ class EventController {
         }
     };
 
+    static editEventDetails = async (req, res) => {
+        const event = req.body;
+        event.author = req.payload.userId;
+
+        const {message, executed, query, error} = await EventQuery.editEventDetails(event);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            console.log(error)
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
     static getAllEvent = async (req, res) => {
         const {message, executed, query, error} = await EventQuery.getAllEvents();
 

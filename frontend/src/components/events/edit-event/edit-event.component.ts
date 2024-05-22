@@ -52,11 +52,11 @@ export class EditEventComponent implements OnInit {
     ]),
 
     scheduledDate: new FormControl('', [
-      Validators.required, Validators.pattern(regex.event.scheduledTime)
+      Validators.required, Validators.pattern(regex.event.scheduledDate)
     ]),
 
     scheduledTime: new FormControl('', [
-      Validators.required, Validators.pattern(regex.event.scheduledDate)
+      Validators.required, Validators.pattern(regex.event.scheduledTime)
     ]),
 
     latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
@@ -84,33 +84,30 @@ export class EditEventComponent implements OnInit {
     });
   }
 
-  handleEditForm() {
+  handleEditDetailsForm() {
+    console.log(this.editEventForm)
+    const {name, description, scheduledDate, scheduledTime} = this.editEventForm.value;
     if (!this.editEventForm.valid) return;
 
-    const formData = this.editEventForm.value;
-    const scheduledDateTime = `${formData.scheduledDate} ${formData.scheduledTime}`;
+    const scheduledDateTime = `${scheduledDate} ${scheduledTime}`;
 
-    const event: EventItem = {
-      name: formData.name!,
-      description: formData.description!,
+    const eventDetails: EventItem = {
+      name: name!,
+      description: description!,
       scheduledDateTime: scheduledDateTime,
-      picUrl: "https://cdn-9.motorsport.com/images/amp/YpNpMWJ0/s1000/ferrari-f1-75-con-paraspruzzi.jpg",
-      summaryUrl: "https://www.fia.com/sites/default/files/fia_2024_formula_1_technical_regulations_-_issue_1_-_2023-04-25.pdf" ,
-      latitude: 10.1,
-      longitude: 10.2
+      id: this.event?.id
     }
 
-    this.eventService.editEvent(event).subscribe(body => {
+
+    this.eventService.editEventDetails(eventDetails).subscribe(body => {
       this.edited.emit(body.data.executed)
-    })
+    });
   }
 
   private patchValues = (event: EventItem) => {
     const scheduledDateTime = new Date(event.scheduledDateTime!);
     const scheduledDate = new DatePipe('en-US').transform(scheduledDateTime, 'YYYY-MM-dd')?.toString();
     const scheduledTime = new DatePipe('en-US').transform(scheduledDateTime, 'hh:ss')?.toString();
-
-    console.log(scheduledDate)
 
     this.editEventForm.patchValue({
       name: event.name,

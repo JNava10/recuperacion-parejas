@@ -17,8 +17,8 @@ export class EventService {
     return this.http.post<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
   }
 
-  editEvent = (event: EventItem) => {
-    return this.http.put<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
+  editEventDetails = (event: EventItem) => {
+    return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
   }
 
   getAllEvents = () => {

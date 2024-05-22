@@ -23,6 +23,18 @@ class CreateEvent {
         }
     };
 
+    static editEventDetails = async (eventDetails) => {
+        try {
+            const {name, description, scheduledDate} = eventDetails;
+
+            const query = await models.Event.update({name, description, scheduledDate}, {where: {id: eventDetails.id}});
+
+            return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getAllEvents = async () => {
         try {
             const query = await models.Event.findAll();
