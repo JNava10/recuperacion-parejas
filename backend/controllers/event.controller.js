@@ -72,6 +72,27 @@ class EventController {
         }
     };
 
+    static deleteEventById = async (req, res) => {
+        const {id} = req.params;
+
+        const {message, executed, query, error} = await EventQuery.deleteEvent(id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            console.log(error)
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
     static getAllEvent = async (req, res) => {
         const {message, executed, query, error} = await EventQuery.getAllEvents();
 

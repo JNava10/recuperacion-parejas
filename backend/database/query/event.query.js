@@ -52,6 +52,17 @@ class CreateEvent {
         }
     };
 
+    static deleteEvent = async (id) => {
+        try {
+            console.log(id)
+            const query = await models.Event.destroy({where: {id: id}});
+
+            return new QuerySuccess(true, 'Se ha borrado el evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getAllEvents = async () => {
         try {
             const query = await models.Event.findAll();

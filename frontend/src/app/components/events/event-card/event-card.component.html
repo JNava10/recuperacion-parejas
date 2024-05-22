@@ -21,6 +21,6 @@
 
 <!-- Delete conf. modal -->
 
-<p-dialog [modal]="true" closeOnEscape="true" [(visible)]="editingEvent" class="max-w-l">
+<p-dialog [modal]="true" header="¿Estás seguro de borrar este evento?" closeOnEscape="true" [(visible)]="deletingEvent" class="max-w-l">
   <app-confirm-delete-event (deleteEvent)="handleDeleteEvent($event)"></app-confirm-delete-event>
 </p-dialog>

@@ -3,7 +3,7 @@
     <div class="flex justify-center">
       <div class="grid grid-cols-4 grid-rows-4 gap-3">
         @for (event of events; track event.id) {
-          <app-event-card [event]="event!"/>
+          <app-event-card [event]="event!" (refresh)="getAllEvents()"/>
         }
       </div>
     </div>

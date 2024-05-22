@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {EventItem} from "../../../../interfaces/api/event/event";
 import {DatePipe, NgIf} from "@angular/common";
 import {CreateEventComponent} from "../../../../components/events/create-event/create-event.component";
@@ -31,7 +31,9 @@ export class EventCardComponent {
 
   constructor(private eventService: EventService) {}
 
-  @Input() event?: EventItem
+  @Input() event?: EventItem;
+
+  @Output() refresh = new EventEmitter<null>();
 
   protected editingEvent = false;
   protected deletingEvent = false;
@@ -47,6 +49,8 @@ export class EventCardComponent {
   handleDeleteEvent = (deleteEvent: boolean) => {
     if (!deleteEvent) this.deletingEvent = false;
 
-    this.eventService.deleteEvent(this.event!)
+    this.eventService.deleteEvent(this.event!).subscribe(() => {
+      this.refresh.emit()
+    })
   };
 }

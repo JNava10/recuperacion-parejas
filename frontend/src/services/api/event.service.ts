@@ -32,6 +32,6 @@ export class EventService {
   }
 
   deleteEvent = (event: EventItem) => {
-    return this.http.put<EventResponse>(`${environment.apiUrl}/event/${event.id}`, event, {params: {...sendTokenParam}})
+    return this.http.delete<EventResponse>(`${environment.apiUrl}/event/${event.id}`, {params: {...sendTokenParam}})
   }
 }
