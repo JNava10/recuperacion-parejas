@@ -22,7 +22,7 @@ export interface EventItem {
   updatedAt?: string
 }
 
-export interface GetAllEventsResponse {
+export interface GetEventsResponse {
   data: {
     executed: true
     query: EventItem[]

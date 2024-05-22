@@ -8,5 +8,7 @@ router.put('/details', [validateToken], EventController.editEventDetails);
 router.put('/place', [validateToken], EventController.editEventPlace);
 router.delete('/:id', [validateToken], EventController.deleteEventById);
 router.get('/', [validateToken], EventController.getAllEvent);
+router.get('/available', [validateToken], EventController.getAvailableEvents);
 
 module.exports = router;
+

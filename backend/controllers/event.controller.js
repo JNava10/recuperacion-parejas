@@ -110,6 +110,24 @@ class EventController {
             )
         }
     };
+
+    static getAvailableEvents = async (req, res) => {
+        const {message, executed, query, error} = await EventQuery.getAvailableEvents();
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 }
 
 module.exports = EventController
