@@ -9,6 +9,7 @@ router.put('/place', [validateToken], EventController.editEventPlace);
 router.delete('/:id', [validateToken], EventController.deleteEventById);
 router.get('/', [validateToken], EventController.getAllEvent);
 router.get('/available', [validateToken], EventController.getAvailableEvents);
+router.post('/subscribe/:id', [validateToken], EventController.subscribeEvent);
 
 module.exports = router;
 

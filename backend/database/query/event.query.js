@@ -73,11 +73,28 @@ class CreateEvent {
         }
     };
 
-    static getAvailableEvents = async () => {
+    static getAvailableEvents = async (eventId, userId) => {
         try {
             const query = await models.Event.findAll({where: {scheduledDateTime: {[Op.gt]: new Date(Date.now())}}});
 
             return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static subscribeEvent = async (event, user) => {
+        try {
+            const eventAssistant = {
+                event,
+                user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+
+            const query = await models.EventAssistant.create(eventAssistant);
+
+            return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }

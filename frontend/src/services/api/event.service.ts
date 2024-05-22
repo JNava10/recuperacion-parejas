@@ -41,7 +41,11 @@ export class EventService {
     return this.http.delete<EventResponse>(`${environment.apiUrl}/event/${event.id}`, {params: {...sendTokenParam}})
   }
 
-  suscribeEvent(event: EventItem) {
+  getEvent = (id: number) => {
+    return this.http.get<EventResponse>(`${environment.apiUrl}/event/${id}`, {params: {...sendTokenParam}})
+  }
+
+  subscribeEvent(event: EventItem) {
     return this.http.post<EventResponse>(`${environment.apiUrl}/event/susbcribe/${event.id}`, {params: {...sendTokenParam}})
   }
 }

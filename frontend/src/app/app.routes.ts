@@ -11,5 +11,6 @@ export const routes: Routes = [
   { path: 'chat', component: ChatComponent },
   { path: 'events', component: EventsComponent },
   { path: 'available-events', component: FindAvailableEventsComponent },
+  { path: 'event-info', component: FindAvailableEventsComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];
