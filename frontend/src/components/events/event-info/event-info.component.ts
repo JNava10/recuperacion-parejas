@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {EventService} from "../../../services/api/event.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {EventItem} from "../../../interfaces/api/event/event";
+import {concatWith} from "rxjs";
 
 @Component({
   selector: 'app-event-info',
@@ -14,13 +15,21 @@ export class EventInfoComponent implements OnInit {
   constructor(private eventService: EventService, private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe(params =>
-      this.eventId = Number(params.get('id')!)
-    )
-
-    this.eventService.getEvent(this.eventId!)
+    const eventId = Number(this.activatedRoute.snapshot.queryParams['id']);
+    this.getEvent(eventId);
   }
 
-  event?: EventItem;
+  private getEvent(eventId: number) {
+    console.log(eventId)
+    this.eventService.getEvent(eventId).subscribe(event => {
+      this.event = event;
+    });
+  }
+
   @Input() eventId?: number;
+  event?: EventItem;
+
+  joinEvent = () => {
+    this.eventService.subscribeEvent(this.event!).subscribe()
+  };
 }

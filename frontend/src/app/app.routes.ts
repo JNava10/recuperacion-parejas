@@ -4,6 +4,7 @@ import {DashboardComponent} from "../public/dashboard/dashboard.component";
 import {ChatComponent} from "../components/chatting/chat/chat.component";
 import {EventsComponent} from "../public/events/events.component";
 import {FindAvailableEventsComponent} from "../public/events/find-available-events/find-available-events.component";
+import {EventInfoComponent} from "../components/events/event-info/event-info.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -11,6 +12,6 @@ export const routes: Routes = [
   { path: 'chat', component: ChatComponent },
   { path: 'events', component: EventsComponent },
   { path: 'available-events', component: FindAvailableEventsComponent },
-  { path: 'event-info', component: FindAvailableEventsComponent },
+  { path: 'event-info', component: EventInfoComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];

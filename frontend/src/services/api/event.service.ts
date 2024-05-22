@@ -42,7 +42,9 @@ export class EventService {
   }
 
   getEvent = (id: number) => {
-    return this.http.get<EventResponse>(`${environment.apiUrl}/event/${id}`, {params: {...sendTokenParam}})
+    return this.http.get<EventResponse>(`${environment.apiUrl}/event/${id}`, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
   }
 
   subscribeEvent(event: EventItem) {
