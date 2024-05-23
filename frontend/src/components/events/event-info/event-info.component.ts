@@ -18,7 +18,7 @@ export class EventInfoComponent implements OnInit {
 
   ngOnInit(): void {
     const eventId = Number(this.activatedRoute.snapshot.queryParams['id']);
-    this.eventService.getIfSuscribedToEvent(eventId).subscribe(subscribed => this.isSubscribed = subscribed);
+    this.eventService.getIfRegisteredToEvent(eventId).subscribe(subscribed => this.isSubscribed = subscribed);
     this.getEvent(eventId);
   }
   private getEvent(eventId: number) {
@@ -33,6 +33,10 @@ export class EventInfoComponent implements OnInit {
   isSubscribed?: boolean;
 
   joinEvent = () => {
-    this.eventService.subscribeToEvent(this.event!).subscribe(subscribed => this.isSubscribed = subscribed)
+    this.eventService.registerToEvent(this.event!).subscribe(subscribed => this.isSubscribed = subscribed)
   };
+
+  withdrawFromEvent() {
+    this.eventService.withdrawFromEvent(this.event!).subscribe(withdrawed => this.isSubscribed = !withdrawed)
+  }
 }

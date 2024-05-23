@@ -186,6 +186,25 @@ class EventController {
             )
         }
     };
+
+    static withdrawEvent = async (req, res) => {
+        const {message, executed, query, error} = await EventQuery.withdrawEvent(req.params.id, req.payload.userId);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            console.log(error)
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 }
 
 module.exports = EventController

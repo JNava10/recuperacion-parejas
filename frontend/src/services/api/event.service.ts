@@ -53,14 +53,20 @@ export class EventService {
     )
   }
 
-  getIfSuscribedToEvent = (id: number) => {
+  getIfRegisteredToEvent = (id: number) => {
     return this.http.get<SubscribedToEventResponse>(`${environment.apiUrl}/event/subscribed/${id}`, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     )
   }
 
-  subscribeToEvent(event: EventItem) {
+  registerToEvent(event: EventItem) {
     return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/subscribe/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
+  }
+
+  withdrawFromEvent(event: EventItem) {
+    return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/withdraw/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     )
   }

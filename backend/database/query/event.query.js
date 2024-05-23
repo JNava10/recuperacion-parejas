@@ -119,6 +119,20 @@ class CreateEvent {
             return new QueryError(false, e)
         }
     };
+
+    static withdrawEvent = async (event, user) => {
+        try {
+            const query = await models.EventAssistant.destroy(
+                {
+                    where: {[Op.and]: [{event}, {user}]}
+                }
+            ) !== null;
+
+            return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = CreateEvent;
