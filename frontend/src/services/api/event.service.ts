@@ -35,6 +35,12 @@ export class EventService {
     )
   }
 
+  getRegisteredEvents = () => {
+    return this.http.get<GetEventsResponse>(`${environment.apiUrl}/event/registered`, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
+  }
+
   editEventDetails = (event: EventItem) => {
     return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
   }
