@@ -38,18 +38,12 @@ module.exports = (sequelize, DataTypes) => {
     updated_at: {
       allowNull: false,
       type: DataTypes.DATE
-    },
-    deleted_at: {
-      allowNull: true,
-      type: DataTypes.DATE
-    },
+    }
   }, {
     sequelize,
     modelName: 'EventAssistant',
     tableName: 'event_assistants',
     timestamps: true,
-    paranoid: true,
-    deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });

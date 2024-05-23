@@ -4,6 +4,7 @@ const {QueryTypes, Op} = require("sequelize");
 const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
 const {logger} = require("sequelize/lib/utils/logger");
+const {mode} = require("@cloudinary/url-gen/actions/rotate");
 
 class CreateEvent {
     static createEvent = async (event) => {
@@ -93,12 +94,29 @@ class CreateEvent {
         }
     };
 
-    static getAvailableEvents = async (eventId, userId) => {
+    static getAvailableEvents = async () => {
         try {
             const query = await models.Event.findAll({where: {scheduledDateTime: {[Op.gt]: new Date(Date.now())}}});
 
             return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
         } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static getEventsRegistered = async (user) => {
+        try {
+            const query = await models.sequelize.query(
+                `SELECT * FROM ${models.Event.tableName} WHERE id IN (SELECT event FROM ${models.EventAssistant.tableName} WHERE user = :user)`,
+                {
+                    replacements: {user},
+                    type: QueryTypes.SELECT
+                }
+            );
+
+            return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
+        } catch (e) {
+            console.log(e)
             return new QueryError(false, e)
         }
     };

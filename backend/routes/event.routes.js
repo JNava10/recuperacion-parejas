@@ -8,9 +8,10 @@ router.put('/details', [validateToken], EventController.editEventDetails);
 router.put('/place', [validateToken], EventController.editEventPlace);
 router.get('/', [validateToken], EventController.getAllEvent);
 router.get('/available', [validateToken], EventController.getAvailableEvents);
-router.post('/subscribe/:id', [validateToken], EventController.subscribeEvent);
+router.post('/subscribe/:id', [validateToken], EventController.registerToEvent);
 router.post('/withdraw/:id', [validateToken], EventController.withdrawEvent);
-router.get('/subscribed/:id', [validateToken], EventController.getIfSubscribedToEvent);
+router.get('/registered', [validateToken], EventController.getEventsRegistered);
+router.get('/subscribed/:id', [validateToken], EventController.getIfRegisteredToEvent);
 router.get('/:id', [validateToken], EventController.getEvent);
 router.delete('/:id', [validateToken], EventController.deleteEventById);
 
