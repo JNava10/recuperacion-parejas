@@ -41,6 +41,33 @@ class UserQuery {
     static findUserLikeFullname = async (input) => {
         return await models.sequelize.query(findUserByFullname, {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
     };
+
+    static getNotDeletedUsers = async () => {
+        try {
+            const query = await models.User.findAll();
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static getNotDeletedWithRoles = async () => {
+        try {
+            const query = await models.User.findAll({
+                include: {
+                    model: models.Role,
+                    through: models.AssignedRole,
+                    attributes: ['id', 'name', 'display_name'],
+                    as: 'roles'
+                }
+            });
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = UserQuery

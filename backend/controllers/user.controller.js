@@ -6,6 +6,7 @@ const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
+const EventQuery = require("../database/query/event.query");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -75,6 +76,42 @@ class UserController {
             )
         }
     }
+
+    static getNotDeletedUsers = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers();
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static getNotDeletedUsersWithRoles = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles();
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 }
 
 module.exports = UserController

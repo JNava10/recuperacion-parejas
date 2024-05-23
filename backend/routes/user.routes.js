@@ -9,4 +9,7 @@ router.post('/member/search', UserController.findUser); // Cambiar a GET
 router.get('/member/messages/:receiver', [validateToken], UserController.getMessages)
 router.post('/member/message', [validateToken], UserController.pushMessage)
 
+router.get('/', [validateToken], UserController.getNotDeletedUsers)
+router.get('/with-roles', [validateToken], UserController.getNotDeletedUsersWithRoles)
+
 module.exports = router;
