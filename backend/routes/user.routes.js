@@ -11,5 +11,6 @@ router.post('/member/message', [validateToken], UserController.pushMessage)
 
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
 router.get('/with-roles', [validateToken], UserController.getNotDeletedUsersWithRoles)
+router.delete('/:id', [validateToken], UserController.deleteUser)
 
 module.exports = router;

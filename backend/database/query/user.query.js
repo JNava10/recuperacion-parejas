@@ -68,6 +68,17 @@ class UserQuery {
             return new QueryError(false, e)
         }
     };
+
+    static deleteUser = async (id) => {
+        try {
+            const query = await models.User.destroy({where: id});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
 }
 
 module.exports = UserQuery
