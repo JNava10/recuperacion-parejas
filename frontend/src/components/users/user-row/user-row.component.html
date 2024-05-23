@@ -1,0 +1,31 @@
+<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+  <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+    {{user?.email}}
+  </th>
+  <td class="px-6 py-4">
+    {{user?.name}}
+  </td>
+  <td class="px-6 py-4">
+    {{user?.firstSurname}}
+  </td>
+  <td class="px-6 py-4">
+    {{user?.secondSurname}}
+  </td>
+  <td class="px-6 py-4">
+    <ul class="flex flex-row gap-2">
+      @for (role of user?.roles!; track role.id) {
+        <app-role-badge [role]="role"></app-role-badge>
+      }
+    </ul>
+  </td>
+  <td class="px-6 py-4">
+    <button type="button" (click)="deleteUser()" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Red</button>
+  </td>
+</tr>
+
+
+<!-- Modal para confirmar si borrar el usuario -->
+
+<p-dialog [modal]="true" header="¿Estás seguro de borrar este evento?" closeOnEscape="true" [(visible)]="deletingUser" class="max-w-l">
+  <app-confirm-delete-event (deleteEvent)="handleDeleteUser($event)"></app-confirm-delete-event>
+</p-dialog>

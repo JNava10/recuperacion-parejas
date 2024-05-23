@@ -18,10 +18,12 @@ export class UsersComponent implements OnInit {
   usersFetched = false;
 
   ngOnInit() {
+    this.getUsers();
+  }
+
+  protected getUsers() {
     this.userService.getNotDeletedWithRoles().subscribe(users => {
       this.users = users;
-
-      console.log(users)
 
       this.usersFetched = true;
     })

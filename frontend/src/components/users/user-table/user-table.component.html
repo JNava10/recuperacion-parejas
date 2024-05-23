@@ -17,32 +17,16 @@
       <th scope="col" class="px-6 py-3">
         Roles
       </th>
+      <th scope="col" class="px-6 py-3">
+          <!--   Encabezado de los botones     -->
+      </th>
     </tr>
     </thead>
     <tbody>
       @for (user of users; track user.id) {
-        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            {{user.email}}
-          </th>
-          <td class="px-6 py-4">
-            {{user.name}}
-          </td>
-          <td class="px-6 py-4">
-            {{user.firstSurname}}
-          </td>
-          <td class="px-6 py-4">
-            {{user.secondSurname}}
-          </td>
-          <td class="px-6 py-4">
-            <ul class="flex flex-row gap-2">
-              @for (role of user.roles!; track role.id) {
-                <app-role-badge [role]="role"></app-role-badge>
-              }
-            </ul>
-          </td>
-        </tr>
+        <app-user-row (refresh)="emitRefresh()" [user]="user"></app-user-row>
       }
     </tbody>
   </table>
 </div>
+

@@ -44,6 +44,13 @@ export interface GetUserResponse {
   }
 }
 
+export interface DeleteUserResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
+}
+
 export interface Role {
   id?: number,
   name?: string,
