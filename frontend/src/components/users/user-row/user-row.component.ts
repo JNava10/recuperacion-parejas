@@ -17,18 +17,7 @@ import {DialogModule} from "primeng/dialog";
   styleUrl: './user-row.component.css'
 })
 export class UserRowComponent {
-  constructor(private userService: UserService) {}
 
   @Input() user?: UserItem
-  @Output() refresh = new EventEmitter<null>()
 
-  deletingUser = false;
-
-  handleDeleteUser = (confirmDelete: boolean) => {
-    if (!confirmDelete) this.deletingUser = false;
-
-    this.userService.deleteUser(this.user!).subscribe(deleted => {
-      if (deleted) this.refresh.emit()
-    });
-  }
 }

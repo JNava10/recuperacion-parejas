@@ -71,7 +71,7 @@ class UserQuery {
 
     static deleteUser = async (id) => {
         try {
-            const query = await models.User.destroy({where: id});
+            const query = await models.User.destroy({where: {id}});
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
