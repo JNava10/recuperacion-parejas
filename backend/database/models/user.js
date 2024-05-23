@@ -60,11 +60,11 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    first_surname: {
+    firstSurname: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    second_surname: {
+    secondSurname: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -82,11 +82,11 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: false
     },
-    pic_url: {
+    picUrl: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    last_login: {
+    lastLogin: {
       type: DataTypes.DATE,
       allowNull: true,
     },
@@ -94,15 +94,15 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    created_at: {
+    createdAt: {
       allowNull: false,
       type: DataTypes.DATE
     },
-    updated_at: {
+    updatedAt: {
       allowNull: false,
       type: DataTypes.DATE
     },
-    deleted_at: {
+    deletedAt: {
       allowNull: true,
       type: DataTypes.DATE
     }
@@ -112,9 +112,7 @@ module.exports = (sequelize) => {
     tableName: 'users',
     timestamps: true,
     paranoid: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-    deletedAt: 'deleted_at',
+    underscored: true
   });
   return User;
 };

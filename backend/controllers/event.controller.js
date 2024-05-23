@@ -112,7 +112,6 @@ class EventController {
     };
 
     static getEvent = async (req, res) => {
-        console.log('a')
         const {message, executed, query, error} = await EventQuery.getEvent(req.params.id);
 
         if (executed) {
