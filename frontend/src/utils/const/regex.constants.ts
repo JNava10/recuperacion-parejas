@@ -7,3 +7,11 @@ export const event = {
   scheduledDate: /[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/,
   scheduledTime: /[0-9]{1,2}:[0-9]{1,2}/
 }
+
+export const user = {
+  name: /[A-Za-z\s.]{1,20}$/,
+  firstLastname: /[A-Za-z\s.]{1,20}$/,
+  secondLastname: /[A-Za-z\s.]{1,20}$/,
+  email: /[A-Za-z0-9]{4,25}@[A-Za-z]{3,10}.[A-Za-z]{2,7}$/,
+  password: /[\w!"·$%&\/(\\)=?*¿+\-`<>.:,;|@#~½¬{\[\]}ªº]{3,20}/
+}
