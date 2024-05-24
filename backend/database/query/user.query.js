@@ -1,4 +1,3 @@
-
 const models = require('../models/index');
 const {findUserByNameOrNick, findUserByFullname} = require("../../constants/sql.const");
 const {QueryTypes, Op} = require("sequelize");
@@ -52,6 +51,16 @@ class UserQuery {
         }
     };
 
+    static checkIfUserExists = async (email) => {
+        try {
+            const query = await models.User.findOne({where: {email}}) !== null;
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getNotDeletedWithRoles = async () => {
         try {
             const query = await models.User.findAll({
@@ -62,6 +71,16 @@ class UserQuery {
                     as: 'roles'
                 }
             });
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static createUser = async (user) => {
+        try {
+            const query = await models.User.create(user);
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {

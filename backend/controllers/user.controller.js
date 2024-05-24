@@ -112,6 +112,28 @@ class UserController {
             )
         }
     };
+
+    static createUser = async (req, res) => {
+        const user = req.body;
+
+        const emailExists = await UserQuery.checkIfUserExists(user.email)
+
+        const {message, executed, query, error} = await UserQuery.createUser(user);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 }
 
 module.exports = UserController
