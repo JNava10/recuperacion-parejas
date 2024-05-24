@@ -4,12 +4,14 @@ import {CreateUserItem, UserItem} from "../../../interfaces/api/user/user";
 import {UserService} from "../../../services/api/user.service";
 import * as regex from "../../../utils/const/regex.constants";
 import * as customValidators from "../../../utils/validators/customValidators";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
@@ -28,10 +30,15 @@ export class UserFormComponent {
       confirmPassword: new FormControl('', Validators.pattern(regex.user.password)),
     })
   }, {
-    validators: [customValidators.passwordsMatch('password', 'confirmPassword')]
+    validators: [customValidators.passwordsMatch('password', 'confirmPassword')],
+    updateOn: "submit"
   });
 
-  createUser = () => {
+  createUser = (event: SubmitEvent) => {
+    if (this.userForm.invalid) return
+
+    event.preventDefault();
+
     const user = this.getUserData();
 
     this.userService.createUser(user).subscribe();
@@ -52,4 +59,5 @@ export class UserFormComponent {
 
     return user;
   }
+  protected readonly MouseEvent = MouseEvent;
 }
