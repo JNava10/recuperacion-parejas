@@ -92,6 +92,7 @@ module.exports = (sequelize) => {
     },
     connected: {
       type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: false,
     },
     createdAt: {

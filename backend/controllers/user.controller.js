@@ -112,6 +112,40 @@ class UserController {
             )
         }
     };
+
+    static createUser = async (req, res) => {
+        const user = req.body;
+
+        const emailExists = await UserQuery.checkIfEmailExists(user.email).query; // TODO: Pasar al middleware
+
+        if (emailExists) return res.status(409).json(
+            new StdResponse("El correo indicado ya existe",{executed: false})
+        )
+
+        const nicknameExists = await UserQuery.checkIfEmailExists(user.nickname).query; // TODO: Pasar al middleware
+
+        console.log(nicknameExists)
+
+        if (nicknameExists) return res.status(409).json(
+            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
+        )
+
+        const {message, executed, query, error} = await UserQuery.createUser(user);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 }
 
 module.exports = UserController

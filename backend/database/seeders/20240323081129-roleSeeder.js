@@ -16,7 +16,7 @@ module.exports = {
     const roleFields = await models.Role.findAll();
     const userFields = await models.User.findAll();
 
-    // Filtramos los roles segun su nombre para poder asignarlos a un usuario especifico si es necesario.
+    // Filtramos los role segun su nombre para poder asignarlos a un usuario especifico si es necesario.
     const memberRole = roleFields.find(role => role.name === roleNames.member.name);
     const adminRole = roleFields.find(role => role.name === roleNames.admin.name);
 
@@ -46,7 +46,7 @@ module.exports = {
           role: role.id
         });
       } else {
-        // Si es aleatorio, simplemente se asignará un rol secuencialmente, reiniciando el contador si ya no hay mas roles asignables.
+        // Si es aleatorio, simplemente se asignará un rol secuencialmente, reiniciando el contador si ya no hay mas role asignables.
         await models.AssignedRole.create({
           user: userField.id,
           role: roleFields[roleIndex].id

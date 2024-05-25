@@ -1,4 +1,3 @@
-
 const models = require('../models/index');
 const {findUserByNameOrNick, findUserByFullname} = require("../../constants/sql.const");
 const {QueryTypes, Op} = require("sequelize");
@@ -52,6 +51,26 @@ class UserQuery {
         }
     };
 
+    static checkIfEmailExists = async (email) => {
+        try {
+            const query = await models.User.findOne({where: {email}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static checkIfNicknameExists = async (nickname) => {
+        try {
+            const query = await models.User.findOne({where: {nickname}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getNotDeletedWithRoles = async () => {
         try {
             const query = await models.User.findAll({
@@ -65,6 +84,30 @@ class UserQuery {
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static createUser = async (user) => {
+        try {
+            const roleIds = [...user.roleIds];
+            let userCreated;
+
+            user.roles = undefined;
+
+            const created = await models.User.create(user);
+
+            if (created) {
+                userCreated = await models.User.findOne({where: {email: user.email}, attributes: ['id']});
+
+                for (const roleId of roleIds) {
+                    await models.AssignedRole.create({user: userCreated.id, role: roleId})
+                }
+            }
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', true);
+        } catch (e) {
+            console.warn(e)
             return new QueryError(false, e)
         }
     };

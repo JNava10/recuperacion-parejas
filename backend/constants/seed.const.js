@@ -2,7 +2,7 @@ const {faker} = require('@faker-js/faker');
 const Preference = require("../classes/preference");
 const DefaultPreference = require("../classes/defaultPreference");
 
-// Información sobre los roles del sistema.
+// Información sobre los role del sistema.
 const roleNames = {
     admin: {
         name: 'admin', // Sería mejor idea introducir la estructura de estos objetos en una clase... (No estoy seguro)

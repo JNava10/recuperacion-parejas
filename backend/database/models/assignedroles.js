@@ -31,11 +31,13 @@ module.exports = (sequelize) => {
     },
     updated_at: {
       allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      default: new Date(Date.now())
     },
     deleted_at: {
       allowNull: true,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      default: new Date(Date.now())
     }
   }, {
     sequelize,

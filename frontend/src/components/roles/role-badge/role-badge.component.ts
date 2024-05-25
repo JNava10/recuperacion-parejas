@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {Role} from "../../../interfaces/api/user/user";
+import {RoleItem} from "../../../interfaces/api/user/user";
 
 @Component({
   selector: 'app-role-badge',
@@ -9,5 +9,5 @@ import {Role} from "../../../interfaces/api/user/user";
   styleUrl: './role-badge.component.css'
 })
 export class RoleBadgeComponent {
-  @Input() role?: Role
+  @Input() role?: RoleItem
 }

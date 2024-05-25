@@ -26,7 +26,12 @@ export interface UserItem {
   connected?: boolean
   createdAt?: string
   updatedAt?: string
-  roles?: Role[]
+  roles?: RoleItem[]
+  roleIds?: number[]
+}
+
+export interface CreateUserItem extends UserItem {
+  password?: string
 }
 
 export interface UserResponse extends ApiResponse {
@@ -44,8 +49,22 @@ export interface GetUserResponse {
   }
 }
 
-export interface Role {
+export interface CreateUserResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
+}
+
+export interface RoleItem {
   id?: number,
   name?: string,
   display_name?: string
+}
+
+export interface GetRolesResponse {
+  data: {
+    executed: true
+    query: RoleItem[]
+  }
 }

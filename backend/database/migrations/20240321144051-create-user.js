@@ -53,6 +53,7 @@ module.exports = {
       },
       connected: {
         type: DataTypes.BOOLEAN,
+        defaultValue: false,
         allowNull: false,
       },
       created_at: {
