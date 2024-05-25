@@ -26,7 +26,8 @@ export interface UserItem {
   connected?: boolean
   createdAt?: string
   updatedAt?: string
-  roles?: Role[]
+  roles?: RoleItem[]
+  roleIds?: number[]
 }
 
 export interface CreateUserItem extends UserItem {
@@ -55,8 +56,15 @@ export interface CreateUserResponse {
   }
 }
 
-export interface Role {
+export interface RoleItem {
   id?: number,
   name?: string,
   display_name?: string
+}
+
+export interface GetRolesResponse {
+  data: {
+    executed: true
+    query: RoleItem[]
+  }
 }
