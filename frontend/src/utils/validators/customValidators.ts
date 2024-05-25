@@ -12,7 +12,7 @@ export function passwordsMatch(passwordControlName: string, confirmPasswordName:
 
     const passwordMatch = passwordFormControl.value === confPasswordFormControl.value;
     const error = {passwordMatch: 'Las contraseñas no coinciden'};
-    const noError = {passwordMatch: 'Las contraseñas no coinciden'};
+    const noError = null;
 
     if (passwordMatch) {
       // Aunque parezca redundante, es necesario poner nulos los errores para evitar que sigan al volver a lanzar las validaciones.

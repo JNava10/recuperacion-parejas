@@ -116,7 +116,19 @@ class UserController {
     static createUser = async (req, res) => {
         const user = req.body;
 
-        const emailExists = await UserQuery.checkIfUserExists(user.email)
+        const emailExists = await UserQuery.checkIfEmailExists(user.email).query; // TODO: Pasar al middleware
+
+        if (emailExists) return res.status(409).json(
+            new StdResponse("El correo indicado ya existe",{executed: false})
+        )
+
+        const nicknameExists = await UserQuery.checkIfEmailExists(user.nickname).query; // TODO: Pasar al middleware
+
+        console.log(nicknameExists)
+
+        if (nicknameExists) return res.status(409).json(
+            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
+        )
 
         const {message, executed, query, error} = await UserQuery.createUser(user);
 

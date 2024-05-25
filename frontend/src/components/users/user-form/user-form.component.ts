@@ -25,6 +25,7 @@ export class UserFormComponent {
     firstLastname: new FormControl('', Validators.pattern(regex.user.firstLastname)),
     secondLastname: new FormControl('', Validators.pattern(regex.user.secondLastname)),
     email: new FormControl('', Validators.pattern(regex.user.email)),
+    nickname: new FormControl('', Validators.pattern(regex.user.nickname)),
     passwords: new FormGroup({
       password: new FormControl('', Validators.pattern(regex.user.password)),
       confirmPassword: new FormControl('', Validators.pattern(regex.user.password)),
@@ -51,13 +52,12 @@ export class UserFormComponent {
       name: formData.name!,
       firstSurname: formData.firstLastname!,
       secondSurname: formData.secondLastname!,
+      nickname: formData.nickname!,
       email: formData.email!,
       password: formData.passwords!.password!,
+      picUrl: "https://www.mundodeportivo.com/files/image_449_220/files/fp/uploads/2024/05/24/6650bdf5b973a.r_d.2397-2343-902.jpeg"
     }
-
-    console.log(user)
 
     return user;
   }
-  protected readonly MouseEvent = MouseEvent;
 }

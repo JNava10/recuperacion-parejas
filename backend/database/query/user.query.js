@@ -51,9 +51,19 @@ class UserQuery {
         }
     };
 
-    static checkIfUserExists = async (email) => {
+    static checkIfEmailExists = async (email) => {
         try {
-            const query = await models.User.findOne({where: {email}}) !== null;
+            const query = await models.User.findOne({where: {email}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static checkIfNicknameExists = async (nickname) => {
+        try {
+            const query = await models.User.findOne({where: {nickname}});
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
@@ -84,6 +94,7 @@ class UserQuery {
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
+            console.warn(e)
             return new QueryError(false, e)
         }
     };
