@@ -90,9 +90,22 @@ class UserQuery {
 
     static createUser = async (user) => {
         try {
-            const query = await models.User.create(user);
+            const roleIds = [...user.roleIds];
+            let userCreated;
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+            user.roles = undefined;
+
+            const created = await models.User.create(user);
+
+            if (created) {
+                userCreated = await models.User.findOne({where: {email: user.email}, attributes: ['id']});
+
+                for (const roleId of roleIds) {
+                    await models.AssignedRole.create({user: userCreated.id, role: roleId})
+                }
+            }
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', true);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
