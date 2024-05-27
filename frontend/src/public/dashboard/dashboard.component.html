@@ -1,3 +1,7 @@
 <app-find-members/>
-
 <app-registered-events></app-registered-events>
+
+@if (likableUsers) {
+  <app-users-to-match-list [users]="likableUsers"></app-users-to-match-list>
+}
+
