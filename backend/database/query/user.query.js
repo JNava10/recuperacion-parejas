@@ -30,10 +30,17 @@ class UserQuery {
      * @param {string} roleName
      * @returns {Promise<boolean>}
      */
-    static userHasRole = async (email, roleName) => {
+    static userHasRoleByEmail = async (email, roleName) => {
         return await models.User.findOne({
             where: {email: email},
             include: {model: models.Role, where: {name: roleName}, as: 'roles'}
+        });
+    }
+
+    static userHasRoleByIds = async (id, roleId) => {
+        return await models.User.findOne({
+            where: {id},
+            include: {model: models.Role, where: {id: roleId}, as: 'roles'}
         });
     }
 
@@ -127,19 +134,85 @@ class UserQuery {
         try {
             const edited = await models.User.update(data, {where: {id}});
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', edited);
+            return new QuerySuccess(true, 'Se ha actualizado la contraseña correctamente.', edited);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
         }
     };
 
-    static findById = async (id) => {
+    static insertUserRoles = async (roles, user) => {
         try {
-            const query = await models.User.findOne({id});
+            const entries = [];
+
+            console.log(roles)
+
+            roles.forEach(role => entries.push({user, role}))
+            const created = await models.AssignedRole.bulkCreate(entries);
+
+            const userRoles = await models.AssignedRole.findAll({where: {user}, attributes: ['role']});
+
+            return new QuerySuccess(created !== null, 'Se han insertado los usuarios correctamente.', {rolesAssigned: userRoles.map(assignedRole => assignedRole.role)});
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static deleteUserRoles = async (roles, user) => {
+        try {
+            const deleted = await models.AssignedRole.destroy({where: {
+                [Op.and]: [
+                    {user},
+                    {role: {[Op.in]: roles}}
+                ]}
+            });
+
+            return new QuerySuccess(true, 'Se han insertado los usuarios correctamente.', deleted);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+
+    /**
+     *
+     * @param id
+     * @param {Object?} options
+     * @param {boolean} options.withRoles
+     * @returns {Promise<QueryError|QuerySuccess>}
+     */
+    static findById = async (id, options) => {
+        try {
+            let query;
+
+            if (options.withRoles) {
+                query = await models.User.findOne({where: {id},
+                    include: {
+                        model: models.Role,
+                        through: models.AssignedRole,
+                        as: 'roles'
+                    }});
+            } else {
+                query = await models.User.findOne({id});
+            }
 
             return new QuerySuccess(true, 'Se ha obtenido el usuario correctamente.', query);
         } catch (e) {
+            console.log(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getUserRoles = async (user) => {
+        try {
+            let items = await models.AssignedRole.findAll({where: {user}, attributes: ['role']});
+            const roles = items.map(item => item.role);
+
+            return new QuerySuccess(true, 'Se ha obtenido el usuario correctamente.', roles);
+        } catch (e) {
+            console.log(e)
             return new QueryError(false, e)
         }
     };

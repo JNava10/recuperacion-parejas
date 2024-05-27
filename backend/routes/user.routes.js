@@ -15,5 +15,7 @@ router.put('/data/:id', [validateToken], UserController.updateUserData)
 
 router.get('/with-roles', [validateToken], UserController.getNotDeletedUsersWithRoles)
 router.post('/', [validateToken], UserController.createUser)
+router.post('/roles/:id', [validateToken], UserController.addUserRoles)
+router.post('/roles/delete/:id', [validateToken], UserController.deleteUserRoles)
 
 module.exports = router;

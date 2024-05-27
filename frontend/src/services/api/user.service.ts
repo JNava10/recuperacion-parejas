@@ -28,7 +28,7 @@ export class UserService {
   }
 
   findUserById = (id: string) => {
-    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/${id}`, {params: {...sendTokenParam}}).pipe(
+    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/${id}`, {params: {...sendTokenParam, withRoles: true}}).pipe(
       map(body => body.data.query)
     )
   }
@@ -56,6 +56,19 @@ export class UserService {
       map(body => body.data.query)
     )
   }
+
+  addRoles = (id: number, roles: number[]) => {
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
+  }
+
+  deleteRoles = (id: number, roles: number[]) => {
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
+  }
+
 
   editUserData = (data: CreateUserItem, id: number) => {
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}}).pipe(

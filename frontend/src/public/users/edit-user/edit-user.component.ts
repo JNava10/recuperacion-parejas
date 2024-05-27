@@ -30,6 +30,6 @@ export class EditUserComponent implements OnInit {
   }
 
   user?: UserItem;
-  roles: RoleItem[] = [];
+  roles?: RoleItem[];
 
 }

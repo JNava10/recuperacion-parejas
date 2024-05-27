@@ -1,12 +1,13 @@
 
 const {sendStandardResponse} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
-const {compare} = require("bcrypt");
+const bcrypt = require("bcrypt");
 const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
+const {el} = require("@faker-js/faker");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -27,7 +28,12 @@ class UserController {
     };
 
     static findById = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.findById(req.params.id);
+        const withRoles = req.query.withRoles;
+        let options = {};
+
+        if (withRoles) options.withRoles = true
+
+        const {message, executed, query, error} = await UserQuery.findById(req.params.id, options);
 
         if (executed) {
             return res.status(200).json(
@@ -183,8 +189,46 @@ class UserController {
         }
     };
 
+    static addUserRoles = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.insertUserRoles(req.body.roles, req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static deleteUserRoles = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
     static updateUserPassword = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.updateUserPassword(req.body, req.params.id);
+        const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
+
+        const {message, executed, query, error} = await UserQuery.updateUserPassword(password, req.params.id);
 
         if (executed) {
             return res.status(200).json(

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
-import {SelectRolesComponent} from "../../../components/roles/select-roles/select-roles.component";
+import {SelectRolesEditComponent} from "../../../components/roles/select-roles/select-roles.component";
 import {UserService} from "../../../services/api/user.service";
 import {CreateUserItem, RoleItem, UserItem} from "../../../interfaces/api/user/user";
 import * as regex from "../../../utils/const/regex.constants";
@@ -14,7 +14,7 @@ import * as customValidators from "../../../utils/validators/customValidators";
     FormsModule,
     NgIf,
     ReactiveFormsModule,
-    SelectRolesComponent
+    SelectRolesEditComponent
   ],
   templateUrl: './edit-user-form.component.html',
   styleUrl: './edit-user-form.component.css'
@@ -26,7 +26,7 @@ export class EditUserFormComponent implements OnInit {
    this.setUserData()
  }
 
-  @Input() roles: RoleItem[] = [];
+  @Input() roles?: RoleItem[];
   @Input() user?: UserItem;
 
   userDataForm = new FormGroup({
@@ -35,6 +35,7 @@ export class EditUserFormComponent implements OnInit {
     secondLastname: new FormControl('', Validators.pattern(regex.user.secondLastname)),
     email: new FormControl('', Validators.pattern(regex.user.email)),
     nickname: new FormControl('', Validators.pattern(regex.user.nickname)),
+    roles: new FormControl(new Array<RoleItem>(), Validators.required)
   },);
 
   passwordsForm = new FormGroup({
@@ -43,8 +44,6 @@ export class EditUserFormComponent implements OnInit {
       confirmPassword: new FormControl('', Validators.pattern(regex.user.password)),
     }),
   }, {  validators: [customValidators.passwordsMatch('password', 'confirmPassword')], updateOn: "submit"});
-
-  rolesControl = new FormControl(new Array<RoleItem>(), Validators.required);
 
   editUser = (event: SubmitEvent) => {
     if (this.userDataForm.invalid) return
@@ -57,7 +56,7 @@ export class EditUserFormComponent implements OnInit {
   };
 
   private getRolesData = () => {
-    const roles = this.rolesControl.value;
+    const roles = this.userDataForm.value.roles;
     return roles?.map(role => role.id!);
   }
 
@@ -83,14 +82,6 @@ export class EditUserFormComponent implements OnInit {
       nickname: this.user!.nickname!,
       email: this.user!.email!,
     })
-  }
-  setRolesSelected(selectedRoles: RoleItem[]) {
-    this.rolesControl.patchValue(selectedRoles);
-  }
-
-  handleSubmitRoles = () => {
-    const roleIds = this.getRolesData()
-
   }
 
   handleSubmitPassword = () => {

@@ -41,10 +41,10 @@
       </div>
     </div>
     <div class="flex flex-row gap-3">
-      <div>
-        <app-select-roles [roles]="roles" (sendRoles)="setRolesSelected($event)"></app-select-roles>
-        <span class="text-red-400" *ngIf="!this.userForm.get('roles')!.valid && form.submitted">Campo no valido</span>
-      </div>
+<!--      <div>-->
+<!--        <app-select-roles [roles]="roles" (sendRole)="setRolesSelected($event)"></app-select-roles>-->
+<!--        <span class="text-red-400" *ngIf="!this.userForm.get('roles')!.valid && form.submitted">Campo no valido</span>-->
+<!--      </div>-->
       <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
         Crear
       </button>

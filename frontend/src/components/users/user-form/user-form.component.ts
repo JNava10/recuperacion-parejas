@@ -5,7 +5,7 @@ import {UserService} from "../../../services/api/user.service";
 import * as regex from "../../../utils/const/regex.constants";
 import * as customValidators from "../../../utils/validators/customValidators";
 import {NgIf} from "@angular/common";
-import {SelectRolesComponent} from "../../roles/select-roles/select-roles.component";
+import {SelectRolesEditComponent} from "../../roles/select-roles/select-roles.component";
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
 
 @Component({
@@ -14,7 +14,7 @@ import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
   imports: [
     ReactiveFormsModule,
     NgIf,
-    SelectRolesComponent,
+    SelectRolesEditComponent,
     RoleBadgeComponent
   ],
   templateUrl: './user-form.component.html',
@@ -66,10 +66,5 @@ export class UserFormComponent {
     }
 
     return user;
-  }
-
-  setRolesSelected(selectedRoles: RoleItem[]) {
-    console.log(selectedRoles)
-    this.userForm.patchValue({roles: selectedRoles})
   }
 }
