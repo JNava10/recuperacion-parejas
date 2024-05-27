@@ -9,7 +9,7 @@ import {RoleItem} from "../../../interfaces/api/user/user";
   styleUrl: './select-roles.component.css'
 })
 export class SelectRolesComponent {
-  @Input() roles: RoleItem[] = [];
+  @Input() roles?: RoleItem[];
   @Output() sendRoles = new EventEmitter<RoleItem[]>();
 
   rolesSelected = new Set<RoleItem>();

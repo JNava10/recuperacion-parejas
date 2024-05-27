@@ -29,34 +29,40 @@ export class EditUserFormComponent implements OnInit {
   @Input() roles: RoleItem[] = [];
   @Input() user?: UserItem;
 
-  userForm = new FormGroup({
+  userDataForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
     firstLastname: new FormControl('', Validators.pattern(regex.user.firstLastname)),
     secondLastname: new FormControl('', Validators.pattern(regex.user.secondLastname)),
     email: new FormControl('', Validators.pattern(regex.user.email)),
     nickname: new FormControl('', Validators.pattern(regex.user.nickname)),
+  },);
+
+  passwordsForm = new FormGroup({
     passwords: new FormGroup({
       password: new FormControl('', Validators.pattern(regex.user.password)),
       confirmPassword: new FormControl('', Validators.pattern(regex.user.password)),
     }),
-    roles: new FormControl(new Array<RoleItem>(), Validators.required),
-  }, {
-    validators: [customValidators.passwordsMatch('password', 'confirmPassword')],
-  });
+  }, {  validators: [customValidators.passwordsMatch('password', 'confirmPassword')], updateOn: "submit"});
+
+  rolesControl = new FormControl(new Array<RoleItem>(), Validators.required);
 
   editUser = (event: SubmitEvent) => {
-    if (this.userForm.invalid) return
+    if (this.userDataForm.invalid) return
 
     event.preventDefault();
 
     const user = this.getUserData();
 
-    this.userService.createUser(user).subscribe();
+    this.userService.editUserData(user!, this.user?.id!).subscribe();
   };
 
+  private getRolesData = () => {
+    const roles = this.rolesControl.value;
+    return roles?.map(role => role.id!);
+  }
+
   private getUserData = () => {
-    const formData = this.userForm.value;
-    const roles = formData.roles?.map(role => role.id!);
+    const formData = this.userDataForm.value;
 
     const user: CreateUserItem = {
       name: formData.name!,
@@ -64,16 +70,13 @@ export class EditUserFormComponent implements OnInit {
       secondSurname: formData.secondLastname!,
       nickname: formData.nickname!,
       email: formData.email!,
-      password: formData.passwords!.password!,
-      picUrl: "https://www.mundodeportivo.com/files/image_449_220/files/fp/uploads/2024/05/24/6650bdf5b973a.r_d.2397-2343-902.jpeg",
-      roleIds: roles!
     }
 
     return user;
   }
 
   setUserData() {
-    this.userForm.patchValue({
+    this.userDataForm.patchValue({
       name: this.user!.name!,
       firstLastname: this.user!.firstSurname!,
       secondLastname: this.user!.firstSurname!,
@@ -82,6 +85,19 @@ export class EditUserFormComponent implements OnInit {
     })
   }
   setRolesSelected(selectedRoles: RoleItem[]) {
-    this.userForm.patchValue({roles: selectedRoles})
+    this.rolesControl.patchValue(selectedRoles);
   }
+
+  handleSubmitRoles = () => {
+    const roleIds = this.getRolesData()
+
+  }
+
+  handleSubmitPassword = () => {
+    if (this.passwordsForm.invalid) return;
+
+    const password = this.passwordsForm.value.passwords?.password;
+
+    this.userService.updatePassword(this.user?.id!, password!).subscribe();
+  };
 }

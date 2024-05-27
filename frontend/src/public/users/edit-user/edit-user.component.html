@@ -1,3 +1,3 @@
-@if (user) {
-  <app-edit-user-form [user]="user"></app-edit-user-form>
+@if (user && roles.length > 0) {
+  <app-edit-user-form [user]="user" [roles]="roles"></app-edit-user-form>
 }

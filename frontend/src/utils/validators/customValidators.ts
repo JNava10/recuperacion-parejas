@@ -23,8 +23,6 @@ export function passwordsMatch(passwordControlName: string, confirmPasswordName:
       passwordFormControl.setErrors(error);
       confPasswordFormControl.setErrors(error);
 
-      console.log('a')
-
       return error
     }
   };

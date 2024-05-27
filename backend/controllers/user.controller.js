@@ -27,7 +27,7 @@ class UserController {
     };
 
     static findById = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getUserById(req.params.id);
+        const {message, executed, query, error} = await UserQuery.findById(req.params.id);
 
         if (executed) {
             return res.status(200).json(
@@ -141,6 +141,50 @@ class UserController {
         )
 
         const {message, executed, query, error} = await UserQuery.createUser(user);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static updateUserData = async (req, res) => {
+        const newUserData = req.body;
+
+        const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar al middleware
+
+        if (nicknameExists) return res.status(409).json(
+            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
+        )
+
+        const {message, executed, query, error} = await UserQuery.updateUserData(newUserData, req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static updateUserPassword = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.updateUserPassword(req.body, req.params.id);
 
         if (executed) {
             return res.status(200).json(

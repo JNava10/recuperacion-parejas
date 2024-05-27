@@ -112,6 +112,28 @@ class UserQuery {
         }
     };
 
+    static updateUserData = async (data, id) => {
+        try {
+            const edited = await models.User.update(data, {where: {id}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', edited);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static updateUserPassword = async (data, id) => {
+        try {
+            const edited = await models.User.update(data, {where: {id}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', edited);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
     static findById = async (id) => {
         try {
             const query = await models.User.findOne({id});
