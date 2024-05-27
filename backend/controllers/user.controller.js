@@ -27,10 +27,22 @@ class UserController {
     };
 
     static findById = async (req, res) => {
-        const userId = req.params.id;
+        const {message, executed, query, error} = await UserQuery.getUserById(req.params.id);
 
-        const user = await UserQuery.findUserById
-    }
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 
     static getMessages = async (req, res) => {
         const receiverId = req.params.receiver;
@@ -123,8 +135,6 @@ class UserController {
         )
 
         const nicknameExists = await UserQuery.checkIfEmailExists(user.nickname).query; // TODO: Pasar al middleware
-
-        console.log(nicknameExists)
 
         if (nicknameExists) return res.status(409).json(
             new StdResponse("El nick del usuario indicado ya existe",{executed: false})

@@ -111,6 +111,16 @@ class UserQuery {
             return new QueryError(false, e)
         }
     };
+
+    static findById = async (id) => {
+        try {
+            const query = await models.User.findOne({id});
+
+            return new QuerySuccess(true, 'Se ha obtenido el usuario correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = UserQuery

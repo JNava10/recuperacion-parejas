@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {UserFormComponent} from "../../components/users/user-form/user-form.component";
-import {UserService} from "../../services/api/role.service";
-import {RoleItem} from "../../interfaces/api/user/user";
+import {UserFormComponent} from "../../../components/users/user-form/user-form.component";
+import {UserService} from "../../../services/api/role.service";
+import {RoleItem} from "../../../interfaces/api/user/user";
 
 @Component({
   selector: 'app-add-user',
