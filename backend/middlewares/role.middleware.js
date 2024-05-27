@@ -12,7 +12,7 @@ const isAdmin = async (req, res, next) => {
 
     const {userEmail} = req.payload;
 
-    const hasRole = await UserQuery.userHasRole(userEmail, roleNames.admin.name)
+    const hasRole = await UserQuery.userHasRoleByEmail(userEmail, roleNames.admin.name)
 
     if (!hasRole) return res.status(401).json(
         new StdResponse(
@@ -34,7 +34,7 @@ const isMember = async (req, res, next) => {
 
     const {userEmail} = req.payload;
 
-    const hasRole = await UserQuery.userHasRole(userEmail, roleNames.member.name)
+    const hasRole = await UserQuery.userHasRoleByEmail(userEmail, roleNames.member.name)
 
     if (!hasRole) return res.status(401).json(
         new StdResponse(

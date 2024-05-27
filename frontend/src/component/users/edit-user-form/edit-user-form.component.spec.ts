@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SelectRolesEditComponent } from './select-roles.component';
+import { EditUserFormComponent } from './edit-user-form.component';
 
-describe('SelectRolesComponent', () => {
-  let component: SelectRolesEditComponent;
-  let fixture: ComponentFixture<SelectRolesEditComponent>;
+describe('EditUserFormComponent', () => {
+  let component: EditUserFormComponent;
+  let fixture: ComponentFixture<EditUserFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SelectRolesEditComponent]
+      imports: [EditUserFormComponent]
     })
     .compileComponents();
-
-    fixture = TestBed.createComponent(SelectRolesEditComponent);
+    
+    fixture = TestBed.createComponent(EditUserFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

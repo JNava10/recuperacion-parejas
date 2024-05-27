@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {UserFormComponent} from "../../components/users/user-form/user-form.component";
-import {UserService} from "../../services/api/role.service";
-import {RoleItem} from "../../interfaces/api/user/user";
+import {UserFormComponent} from "../../../components/users/user-form/user-form.component";
+import {RoleService} from "../../../services/api/role.service";
+import {RoleItem} from "../../../interfaces/api/user/user";
 
 @Component({
   selector: 'app-add-user',
@@ -14,7 +14,7 @@ import {RoleItem} from "../../interfaces/api/user/user";
 })
 export class AddUserComponent implements OnInit {
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: RoleService) {}
 
   ngOnInit(): void {
     this.userService.getAllRoles().subscribe(roles => {

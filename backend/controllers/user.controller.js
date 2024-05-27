@@ -1,12 +1,13 @@
 
 const {sendStandardResponse} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
-const {compare} = require("bcrypt");
+const bcrypt = require("bcrypt");
 const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
+const {el} = require("@faker-js/faker");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -27,10 +28,27 @@ class UserController {
     };
 
     static findById = async (req, res) => {
-        const userId = req.params.id;
+        const withRoles = req.query.withRoles;
+        let options = {};
 
-        const user = await UserQuery.findUserById
-    }
+        if (withRoles) options.withRoles = true
+
+        const {message, executed, query, error} = await UserQuery.findById(req.params.id, options);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
 
     static getMessages = async (req, res) => {
         const receiverId = req.params.receiver;
@@ -124,13 +142,93 @@ class UserController {
 
         const nicknameExists = await UserQuery.checkIfEmailExists(user.nickname).query; // TODO: Pasar al middleware
 
-        console.log(nicknameExists)
-
         if (nicknameExists) return res.status(409).json(
             new StdResponse("El nick del usuario indicado ya existe",{executed: false})
         )
 
         const {message, executed, query, error} = await UserQuery.createUser(user);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static updateUserData = async (req, res) => {
+        const newUserData = req.body;
+
+        const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar al middleware
+
+        if (nicknameExists) return res.status(409).json(
+            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
+        )
+
+        const {message, executed, query, error} = await UserQuery.updateUserData(newUserData, req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static addUserRoles = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.insertUserRoles(req.body.roles, req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static deleteUserRoles = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static updateUserPassword = async (req, res) => {
+        const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
+
+        const {message, executed, query, error} = await UserQuery.updateUserPassword(password, req.params.id);
 
         if (executed) {
             return res.status(200).json(

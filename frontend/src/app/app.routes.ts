@@ -6,7 +6,8 @@ import {EventsComponent} from "../public/events/events.component";
 import {FindAvailableEventsComponent} from "../public/events/find-available-events/find-available-events.component";
 import {EventInfoComponent} from "../components/events/event-info/event-info.component";
 import {UsersComponent} from "../public/admin/users/users.component";
-import {AddUserComponent} from "../public/add-user/add-user.component";
+import {AddUserComponent} from "../public/users/add-user/add-user.component";
+import {EditUserComponent} from "../public/users/edit-user/edit-user.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'event-info', component: EventInfoComponent },
   { path: 'users', component: UsersComponent },
   { path: 'add-user', component: AddUserComponent },
+  { path: 'edit-user', component: EditUserComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];

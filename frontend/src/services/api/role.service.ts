@@ -4,9 +4,9 @@ import {HttpClient} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {
   CreateUserItem,
-  CreateUserResponse,
+  ManageUserResponse,
   GetRolesResponse,
-  GetUserResponse,
+  GetUsersResponse,
   User,
   UserResponse
 } from "../../interfaces/api/user/user";
@@ -17,7 +17,7 @@ import {map, tap} from "rxjs";
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class RoleService {
 
   constructor(private http: HttpClient) { }
 

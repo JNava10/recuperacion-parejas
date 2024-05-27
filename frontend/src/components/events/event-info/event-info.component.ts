@@ -12,9 +12,7 @@ import {concatWith} from "rxjs";
   styleUrl: './event-info.component.css'
 })
 export class EventInfoComponent implements OnInit {
-  constructor(private eventService: EventService, private router: Router, private activatedRoute: ActivatedRoute) {
-
-  }
+  constructor(private eventService: EventService, private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     const eventId = Number(this.activatedRoute.snapshot.queryParams['id']);

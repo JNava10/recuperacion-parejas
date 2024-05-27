@@ -42,14 +42,21 @@ export interface UserMessagesResponse extends ApiResponse {
   user: User
 }
 
-export interface GetUserResponse {
+export interface GetUsersResponse {
   data: {
     executed: true
     query: UserItem[]
   }
 }
 
-export interface CreateUserResponse {
+export interface GetUserResponse {
+  data: {
+    executed: true
+    query: UserItem
+  }
+}
+
+export interface ManageUserResponse {
   data: {
     executed: true
     query: boolean

@@ -11,7 +11,6 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
     }
   }
   AssignedRole.init({
@@ -33,19 +32,12 @@ module.exports = (sequelize) => {
       allowNull: false,
       type: DataTypes.DATE,
       default: new Date(Date.now())
-    },
-    deleted_at: {
-      allowNull: true,
-      type: DataTypes.DATE,
-      default: new Date(Date.now())
     }
   }, {
     sequelize,
     modelName: 'AssignedRole',
     tableName: 'assigned_roles',
     timestamps: true,
-    paranoid: true,
-    deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
