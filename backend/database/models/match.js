@@ -1,10 +1,9 @@
 'use strict';
 const {
-  Model,
-  DataTypes
+  Model, DataTypes
 } = require('sequelize');
-module.exports = (sequelize) => {
-  class Friendship extends Model {
+module.exports = (sequelize, DataTypes) => {
+  class Match extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -14,22 +13,21 @@ module.exports = (sequelize) => {
       // define association here
     }
   }
-  Friendship.init({
-    requesting_user: {
+  Match.init({
+    userWhoMatched: {
       type: DataTypes.INTEGER,
       primaryKey: true
     },
-    requested_user: {
+    userToMatch: {
       type: DataTypes.INTEGER,
       primaryKey: true
-    }
+    },
+    createdAt: DataTypes.DATE
   }, {
     sequelize,
-    modelName: 'Friendship',
-    tableName: 'friendships',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    modelName: 'Match',
+    tableName: 'matches',
+    underscored: true
   });
-  return Friendship;
+  return Match;
 };
