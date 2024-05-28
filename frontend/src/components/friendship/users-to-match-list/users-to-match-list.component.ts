@@ -26,10 +26,24 @@ export class UsersToMatchListComponent implements OnInit{
 
   handleUserClicked = (isLike: boolean) => {
     if (isLike) {
-      this.friendshipService.likeUser(this.userSelected!)
+      this.friendshipService.likeUser(this.userSelected!).subscribe(isMatch =>  {
+        if (isMatch) this.showMatch()
+        else {
+          this.selectNextUser();
+        }
+      })
+    } else {
+      this.selectNextUser();
     }
+  };
 
+  private showMatch() {
+    console.log('Match!')
+    this.selectNextUser();
+  }
+
+  private selectNextUser() {
     this.users?.shift();
     this.userSelected = this.users![0];
-  };
+  }
 }

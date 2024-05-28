@@ -7,5 +7,6 @@ const router = Router();
 
 
 router.get('/likables', [validateToken], FriendshipController.findLikableUsers);
+router.post('/like/:id', [validateToken], FriendshipController.likeUser);
 
 module.exports = router;
