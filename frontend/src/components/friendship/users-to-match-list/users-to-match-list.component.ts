@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UserItem} from "../../../interfaces/api/user/user";
 import {UsersToMatchCardComponent} from "../users-to-match-card/users-to-match-card.component";
 import {FriendshipService} from "../../../services/api/friendship.service";
@@ -21,24 +21,29 @@ export class UsersToMatchListComponent implements OnInit{
   }
 
   @Input() users?: UserItem[];
+  @Output() isMatch = new EventEmitter<UserItem>();
 
   userSelected?: UserItem
 
   handleUserClicked = (isLike: boolean) => {
     if (isLike) {
       this.friendshipService.likeUser(this.userSelected!).subscribe(isMatch =>  {
-        if (isMatch) this.showMatch()
-        else {
-          this.selectNextUser();
-        }
+        this.handleLike(isMatch);
       })
     } else {
       this.selectNextUser();
     }
   };
 
+  private handleLike(isMatch: boolean) {
+    if (isMatch) this.showMatch();
+    else {
+      this.selectNextUser();
+    }
+  }
+
   private showMatch() {
-    console.log('Match!')
+    this.isMatch.emit(this.userSelected);
     this.selectNextUser();
   }
 

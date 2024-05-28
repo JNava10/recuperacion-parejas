@@ -2,6 +2,17 @@
 <app-registered-events></app-registered-events>
 
 @if (likableUsers) {
-  <app-users-to-match-list [users]="likableUsers"></app-users-to-match-list>
+  <app-users-to-match-list [users]="likableUsers" (isMatch)="handleMatch($event)"></app-users-to-match-list>
 }
+
+<p-dialog header="¡Has hecho una nueva amistad!" [modal]="true" [(visible)]="isMatch">
+  <div>
+    {{matchedUser?.nickname}}
+    <div>
+      <button (click)="goToChat(this.matchedUser!)" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <i class="fa-solid fa-envelope"></i>
+      </button>
+    </div>
+  </div>
+</p-dialog>
 

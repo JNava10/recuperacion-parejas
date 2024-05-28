@@ -6,6 +6,8 @@ import {UsersToMatchListComponent} from "../../components/friendship/users-to-ma
 import {FriendshipService} from "../../services/api/friendship.service";
 import {UserService} from "../../services/api/user.service";
 import {UserItem} from "../../interfaces/api/user/user";
+import {DialogModule} from "primeng/dialog";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
   selector: 'app-dashboard',
@@ -13,13 +15,14 @@ import {UserItem} from "../../interfaces/api/user/user";
   imports: [
     FindMembersComponent,
     RegisteredEventsComponent,
-    UsersToMatchListComponent
+    UsersToMatchListComponent,
+    DialogModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
     this.userService.getAllUsers().subscribe(users => {
@@ -27,6 +30,16 @@ export class DashboardComponent implements OnInit {
     })
   }
 
+  isMatch = false;
+  matchedUser?: UserItem;
   likableUsers?: UserItem[];
 
+  handleMatch(matchedUser: UserItem) {
+    this.matchedUser = matchedUser;
+    this.isMatch = true;
+  }
+
+  goToChat = async (user: UserItem) => {
+    await this.router.navigate(['chat', {id: user.id}]);
+  };
 }
