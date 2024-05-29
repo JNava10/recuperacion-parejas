@@ -5,6 +5,11 @@
   <app-users-to-match-list [users]="likableUsers" (isMatch)="handleMatch($event)"></app-users-to-match-list>
 }
 
+<section>
+  <h3>Matches establecidos</h3>
+  <app-matches-list [matches]="matches"></app-matches-list>
+</section>
+
 <p-dialog header="¡Has hecho una nueva amistad!" [modal]="true" [(visible)]="isMatch">
   <div>
     {{matchedUser?.nickname}}

@@ -39,6 +39,16 @@ module.exports = (sequelize) => {
         as: 'friendships',
       });
 
+      this.hasMany(models.Match, {
+        foreignKey: 'userWhoMatched',
+        as: 'userWhoMatch',
+      });
+
+      this.hasMany(models.Match, {
+        foreignKey: 'userToMatched',
+        as: 'userMatch',
+      });
+
       this.belongsToMany(models.Preference, {
         through: models.UserPreference,
         as: 'preferences',

@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsTo(models.User, {foreignKey: 'userToMatch', as: 'userMatch'})
+      this.belongsTo(models.User, {foreignKey: 'userWhoMatched', as: 'userMatched'})
     }
   }
   Match.init({

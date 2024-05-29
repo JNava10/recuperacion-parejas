@@ -48,6 +48,36 @@ class FriendshipQuery {
             return new QueryError(false, e)
         }
     };
+
+    static getMatchedUsers = async (userWhoMatched) => {
+        try {
+            const matchedUsers = await models.Match.findAll({
+                where: {[Op.or]: [
+                        {userWhoMatched: userWhoMatched},
+                        {userToMatch: userWhoMatched},
+                    ]
+                },
+                attributes: ['userWhoMatched', 'userToMatch'],
+                include: [
+                    {
+                        model: models.User,
+                        attributes: ['id', 'nickname', 'firstSurname', 'secondSurname', 'picUrl'],
+                        as: 'userMatch'
+                    },
+                    {
+                        model: models.User,
+                        attributes: ['id', 'nickname', 'firstSurname', 'secondSurname', 'picUrl'],
+                        as: 'userMatched'
+                    }
+                ]
+            });
+
+            return new QuerySuccess(matchedUsers, 'Se han obtenido los amigos correctamente.', matchedUsers);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = FriendshipQuery

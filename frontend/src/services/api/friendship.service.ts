@@ -20,6 +20,12 @@ export class FriendshipService {
     );
   }
 
+  getOwnMatches = () => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/friendship/matched`, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    );
+  }
+
   getLikableUsers = () => {
     return this.http.get<GetUsersResponse>(`${environment.apiUrl}/friendship/likables/`, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
