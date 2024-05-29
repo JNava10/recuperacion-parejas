@@ -61,12 +61,12 @@ class FriendshipQuery {
                 include: [
                     {
                         model: models.User,
-                        attributes: ['id', 'nickname', 'firstSurname', 'secondSurname'],
+                        attributes: ['id', 'nickname', 'firstSurname', 'secondSurname', 'picUrl'],
                         as: 'userMatch'
                     },
                     {
                         model: models.User,
-                        attributes: ['id', 'nickname', 'firstSurname', 'secondSurname'],
+                        attributes: ['id', 'nickname', 'firstSurname', 'secondSurname', 'picUrl'],
                         as: 'userMatched'
                     }
                 ]

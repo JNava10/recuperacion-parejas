@@ -8,6 +8,7 @@ import {UserService} from "../../services/api/user.service";
 import {UserItem} from "../../interfaces/api/user/user";
 import {DialogModule} from "primeng/dialog";
 import {ActivatedRoute, Router} from "@angular/router";
+import {MatchesListComponent} from "../../components/friendship/matches-list/matches-list.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +17,8 @@ import {ActivatedRoute, Router} from "@angular/router";
     FindMembersComponent,
     RegisteredEventsComponent,
     UsersToMatchListComponent,
-    DialogModule
+    DialogModule,
+    MatchesListComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -29,14 +31,15 @@ export class DashboardComponent implements OnInit {
       this.likableUsers = users;
     });
 
-    this.friendshipService.getOwnMatches().subscribe(friends => {
-      console.log(friends)
+    this.friendshipService.getOwnMatches().subscribe(matches => {
+      this.matches = matches;
     })
   }
 
   isMatch = false;
   matchedUser?: UserItem;
   likableUsers?: UserItem[];
+  matches?: UserItem[];
 
   handleMatch(matchedUser: UserItem) {
     this.matchedUser = matchedUser;
