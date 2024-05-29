@@ -1,3 +1,6 @@
+const seederConstants = require("../constants/seed.const");
+
+
 class DefaultPreference {
 
     /**

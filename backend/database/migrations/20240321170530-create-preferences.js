@@ -10,6 +10,16 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
+      type: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: {
+            tableName: models.PreferenceType.tableName
+          },
+          key: 'id'
+        }
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
