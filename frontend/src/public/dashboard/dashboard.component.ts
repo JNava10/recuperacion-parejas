@@ -22,11 +22,15 @@ import {ActivatedRoute, Router} from "@angular/router";
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(private userService: UserService, private router: Router, private friendshipService: FriendshipService) {}
 
   ngOnInit(): void {
     this.userService.getAllUsers().subscribe(users => {
       this.likableUsers = users;
+    });
+
+    this.friendshipService.getOwnMatches().subscribe(friends => {
+      console.log(friends)
     })
   }
 
