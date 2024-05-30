@@ -17,6 +17,15 @@ export interface PreferenceItem {
   deleted_at?: string
 }
 
+export interface CreatePreferenceItem {
+  name?: string,
+  description?: string
+}
+
+export interface CreateChoicePreference extends CreatePreferenceItem{
+  options: PreferenceOption[]
+}
+
 export interface PreferenceItemWithType extends PreferenceItem {
   type: PreferenceType
 }
@@ -24,4 +33,9 @@ export interface PreferenceItemWithType extends PreferenceItem {
 export interface PreferenceType {
   id?: number
   text?: string
+}
+
+
+export interface PreferenceOption {
+  text: string
 }
