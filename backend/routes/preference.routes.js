@@ -5,5 +5,6 @@ const router = Router();
 
 
 router.get('/activated', [validateToken], PreferenceController.getActivatedPreferences);
+router.post('/save/choice', [validateToken], PreferenceController.createChoicePreference);
 
 module.exports = router;

@@ -30,11 +30,14 @@ module.exports = {
       },
       created_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        default: new Date(Date.now())
+
       },
       updated_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        default: new Date(Date.now())
       },
       deleted_at: {
         allowNull: true,

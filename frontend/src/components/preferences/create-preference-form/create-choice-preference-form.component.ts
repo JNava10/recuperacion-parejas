@@ -3,10 +3,11 @@ import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Val
 import * as regex from "../../../utils/const/regex.constants";
 import {NgIf} from "@angular/common";
 import {
-  CreateChoicePreference,
+  CreateChoicePreferenceItem,
   CreatePreferenceItem,
   PreferenceOption
 } from "../../../interfaces/api/preference/preferenceItem";
+import {PreferenceService} from "../../../services/api/preference.service";
 
 @Component({
   selector: 'app-create-preference-form',
@@ -19,7 +20,7 @@ import {
   styleUrl: './create-choice-preference-form.component.css'
 })
 export class CreateChoicePreferenceFormComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService) {
   }
 
   ngOnInit() {
@@ -45,14 +46,17 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
   optionFields = 1;
 
   handleForm($event: MouseEvent) {
+    if (this.choicePreferenceForm.invalid) return;
+
     const formValues = this.choicePreferenceForm.value;
 
+    const choicePreference: CreateChoicePreferenceItem = {
+      name: formValues.name!,
+      description: formValues.description!,
+      options: this.options.value,
+    }
 
-    // const choicePreference: CreateChoicePreference = {
-    //   name: formValues.name!,
-    //   description: formValues.description!,
-    //   options: options,
-    // }
+    this.preferenceService.saveChoicePreference(choicePreference).subscribe()
   }
   createPreferenceOptions = () => {
     for (let i = 0; i < this.optionFields; i++) {
@@ -66,11 +70,10 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
   };
 
   protected removeOption = (index: number) => {
-    console.log(index)
     this.options.removeAt(index)
-
-    console.log(this.options.value)
   }
+
+  minOptionsRequired = 2;
 
   protected createOption() {
     const optionForm = this.formBuilder.group({
@@ -78,12 +81,5 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
     }, {updateOn: "change"});
 
     this.options.push(optionForm)
-
-    console.log(this.choicePreferenceForm.value.options)
-  }
-
-  test(formGroup: FormGroup) {
-    console.log(formGroup.value)
-    return "";
   }
 }

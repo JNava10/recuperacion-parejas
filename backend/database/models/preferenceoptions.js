@@ -27,7 +27,8 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'PreferenceOption',
-    tableName: 'preference_options'
+    tableName: 'preference_options',
+    timestamps: false
   });
   return PreferenceOptions;
 };

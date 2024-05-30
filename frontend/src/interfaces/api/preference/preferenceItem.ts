@@ -22,7 +22,7 @@ export interface CreatePreferenceItem {
   description?: string
 }
 
-export interface CreateChoicePreference extends CreatePreferenceItem{
+export interface CreateChoicePreferenceItem extends CreatePreferenceItem {
   options: PreferenceOption[]
 }
 
