@@ -7,8 +7,6 @@ const seederConstants = require("../../constants/seed.const");
 const make = async (list, types) => {
     const preferences = [];
 
-    console.log(types)
-
     const valueTypeId = types.find(type => type.name === preferenceTypes.value).id
     const optionTypeId = types.find(type => type.name === preferenceTypes.value).id
 
@@ -29,8 +27,6 @@ const make = async (list, types) => {
 
         preferences.push(preference);
     });
-
-    console.log(preferences)
 
     return preferences;
 }
