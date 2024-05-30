@@ -26,25 +26,26 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
     this.createPreferenceOptions()
   }
 
-  choicePreferenceForm = new FormGroup({
-    name: new FormControl('', {validators: [
+  choicePreferenceForm = this.formBuilder.group({
+    name: ['', {
+      validators: [
         Validators.required, Validators.pattern(regex.event.name),
-      ]}),
+      ]
+    }],
 
-    description: new FormControl('', [
-      Validators.required, Validators.pattern(regex.event.description)
-    ]),
+    description: ['', {
+        validators: [
+          Validators.required, Validators.pattern(regex.event.name),
+        ]
+      }],
+
+    options: this.formBuilder.array(new Array<FormGroup>())
   }, {updateOn: "submit"});
-
-  optionsFormGroup = this.formBuilder.group({
-    options: this.formBuilder.array([])
-  });
 
   optionFields = 1;
 
   handleForm($event: MouseEvent) {
     const formValues = this.choicePreferenceForm.value;
-    const options = this.getOptionsFromForm()
 
 
     // const choicePreference: CreateChoicePreference = {
@@ -53,13 +54,6 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
     //   options: options,
     // }
   }
-
-  private getOptionsFromForm = () => {
-    const controls = this.optionsFormGroup.controls;
-
-    console.log(controls)
-  };
-
   createPreferenceOptions = () => {
     for (let i = 0; i < this.optionFields; i++) {
      this.createOption();
@@ -67,24 +61,29 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
   }
 
   // Con get se puede acceder al formulario de forma dinamica.
-  get options() {
-    return this.optionsFormGroup.controls.options as FormArray;
+  get options(): FormArray<FormGroup> {
+    return this.choicePreferenceForm.controls.options as FormArray;
   };
 
   protected removeOption = (index: number) => {
     console.log(index)
-    this.options.removeAt(index);
+    this.options.removeAt(index)
+
+    console.log(this.options.value)
   }
 
   protected createOption() {
-    this.options.push(
-      new FormControl("", Validators.required)
-    )
+    const optionForm = this.formBuilder.group({
+      text: ["", Validators.required]
+    }, {updateOn: "change"});
 
-    console.log(this.options.controls)
+    this.options.push(optionForm)
+
+    console.log(this.choicePreferenceForm.value.options)
   }
 
-  private getName(index: number) {
-    return `option_${index}`;
+  test(formGroup: FormGroup) {
+    console.log(formGroup.value)
+    return "";
   }
 }
