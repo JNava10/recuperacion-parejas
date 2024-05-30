@@ -14,7 +14,7 @@ export class PreferenceService {
   constructor(private http: HttpClient) { }
 
   getActivatedPreferences = () => {
-    return this.http.get<GetPreferenceResponse>(`${environment.apiUrl}/preferences/activated`, {params: {...sendTokenParam}}).pipe(
+    return this.http.get<GetPreferenceResponse>(`${environment.apiUrl}/preference/activated`, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     );
   }

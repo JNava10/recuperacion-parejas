@@ -8,6 +8,7 @@ import {EventInfoComponent} from "../components/events/event-info/event-info.com
 import {UsersComponent} from "../public/admin/users/users.component";
 import {AddUserComponent} from "../public/users/add-user/add-user.component";
 import {EditUserComponent} from "../public/users/edit-user/edit-user.component";
+import {PreferencesComponent} from "../public/admin/preferences/preferences.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,5 +20,6 @@ export const routes: Routes = [
   { path: 'users', component: UsersComponent },
   { path: 'add-user', component: AddUserComponent },
   { path: 'edit-user', component: EditUserComponent },
+  { path: 'preferences', component: PreferencesComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];

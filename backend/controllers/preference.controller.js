@@ -5,10 +5,12 @@ const {el} = require("@faker-js/faker");
 const FriendshipQuery = require("../database/query/friendship.query");
 const PreferenceQuery = require("../database/query/preference.query");
 
-class FriendshipController {
+class PreferenceController {
     static getActivatedPreferences = async (req, res) => {
         try {
             const {message, query} = await PreferenceQuery.getActivatedPreferences();
+
+            console.log(query)
 
             return res.status(200).json(
                 new StdResponse(message,{executed: true, query})
@@ -21,4 +23,4 @@ class FriendshipController {
     };
 }
 
-module.exports = FriendshipController
+module.exports = PreferenceController

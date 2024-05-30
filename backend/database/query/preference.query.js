@@ -7,7 +7,13 @@ const QueryError = require("../../classes/QueryError");
 class PreferenceQuery {
     static getActivatedPreferences = async () => {
         try {
-            const activatedPreferences = await models.Preference.findAll();
+            const activatedPreferences = await models.Preference.findAll({
+                attributes: ['name', 'description', 'typeId', 'createdAt', 'updatedAt'],
+                include: {
+                    model: models.PreferenceType,
+                    as: 'type'
+                }
+            });
 
             return new QuerySuccess(activatedPreferences !== null, 'Se han obtenido los amigos correctamente.', activatedPreferences);
         } catch (e) {

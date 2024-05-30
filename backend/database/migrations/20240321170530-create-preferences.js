@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      type: {
+      type_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

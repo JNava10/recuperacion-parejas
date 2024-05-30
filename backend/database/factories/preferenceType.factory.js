@@ -6,8 +6,8 @@ const {preferenceTypes} = require("../../constants/seed.const");
 const make = (typeNames) => {
     const types = [];
 
-    typeNames.forEach(name => {
-       types.push({name})
+    typeNames.forEach(item => {
+       types.push({text: item.text})
     });
 
     return types;
