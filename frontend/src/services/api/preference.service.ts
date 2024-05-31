@@ -4,7 +4,11 @@ import {environment} from "../../environments/environment";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {map} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-import {CreateChoicePreferenceItem, GetPreferenceResponse} from "../../interfaces/api/preference/preferenceItem";
+import {
+  CreateChoicePreferenceItem,
+  CreateRangePreferenceItem,
+  GetPreferenceResponse
+} from "../../interfaces/api/preference/preferenceItem";
 
 @Injectable({
   providedIn: 'root'
@@ -24,4 +28,10 @@ export class PreferenceService {
       map(body => body.data.query)
     );
   }
+  saveRangePreference = (preference: CreateRangePreferenceItem) => {
+    return this.http.post<GetPreferenceResponse>(`${environment.apiUrl}/preference/save/range`, preference, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    );
+  }
+
 }

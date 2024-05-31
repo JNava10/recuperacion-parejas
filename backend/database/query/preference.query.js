@@ -54,6 +54,32 @@ class PreferenceQuery {
             return new QueryError(false, e)
         }
     };
+
+    static createRangePreference = async (preference) => {
+        try {
+            const type = await models.PreferenceType.findOne({where: {text: preferenceTypes.range.text}})
+            const {name, description, range} = preference;
+
+            const createdPreference = await models.Preference.create({
+                name,
+                description,
+                typeId: type.id
+            });
+
+            if (createdPreference.id) {
+                await models.PreferenceValue.create({
+                    preference: createdPreference.id,
+                    min_value: range.min,
+                    max_value: range.max,
+                });
+            }
+
+            return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = PreferenceQuery

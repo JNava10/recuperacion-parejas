@@ -51,7 +51,6 @@ export class CreateRangePreferenceFormComponent {
   }, {updateOn: "submit"});
 
   handleForm($event: SubmitEvent) {
-    console.log(this.rangePreferenceForm.get('range')?.valid )
     if (this.rangePreferenceForm.invalid) return;
 
     const formValues = this.rangePreferenceForm.value;
@@ -65,8 +64,6 @@ export class CreateRangePreferenceFormComponent {
       }
     }
 
-    console.log(rangePreference)
-
-    // this.preferenceService.saveChoicePreference(choicePreference).subscribe()
+    this.preferenceService.saveRangePreference(rangePreference).subscribe()
   }
 }

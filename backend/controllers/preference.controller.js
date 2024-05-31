@@ -35,6 +35,20 @@ class PreferenceController {
             )
         }
     };
+
+    static createRangePreference = async (req, res) => {
+        try {
+            const {message, query, executed} = await PreferenceQuery.createRangePreference(req.body);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            )
+        }
+    };
 }
 
 module.exports = PreferenceController
