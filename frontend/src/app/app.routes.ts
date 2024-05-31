@@ -13,6 +13,9 @@ import {CreatePreferenceComponent} from "../public/admin/preferences/create-pref
 import {
   CreateChoicePreferenceFormComponent
 } from "../components/preferences/create-preference-form/create-choice-preference-form.component";
+import {
+  CreateRangePreferenceComponent
+} from "../public/admin/preferences/create-range-preference/create-range-preference.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,5 +29,6 @@ export const routes: Routes = [
   { path: 'edit-user', component: EditUserComponent },
   { path: 'preferences', component: PreferencesComponent },
   { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
+  { path: 'create-range-preference', component: CreateRangePreferenceComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];

@@ -26,6 +26,13 @@ export interface CreateChoicePreferenceItem extends CreatePreferenceItem {
   options: PreferenceOption[]
 }
 
+export interface CreateRangePreferenceItem extends CreatePreferenceItem {
+  range: {
+    min: number,
+    max: number
+  }
+}
+
 export interface PreferenceItemWithType extends PreferenceItem {
   type: PreferenceType
 }

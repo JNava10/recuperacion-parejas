@@ -19,6 +19,7 @@ export const user = {
 
 export const preference = {
   name: /[A-Za-z¿?,\s.]{1,25}$/,
-  description: /[\w¿?,\s.]{1,50}$/,
+  description: /[A-Za-z¿?,\s.]{1,50}$/,
   option: /[\w¿?,\s.]{1,20}$/,
 }
+
