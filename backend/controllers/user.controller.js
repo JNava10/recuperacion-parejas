@@ -10,6 +10,7 @@ const EventQuery = require("../database/query/event.query");
 const {el} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
+const {sendEmail} = require("../helpers/mail.helper");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -265,16 +266,20 @@ class UserController {
 
     static sendRecoverEmail = async (req, res) => {
         try {
-            const {email} = req.body
+            // const {email} = req.body
 
-            const emailExists = await UserQuery.checkIfEmailExists(email);
 
-            if (!emailExists.query)  return res.status(200).json(
-                new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
-            )
+            // const emailExists = await UserQuery.checkIfEmailExists(email);
 
-            const {recoverCode, expiresAt} = RecoverController.set(email);
+            // if (!emailExists.query)  return res.status(200).json(
+            //     new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
+            // )
 
+            // const {recoverCode, expiresAt} = RecoverController.set(email);
+
+            const emailSended = sendEmail('juannr2002@gmail.com', 'hola', 'que tal', '<p>Sí.</p>');
+
+            console.log(emailSended)
 
             // return res.status(200).json(
             //     new StdResponse(message,{executed, {}})

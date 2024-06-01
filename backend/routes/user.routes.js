@@ -19,4 +19,6 @@ router.post('/roles/:id', [validateToken], UserController.addUserRoles)
 router.post('/roles/delete/:id', [validateToken], UserController.deleteUserRoles)
 router.post('/register', [], UserController.registerUser)
 
+router.post('/send-recover-mail', UserController.sendRecoverEmail)
+
 module.exports = router;
