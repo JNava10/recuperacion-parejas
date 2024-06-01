@@ -7,20 +7,28 @@ import * as customValidators from "../../../utils/validators/customValidators";
 import {UserService} from "../../../services/api/user.service";
 import {DialogModule} from "primeng/dialog";
 import {Router} from "@angular/router";
+import {ToastModule} from "primeng/toast";
+import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
+import {MessageService} from "primeng/api";
+import {MessageModule} from "primeng/message";
+import {tap} from "rxjs";
 
 @Component({
   selector: 'app-register-form',
   standalone: true,
-    imports: [
-        NgIf,
-        ReactiveFormsModule,
-        DialogModule
-    ],
+  imports: [
+    NgIf,
+    ReactiveFormsModule,
+    DialogModule,
+    ToastModule,
+    CustomToastComponent,
+    MessageModule
+  ],
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.css'
 })
 export class RegisterFormComponent {
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(private userService: UserService, private router: Router, private messageService: MessageService) {}
 
   registerForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -62,10 +70,12 @@ export class RegisterFormComponent {
   sendData = () => {
     if (!this.user) return;
 
-    this.userService.registerUser(this.user!).pipe().subscribe(() => {
+    this.userService.registerUser(this.user!).subscribe(() => {
       this.showPicModal = false;
 
-      this.router.navigate(['login']);
+      this.messageService.add({severity: 'success', summary: 'Se ha registrado el usuario correctamente'});
+
+      setTimeout(() => this.router.navigate(['login']), 1000)
     });
   };
 }
