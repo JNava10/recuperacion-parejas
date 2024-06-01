@@ -8,6 +8,7 @@ const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
 const {el} = require("@faker-js/faker");
+const PreferenceQuery = require("../database/query/preference.query");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -241,6 +242,22 @@ class UserController {
         } else if (!query) {
             return res.status(500).json(
                 new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static registerUser = async (req, res) => {
+        try {
+            if (!req.body.picUrl) req.body.picUrl = process.env.DEFAULT_PROFILE_PIC_URL;
+
+            const {message, query, executed} = await UserQuery.registerUser(req.body);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
             )
         }
     };

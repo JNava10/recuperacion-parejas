@@ -5,19 +5,22 @@ import * as regex from "../../../utils/const/regex.constants";
 import {CreateUserItem, RoleItem, UserItem} from "../../../interfaces/api/user/user";
 import * as customValidators from "../../../utils/validators/customValidators";
 import {UserService} from "../../../services/api/user.service";
+import {DialogModule} from "primeng/dialog";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-register-form',
   standalone: true,
     imports: [
         NgIf,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        DialogModule
     ],
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.css'
 })
 export class RegisterFormComponent {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   registerForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -33,7 +36,7 @@ export class RegisterFormComponent {
     validators: [customValidators.passwordsMatch('password', 'confirmPassword')],
   });
 
-  createUser = (event: SubmitEvent) => {
+  buildUserData = (event: SubmitEvent) => {
     event.preventDefault();
 
     if (this.registerForm.invalid) return;
@@ -49,6 +52,20 @@ export class RegisterFormComponent {
       password: passwords?.password!,
     }
 
-    this.userService.registerUser(user).subscribe();
+    this.user = user;
+    this.showPicModal = true
+  };
+
+  user?: CreateUserItem
+  showPicModal = false;
+
+  sendData = () => {
+    if (!this.user) return;
+
+    this.userService.registerUser(this.user!).pipe().subscribe(() => {
+      this.showPicModal = false;
+
+      this.router.navigate(['login']);
+    });
   };
 }

@@ -4,6 +4,8 @@ const {QueryTypes, Op} = require("sequelize");
 const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
 const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
+const RoleQuery = require("./role.query");
+const {roleNames} = require("../../constants/seed.const");
 
 class UserQuery {
     /**
@@ -213,6 +215,25 @@ class UserQuery {
             return new QuerySuccess(true, 'Se ha obtenido el usuario correctamente.', roles);
         } catch (e) {
             console.log(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static registerUser = async (user) => {
+        try {
+            const memberRole = await RoleQuery.getRole(roleNames.member.name)
+
+            console.log(memberRole)
+
+            const created = await models.User.create(user);
+
+            if (created) {
+                await models.AssignedRole.create({user: created.id, role: memberRole.query.id})
+            }
+
+            return new QuerySuccess(true, 'Se ha registrado el usuario correctamente.', true);
+        } catch (e) {
+            console.warn(e)
             return new QueryError(false, e)
         }
     };

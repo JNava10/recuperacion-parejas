@@ -52,7 +52,7 @@ export class UserService {
   }
 
   registerUser = (user: CreateUserItem) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/register`, user,{params: {...sendTokenParam}}).pipe(
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/register`, user).pipe(
       map(body => body.data.query)
     )
   }
