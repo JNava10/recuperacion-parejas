@@ -11,20 +11,19 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-
-      // Una preferencia solo puede tener un valor en caso de ser numerica.
       this.belongsToMany(models.User, {
         through: models.UserPreference,
         as: 'users',
       });
 
-      // Una preferencia solo puede tener un valor en caso de ser numerica.
       this.hasOne(models.PreferenceValue,  {
         foreignKey: {
           name: 'preference',
           as: 'values'
         }
       });
+
+      this.belongsTo(models.PreferenceType, {as: 'type'});
     }
   }
   Preference.init({
@@ -33,19 +32,22 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    typeId: {
+      type: DataTypes.STRING,
+    },
     name: {
       type: DataTypes.STRING,
     },
     description: {
       type: DataTypes.STRING,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE
     }
 
@@ -55,9 +57,7 @@ module.exports = (sequelize) => {
     tableName: 'preferences',
     timestamps: true,
     paranoid: true,
-    deletedAt: 'deleted_at',
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
   });
   return Preference;
 };

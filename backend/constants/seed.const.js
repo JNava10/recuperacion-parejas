@@ -73,6 +73,17 @@ const defaultSettings = [
 
 // Preferencias creadas por defecto al iniciar el sistema. Luego se podrán agregar más si así se quiere.
 
+const preferenceTypes = {
+    range: {
+        name: 'range',
+        text: 'Rango'
+    },
+    choice: {
+        name: 'choice',
+        text: 'Elección'
+    }
+}
+
 // Preferencias que podrá elegir el usuario
 
 const defaultPreferences = {
@@ -105,5 +116,6 @@ module.exports = {
     settingTypes,
     defaultSettings,
     defaultPreferences,
-    customUsers
+    customUsers,
+    preferenceTypes
 }

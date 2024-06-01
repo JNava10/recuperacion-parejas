@@ -8,6 +8,14 @@ import {EventInfoComponent} from "../components/events/event-info/event-info.com
 import {UsersComponent} from "../public/admin/users/users.component";
 import {AddUserComponent} from "../public/users/add-user/add-user.component";
 import {EditUserComponent} from "../public/users/edit-user/edit-user.component";
+import {PreferencesComponent} from "../public/admin/preferences/preferences.component";
+import {CreatePreferenceComponent} from "../public/admin/preferences/create-preference/create-preference.component";
+import {
+  CreateChoicePreferenceFormComponent
+} from "../components/preferences/create-preference-form/create-choice-preference-form.component";
+import {
+  CreateRangePreferenceComponent
+} from "../public/admin/preferences/create-range-preference/create-range-preference.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,5 +27,8 @@ export const routes: Routes = [
   { path: 'users', component: UsersComponent },
   { path: 'add-user', component: AddUserComponent },
   { path: 'edit-user', component: EditUserComponent },
+  { path: 'preferences', component: PreferencesComponent },
+  { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
+  { path: 'create-range-preference', component: CreateRangePreferenceComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];
