@@ -6,7 +6,8 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {authInterceptor} from "../interceptors/auth.interceptor";
+import {MessageService} from "primeng/api";
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideAnimations(), provideRouter(routes), importProvidersFrom(TuiRootModule), provideHttpClient(withInterceptors([authInterceptor]))]
+  providers: [MessageService, provideAnimations(), provideRouter(routes), importProvidersFrom(TuiRootModule), provideHttpClient(withInterceptors([authInterceptor]))]
 };
