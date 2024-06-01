@@ -51,6 +51,12 @@ export class UserService {
     )
   }
 
+  registerUser = (user: CreateUserItem) => {
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/register`, user,{params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    )
+  }
+
   updatePassword = (id: number, password: string) => {
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/password/${id}`, {password},{params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
