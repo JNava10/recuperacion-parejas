@@ -9,6 +9,7 @@ const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
 const {el} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
+const RecoverController = require("./recover.controller");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -255,6 +256,29 @@ class UserController {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
+        } catch (e) {
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            )
+        }
+    };
+
+    static sendRecoverEmail = async (req, res) => {
+        try {
+            const {email} = req.body
+
+            const emailExists = await UserQuery.checkIfEmailExists(email);
+
+            if (!emailExists.query)  return res.status(200).json(
+                new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
+            )
+
+            const {recoverCode, expiresAt} = RecoverController.set(email);
+
+
+            // return res.status(200).json(
+            //     new StdResponse(message,{executed, {}})
+            // )
         } catch (e) {
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
