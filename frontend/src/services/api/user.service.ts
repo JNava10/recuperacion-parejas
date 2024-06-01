@@ -13,6 +13,7 @@ import {
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {map, tap} from "rxjs";
+import {SendRecoverEmailResponse} from "../../interfaces/recover-password";
 
 @Injectable({
   providedIn: 'root'
@@ -54,6 +55,12 @@ export class UserService {
   registerUser = (user: CreateUserItem) => {
     return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/register`, user).pipe(
       map(body => body.data.query)
+    )
+  }
+
+  sendRecoverEmail = (email: string) => {
+    return this.http.post<SendRecoverEmailResponse>(`${environment.apiUrl}/user/recover-email`, {params: {email}}).pipe(
+      map(body => body.data.sended)
     )
   }
 

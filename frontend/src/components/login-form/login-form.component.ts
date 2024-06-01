@@ -7,7 +7,8 @@ import {NgIf} from "@angular/common";
 import {MessageService} from "primeng/api";
 import {MessagesModule} from "primeng/messages";
 import {StorageService} from "../../services/storage.service";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
+import {CustomToastComponent} from "../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-login-form',
@@ -17,6 +18,8 @@ import {Router} from "@angular/router";
     NgIf,
     // FormErrorComponent,
     MessagesModule,
+    CustomToastComponent,
+    RouterLink,
   ],
   providers: [MessageService],
   templateUrl: './login-form.component.html',

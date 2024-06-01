@@ -17,6 +17,7 @@ import {
   CreateRangePreferenceComponent
 } from "../public/admin/preferences/create-range-preference/create-range-preference.component";
 import {RegisterComponent} from "../public/register/register.component";
+import {RecoverPasswordComponent} from "../public/recover-password/recover-password.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -32,5 +33,6 @@ export const routes: Routes = [
   { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
   { path: 'create-range-preference', component: CreateRangePreferenceComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'recover-password', component: RecoverPasswordComponent },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];
