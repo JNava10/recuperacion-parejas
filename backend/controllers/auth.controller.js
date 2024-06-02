@@ -33,8 +33,7 @@ class AuthController {
             )
         }
 
-        const token = generateToken(user.id, user.email);
-
+        const token = generateToken({userId: user.id, userEmail: user.email});
         console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
 
         return res.status(200).json(

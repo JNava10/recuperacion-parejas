@@ -1,4 +1,6 @@
 const {generateSecureInt, generateSecureHex} = require("../helpers/common.helper");
+const {fa} = require("@faker-js/faker");
+const {generateToken} = require("../helpers/jwt.helper");
 
 class RecoverController {
     /**
@@ -7,7 +9,8 @@ class RecoverController {
      */
     static entries = new Map();
 
-    static defaultMinuteLife = 3 // Cantidad de minutos que durará el codigo.
+    static codeMinuteLife = 10 // Minutos de duración del codigo.
+    static tokenMinuteLife = 5 // Minutos para poder cambiar la contraseña, de lo contrario expirará el token.
 
     static set = (email) => {
         const recoverCode = generateSecureInt(100000, 999999).toString();
@@ -15,7 +18,7 @@ class RecoverController {
 
         const date = new Date(Date.now());
         const expiresAt = new Date(date.setMinutes(
-            date.getMinutes() + RecoverController.defaultMinuteLife
+            date.getMinutes() + RecoverController.codeMinuteLife
         ));
 
         const entry = {
@@ -29,8 +32,28 @@ class RecoverController {
         return entry
     }
 
-    static get = (email) => {
+    static validateCode = (inputEmail, inputCode) => {
+        console.log(RecoverController.entries)
+        const entry = RecoverController.entries.get(inputEmail);
 
+        if (!entry.recoverCode) return {
+            message: "No se ha encontrado ningun email coincidente. Vuelve a pedir el codigo e intentalo de nuevo.",
+            isValid: false
+        }
+
+        if (inputCode === entry.recoverCode) {
+            const token = generateToken({authCode: entry.tokenCode}, `${RecoverController.tokenMinuteLife}m`)
+
+            return {
+                message: "Se ha validado correctamente el codigo.",
+                isValid: true,
+                token
+            }
+        }
+        else return {
+            message: "El codigo introducido no es valido.",
+            isValid: false
+        }
     }
 }
 

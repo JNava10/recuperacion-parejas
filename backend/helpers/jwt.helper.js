@@ -27,8 +27,10 @@ const validateToken = (req , res , next) => {
 // Funcion usada para validar el token unicamente, y no como middleware.
 const verifyToken = (token) => jwt.verify(token, process.env.PRIVATE_KEY);
 
-const generateToken = (userId, userEmail) => {
-    return jwt.sign({userId, userEmail}, process.env.PRIVATE_KEY, {expiresIn: process.env.TOKEN_EXPIRE_TIME});
+const generateToken = (payloadData, expiresAt) => {
+    const expiresIn = expiresAt || process.env.TOKEN_EXPIRE_TIME;
+
+    return jwt.sign(payloadData, process.env.PRIVATE_KEY, {expiresIn});
 }
 
 module.exports = {

@@ -20,11 +20,19 @@ import {UserService} from "../../services/api/user.service";
   styleUrl: './recover-password-form.component.css'
 })
 export class RecoverPasswordFormComponent {
-  constructor(private userService: UserService) {
-  }
+  constructor(private userService: UserService) {}
+
+  emailSended = false;
+  codeChecked = false;
+
+  email?: string;
 
   getEmailForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
+  });
+
+  sendCodeForm = new FormGroup({
+    code: new FormControl('', [Validators.required, Validators.min(100000), Validators.max(999999)]),
   });
 
   handleEmail = () => {
@@ -32,8 +40,20 @@ export class RecoverPasswordFormComponent {
 
     const {email} = this.getEmailForm.value;
 
-    this.userService.sendRecoverEmail(email!);
+    this.userService.sendRecoverEmail(email!).subscribe(sended => {
+      this.emailSended = sended;
+      this.email = email!
+    });
   };
 
-  emailSended = false;
+  sendCode = () => {
+    if (this.sendCodeForm.invalid) return;
+
+    const {code} = this.sendCodeForm.value;
+
+    this.userService.sendRecoverCode(code!, this.email!).subscribe(checked => {
+      this.codeChecked = checked;
+    });
+  };
+
 }

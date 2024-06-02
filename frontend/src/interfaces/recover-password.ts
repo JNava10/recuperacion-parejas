@@ -1,6 +1,11 @@
 export interface SendRecoverEmailResponse {
   data: {
-    sended: boolean
-    reason?: string
+    executed: boolean
+  }
+}
+
+export interface SendRecoverCodeResponse {
+  data: {
+    checked: boolean
   }
 }
