@@ -13,18 +13,16 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmail = (to, subject, text, html) => {
-    try {
-        const mailOptions = {from: process.env.MAIL_USER, to, subject, text, html};
+    const mailOptions = {from: process.env.MAIL_USER, to, subject, text, html};
 
-        return transporter.sendMail(mailOptions, (error, info) => {
-            console.log(info)
+    return transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+            return false;
+        }
 
-            return !error
-        });
-    } catch (e) {
-        console.warn(e);
-        throw e;
-    }
+        return !error
+    });
 }
 
 module.exports = {

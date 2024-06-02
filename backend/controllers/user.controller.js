@@ -11,6 +11,7 @@ const {el} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
+const {getRecoverCodeMail} = require("../constants/mail.constants");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -266,27 +267,51 @@ class UserController {
 
     static sendRecoverEmail = async (req, res) => {
         try {
-            // const {email} = req.body
+            const {email} = req.body
 
+            const emailExists = await UserQuery.checkIfEmailExists(email);
 
-            // const emailExists = await UserQuery.checkIfEmailExists(email);
+            if (!emailExists.query)  return res.status(200).json(
+                new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
+            )
 
-            // if (!emailExists.query)  return res.status(200).json(
-            //     new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
-            // )
+            const {recoverCode, expiresAt} = RecoverController.set(email);
 
-            // const {recoverCode, expiresAt} = RecoverController.set(email);
+            console.log(recoverCode)
 
-            const emailSended = sendEmail('juannr2002@gmail.com', 'hola', 'que tal', '<p>Sí.</p>');
+            // sendEmail(
+            //     email,
+            //     'hola',
+            //     'que tal',
+            //     getRecoverCodeMail(recoverCode, expiresAt)
+            // );
 
-            console.log(emailSended)
-
-            // return res.status(200).json(
-            //     new StdResponse(message,{executed, {}})
-            // )
+            return res.status(200).json(
+                new StdResponse('Se ha enviado el correo correctamente',{executed: true})
+            )
         } catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static checkRecoverCode = async (req, res) => {
+        try {
+            const {code, email} = req.body
+
+            const {isValid, message, token} = RecoverController.validateCode(email, code.toString());
+
+            return res.status(200).json(
+                new StdResponse(message,{isValid, token})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
             )
         }
     };

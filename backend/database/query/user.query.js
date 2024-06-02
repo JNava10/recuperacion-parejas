@@ -68,6 +68,7 @@ class UserQuery {
 
             return new QuerySuccess(true, 'El correo introducido ha sido encontrado.', query);
         } catch (e) {
+            console.log(e)
             return new QueryError(false, e)
         }
     };
