@@ -146,6 +146,17 @@ class UserQuery {
         }
     };
 
+    static updateUserPasswordByEmail = async (password, email) => {
+        try {
+            const edited = await models.User.update({password}, {where: {email}});
+
+            return new QuerySuccess(true, 'Se ha actualizado la contraseña correctamente.', edited);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
     static insertUserRoles = async (roles, user) => {
         try {
             const entries = [];

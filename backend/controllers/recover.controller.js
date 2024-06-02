@@ -1,6 +1,6 @@
 const {generateSecureInt, generateSecureHex} = require("../helpers/common.helper");
-const {fa} = require("@faker-js/faker");
 const {generateToken} = require("../helpers/jwt.helper");
+const jwt = require("jsonwebtoken");
 
 class RecoverController {
     /**
@@ -42,7 +42,7 @@ class RecoverController {
         }
 
         if (inputCode === entry.recoverCode) {
-            const token = generateToken({authCode: entry.tokenCode}, `${RecoverController.tokenMinuteLife}m`)
+            const token = generateToken({authCode: entry.tokenCode, email: inputEmail}, `${RecoverController.tokenMinuteLife}m`)
 
             return {
                 message: "Se ha validado correctamente el codigo.",
@@ -53,6 +53,38 @@ class RecoverController {
         else return {
             message: "El codigo introducido no es valido.",
             isValid: false
+        }
+    }
+
+    static validateToken = async (token) => {
+        try {
+            if (!token) return {
+                message: "No se ha encontrado ningun token.",
+            }
+
+            const {authCode, email} = await jwt.verify(token, process.env.PRIVATE_KEY);
+
+            if (!authCode) return {
+                message: "El token no es valido o ha expirado.",
+            }
+
+            const entry = RecoverController.entries.get(email);
+
+            if (!entry) return {
+                message: "No se ha encontrado ningun email coincidente.",
+            }
+
+            if (entry.tokenCode === authCode) return {
+                email,
+            };
+            else return false;
+        } catch (e) {
+            if (e.name === 'TokenExpiredError') return {
+                message: "El token de recuperación introducido está caducado.",
+            }
+            else return {
+                message: `Ha ocurrido un error al validar el token de recuperación (${e.name}).`,
+            }
         }
     }
 }

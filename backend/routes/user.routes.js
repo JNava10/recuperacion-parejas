@@ -21,5 +21,6 @@ router.post('/register', [], UserController.registerUser)
 
 router.post('/send-recover-email', UserController.sendRecoverEmail)
 router.post('/send-recover-code', UserController.checkRecoverCode)
+router.put('/recover-account/password', UserController.changePasswordRecovering)
 
 module.exports = router;

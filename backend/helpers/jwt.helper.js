@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const StdResponse = require("../classes/stdResponse");
 
-const validateToken = (req , res , next) => {
+const validateAuthToken = (req , res , next) => {
     const token = req.header('x-token');
 
     if (!token){
@@ -35,6 +35,6 @@ const generateToken = (payloadData, expiresAt) => {
 
 module.exports = {
     generateToken,
-    validateToken,
+    validateToken: validateAuthToken,
     verifyToken
 }

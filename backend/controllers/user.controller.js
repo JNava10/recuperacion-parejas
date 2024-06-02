@@ -12,6 +12,7 @@ const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
+const jwt = require("jsonwebtoken");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -232,7 +233,7 @@ class UserController {
     static updateUserPassword = async (req, res) => {
         const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
 
-        const {message, executed, query, error} = await UserQuery.updateUserPassword(password, req.params.id);
+        const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
 
         if (executed) {
             return res.status(200).json(
@@ -279,12 +280,12 @@ class UserController {
 
             console.log(recoverCode)
 
-            // sendEmail(
-            //     email,
-            //     'hola',
-            //     'que tal',
-            //     getRecoverCodeMail(recoverCode, expiresAt)
-            // );
+            sendEmail(
+                email,
+                'hola',
+                'que tal',
+                getRecoverCodeMail(recoverCode, expiresAt)
+            );
 
             return res.status(200).json(
                 new StdResponse('Se ha enviado el correo correctamente',{executed: true})
@@ -306,6 +307,31 @@ class UserController {
 
             return res.status(200).json(
                 new StdResponse(message,{isValid, token})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static changePasswordRecovering = async (req, res) => {
+        try {
+            const {password} = req.body
+            const {recovertoken} = req.headers
+
+            const validatingData = await RecoverController.validateToken(recovertoken); // TODO: Middleware
+
+            if (!validatingData.email) return res.status(200).json(
+                new StdResponse(validatingData.message,{executed: false})
+            )
+
+            const {message, executed} = await UserQuery.updateUserPasswordByEmail(password, validatingData.email);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed})
             )
         } catch (e) {
             console.log(e)

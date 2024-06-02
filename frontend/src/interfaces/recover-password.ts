@@ -6,6 +6,14 @@ export interface SendRecoverEmailResponse {
 
 export interface SendRecoverCodeResponse {
   data: {
-    checked: boolean
+    isValid: boolean
+    token: string
   }
 }
+
+export interface RecoverPasswordResponse {
+  data: {
+    executed: boolean
+  }
+}
+
