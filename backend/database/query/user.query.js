@@ -373,7 +373,7 @@ class UserQuery {
     static getUsersById = async (userIds) => {
         try {
             const results = await models.User.findAll({where: {id: {[Op.in]: userIds}}});
-            return new QuerySuccess(true, 'Se han obtenido los usuarios coincidentes correctamente.', results);
+            return new QuerySuccess(true, 'Se han obtenido los usuarios afínes correctamente.', results);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)

@@ -402,10 +402,10 @@ class UserController {
                 });
             }
 
-            const matchableUsers = await UserQuery.getUsersById(matchableUserIds)
+            const {message, query} = await UserQuery.getUsersById(matchableUserIds)
 
             return res.status(200).json(
-                new StdResponse('Se han obtenido los usuarios afínes correctamente',{executed: true, query: matchableUsers})
+                new StdResponse(message,{executed: query !== null, query})
             )
         } catch (e) {
             console.log(e)
