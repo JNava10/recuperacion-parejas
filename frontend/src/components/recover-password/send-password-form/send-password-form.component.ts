@@ -3,12 +3,14 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import * as regex from "../../../utils/const/regex.constants";
 import {UserService} from "../../../services/api/user.service";
 import {StorageService} from "../../../services/storage.service";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-send-password-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './send-password-form.component.html',
   styleUrl: './send-password-form.component.css'

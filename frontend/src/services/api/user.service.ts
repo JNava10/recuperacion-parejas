@@ -8,7 +8,7 @@ import {
   GetUserResponse,
   GetUsersResponse,
   User,
-  UserResponse
+  UserResponse, UserItem
 } from "../../interfaces/api/user/user";
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
@@ -101,6 +101,18 @@ export class UserService {
 
   sendNewPassword = (password: string, recoverToken: string) => {
     return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/recover-account/password`, {password},{params: {...sendTokenParam}, headers: {recoverToken}}).pipe(
+      map(body => body.data.executed)
+    )
+  }
+
+  activateUser = (user: UserItem) => {
+    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/activate/${user.id}`, {},{params: {...sendTokenParam}}).pipe(
+      map(body => body.data.executed)
+    )
+  }
+
+  deactivateUser = (user: UserItem) => {
+    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/activate/${user.id}`, {},{params: {...sendTokenParam}}).pipe(
       map(body => body.data.executed)
     )
   }

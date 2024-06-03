@@ -18,6 +18,7 @@ export interface UserItem {
   id?: number
   email?: string
   name?: string
+  enabled?: boolean
   firstSurname?: string
   secondSurname?: string
   nickname?: string
