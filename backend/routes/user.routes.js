@@ -21,6 +21,7 @@ router.post('/send-recover-email', UserController.sendRecoverEmail)
 
 router.post('/send-recover-code', UserController.checkRecoverCode)
 router.put('/recover-account/password', UserController.changePasswordRecovering)
+router.put('/enable-or-disable/:userId', [validateToken], UserController.enableOrDisableUser)
 
 router.get('/:id', [validateToken], UserController.findById)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)

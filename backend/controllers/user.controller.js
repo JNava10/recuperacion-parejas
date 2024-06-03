@@ -355,8 +355,6 @@ class UserController {
             choiceAffineUsers = choiceAffineUsers.query.map(item => item.user);
             choiceAffineUsers = [...new Set(choiceAffineUsers)] // Haciendo un Set a partir de los valores, podemos quitar elementos repetidos.
 
-            console.log(choiceAffineUsers)
-
             // 3. Obtener valores de las preferencias de valor de los usuarios obtenidos en el paso anterior
 
             let rangeAffineUsers = (await UserQuery.getValuesOfUserRangePrefs(choiceAffineUsers)).query;
@@ -382,8 +380,6 @@ class UserController {
             // Borramos las preferencias repetidas, introduciendolas en un map.
             const preferencesForFind = new Map([...userMaxPreferences, ...userMinPreferences].map(item => [item.preference, item.value]));
 
-            console.log(preferencesForFind)
-
             preferencesForFind.forEach((value, preference) => {
                 rangeAffineUsers.forEach(user => {
                     const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.75 && prefItem.value < value * 1.35))
@@ -406,6 +402,27 @@ class UserController {
 
             return res.status(200).json(
                 new StdResponse(message,{executed: query !== null, query})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static enableOrDisableUser = async (req, res) => {
+        try {
+            const {userId} = req.params;
+            const {enabled} = req.body;
+
+            const {query, message, executed} = await UserQuery.enableOrDisableUser(userId, enabled);
+
+            console.log(query, message)
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
             )
         } catch (e) {
             console.log(e)

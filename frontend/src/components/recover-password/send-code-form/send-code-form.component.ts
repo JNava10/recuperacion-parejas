@@ -3,12 +3,14 @@ import {UserService} from "../../../services/api/user.service";
 import {StorageService} from "../../../services/storage.service";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ActivatedRoute, Route, Router} from "@angular/router";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-send-code-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './send-code-form.component.html',
   styleUrl: './send-code-form.component.css'

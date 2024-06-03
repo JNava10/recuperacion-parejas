@@ -3,12 +3,14 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {UserService} from "../../../services/api/user.service";
 import {StorageService} from "../../../services/storage.service";
 import {Router} from "@angular/router";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-send-email-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './send-email-form.component.html',
   styleUrl: './send-email-form.component.css'
