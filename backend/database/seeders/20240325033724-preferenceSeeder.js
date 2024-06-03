@@ -28,6 +28,7 @@ module.exports = {
 
     const userPreferences  = userPreferenceFactory.make(insertedPreferences, values, insertedUsers, options);
 
+    console.log('a')
 
     await queryInterface.bulkInsert(models.PreferenceValue.tableName, values, {});
     await queryInterface.bulkInsert(models.PreferenceOption.tableName, options, {});
