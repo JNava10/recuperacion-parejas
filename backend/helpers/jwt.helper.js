@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const StdResponse = require("../classes/stdResponse");
 
-const validateToken = (req , res , next) => {
+const validateAuthToken = (req , res , next) => {
     const token = req.header('x-token');
 
     if (!token){
@@ -27,12 +27,14 @@ const validateToken = (req , res , next) => {
 // Funcion usada para validar el token unicamente, y no como middleware.
 const verifyToken = (token) => jwt.verify(token, process.env.PRIVATE_KEY);
 
-const generateToken = (userId, userEmail) => {
-    return jwt.sign({userId, userEmail}, process.env.PRIVATE_KEY, {expiresIn: process.env.TOKEN_EXPIRE_TIME});
+const generateToken = (payloadData, expiresAt) => {
+    const expiresIn = expiresAt || process.env.TOKEN_EXPIRE_TIME;
+
+    return jwt.sign(payloadData, process.env.PRIVATE_KEY, {expiresIn});
 }
 
 module.exports = {
     generateToken,
-    validateToken,
+    validateToken: validateAuthToken,
     verifyToken
 }

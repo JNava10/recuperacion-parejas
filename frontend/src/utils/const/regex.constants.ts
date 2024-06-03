@@ -22,4 +22,3 @@ export const preference = {
   description: /[A-Za-z¿?,\s.]{1,50}$/,
   option: /[\w¿?,\s.]{1,20}$/,
 }
-

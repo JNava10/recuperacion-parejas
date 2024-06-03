@@ -4,7 +4,7 @@ const {isAdmin, isMember} = require("../middlewares/role.middleware");
 const {validateToken} = require("../helpers/jwt.helper");
 const router = Router();
 
-router.post('/member/search', UserController.findUser); // Cambiar a GET
+router.post('/member/search', UserController.findUser); // TODO: Cambiar a GET
 
 router.get('/member/messages/:receiver', [validateToken], UserController.getMessages)
 router.post('/member/message', [validateToken], UserController.pushMessage)
@@ -18,5 +18,9 @@ router.post('/', [validateToken], UserController.createUser)
 router.post('/roles/:id', [validateToken], UserController.addUserRoles)
 router.post('/roles/delete/:id', [validateToken], UserController.deleteUserRoles)
 router.post('/register', [], UserController.registerUser)
+
+router.post('/send-recover-email', UserController.sendRecoverEmail)
+router.post('/send-recover-code', UserController.checkRecoverCode)
+router.put('/recover-account/password', UserController.changePasswordRecovering)
 
 module.exports = router;

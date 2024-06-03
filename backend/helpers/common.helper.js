@@ -1,4 +1,5 @@
 const {hash} = require("bcrypt");
+const crypto = require("crypto")
 require('dotenv').config()
 
 const hashPassword = async (plainText) => {
@@ -34,9 +35,21 @@ const sendStandardResponse = (response, message, data, status = 200) => {
     })
 }
 
+function generateSecureHex(size) {
+    const randomBytes = crypto.randomBytes(size);
+
+    return randomBytes.toString('hex');
+}
+
+function generateSecureInt(min, max) {
+    return crypto.randomInt(min, max);
+}
+
 module.exports = {
     hashPassword,
     getRandomItem,
     getRandomFromRange,
-    sendStandardResponse
+    sendStandardResponse,
+    generateSecureHex,
+    generateSecureInt
 }

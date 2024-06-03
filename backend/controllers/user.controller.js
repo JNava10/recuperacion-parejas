@@ -9,6 +9,10 @@ const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
 const {el} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
+const RecoverController = require("./recover.controller");
+const {sendEmail} = require("../helpers/mail.helper");
+const {getRecoverCodeMail} = require("../constants/mail.constants");
+const jwt = require("jsonwebtoken");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -229,7 +233,7 @@ class UserController {
     static updateUserPassword = async (req, res) => {
         const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
 
-        const {message, executed, query, error} = await UserQuery.updateUserPassword(password, req.params.id);
+        const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
 
         if (executed) {
             return res.status(200).json(
@@ -258,6 +262,82 @@ class UserController {
         } catch (e) {
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            )
+        }
+    };
+
+    static sendRecoverEmail = async (req, res) => {
+        try {
+            const {email} = req.body
+
+            const emailExists = await UserQuery.checkIfEmailExists(email);
+
+            if (!emailExists.query)  return res.status(200).json(
+                new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
+            )
+
+            const {recoverCode, expiresAt} = RecoverController.set(email);
+
+            console.log(recoverCode)
+
+            sendEmail(
+                email,
+                'hola',
+                'que tal',
+                getRecoverCodeMail(recoverCode, expiresAt)
+            );
+
+            return res.status(200).json(
+                new StdResponse('Se ha enviado el correo correctamente',{executed: true})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static checkRecoverCode = async (req, res) => {
+        try {
+            const {code, email} = req.body
+
+            const {isValid, message, token} = RecoverController.validateCode(email, code.toString());
+
+            return res.status(200).json(
+                new StdResponse(message,{isValid, token})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static changePasswordRecovering = async (req, res) => {
+        try {
+            const {password} = req.body
+            const {recovertoken} = req.headers
+
+            const validatingData = await RecoverController.validateToken(recovertoken); // TODO: Middleware
+
+            if (!validatingData.email) return res.status(200).json(
+                new StdResponse(validatingData.message,{executed: false})
+            )
+
+            const {message, executed} = await UserQuery.updateUserPasswordByEmail(password, validatingData.email);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
             )
         }
     };

@@ -62,10 +62,13 @@ class UserQuery {
 
     static checkIfEmailExists = async (email) => {
         try {
-            const query = await models.User.findOne({where: {email}});
+            const query = await models.User.findOne({where: {email}}) !== null;
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+            if (!query) return new QuerySuccess(true, 'No existe el correo introducido.', query);
+
+            return new QuerySuccess(true, 'El correo introducido ha sido encontrado.', query);
         } catch (e) {
+            console.log(e)
             return new QueryError(false, e)
         }
     };
@@ -135,6 +138,17 @@ class UserQuery {
     static updateUserPassword = async (data, id) => {
         try {
             const edited = await models.User.update(data, {where: {id}});
+
+            return new QuerySuccess(true, 'Se ha actualizado la contraseña correctamente.', edited);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static updateUserPasswordByEmail = async (password, email) => {
+        try {
+            const edited = await models.User.update({password}, {where: {email}});
 
             return new QuerySuccess(true, 'Se ha actualizado la contraseña correctamente.', edited);
         } catch (e) {

@@ -13,6 +13,11 @@ import {
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {map, tap} from "rxjs";
+import {
+  RecoverPasswordResponse,
+  SendRecoverCodeResponse,
+  SendRecoverEmailResponse
+} from "../../interfaces/recover-password";
 
 @Injectable({
   providedIn: 'root'
@@ -57,6 +62,18 @@ export class UserService {
     )
   }
 
+  sendRecoverEmail = (email: string) => {
+    return this.http.post<SendRecoverEmailResponse>(`${environment.apiUrl}/user/send-recover-email`, {email}).pipe(
+      map(body => body.data.executed)
+    )
+  }
+
+  sendRecoverCode = (code: string, email: string) => {
+    return this.http.post<SendRecoverCodeResponse>(`${environment.apiUrl}/user/send-recover-code`, {code, email}).pipe(
+      map(body => body.data)
+    )
+  }
+
   updatePassword = (id: number, password: string) => {
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/password/${id}`, {password},{params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
@@ -79,6 +96,12 @@ export class UserService {
   editUserData = (data: CreateUserItem, id: number) => {
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
+    )
+  }
+
+  sendNewPassword = (password: string, recoverToken: string) => {
+    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/recover-account/password`, {password},{params: {...sendTokenParam}, headers: {recoverToken}}).pipe(
+      map(body => body.data.executed)
     )
   }
 }
