@@ -291,9 +291,10 @@ class UserQuery {
     /**
      *
      * @param {Object<preference: number, value: number>[]} preferenceValues
+     * @param userToIgnore
      * @returns {Promise<QueryError|QuerySuccess>}
      */
-    static getUsersByChoicePrefs = async (preferenceValues) => {
+    static getUsersByChoicePrefs = async (preferenceValues, userToIgnore) => {
         try {
             // Al usar 'map', tambien se puede desestructurar el objeto.
             // Mapeamos así las preferencias para que tengan la estructura adecuada para el where posterior.
@@ -307,8 +308,15 @@ class UserQuery {
 
             const results = await models.UserPreference.findAll({
                 where: {
-                        [Op.or]: whereClauses
-                    },
+                    [Op.and]: [
+                        {
+                            [Op.or]: whereClauses
+                        },
+                        {
+                            [Op.not]: {user: userToIgnore}
+                        }
+                    ]
+                },
                 attributes: ['user']
             });
 
@@ -338,16 +346,34 @@ class UserQuery {
                     }
                 });
 
-            const query = new Map();
+            let query = new Map();
 
             results.forEach(({user, preference, value}) => {
                 const item = query.get(user);
 
                 if (item) item.push({preference, value})
                 else query.set(user, [{preference, value}]);
+            });
+
+            query = Array.from(query).map(temp => {
+                const item = {};
+                item.user = temp[0]; // El ID del usuario (clave de cada item del map)
+                item.preferences = temp[1]; // Array de preferencias (valor de cada item del map)
+
+                return item
             })
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios coincidentes correctamente.', Object.fromEntries(query));
+            return new QuerySuccess(true, 'Se han obtenido los usuarios coincidentes correctamente.', Array.from(query));
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getUsersById = async (userIds) => {
+        try {
+            const results = await models.User.findAll({where: {id: {[Op.in]: userIds}}});
+            return new QuerySuccess(true, 'Se han obtenido los usuarios coincidentes correctamente.', results);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
