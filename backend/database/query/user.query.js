@@ -6,7 +6,7 @@ const QueryError = require("../../classes/QueryError");
 const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
 const RoleQuery = require("./role.query");
 const {roleNames, preferenceTypes} = require("../../constants/seed.const");
-const {it} = require("@faker-js/faker");
+const {it, en} = require("@faker-js/faker");
 
 class UserQuery {
     /**
@@ -377,6 +377,19 @@ class UserQuery {
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
+        }
+    };
+
+    static enableOrDisableUser = async (userId, enabled) => {
+        try {
+            const query = await models.User.update({enabled}, {where: {id: userId}});
+
+            console.log(query)
+
+            return new QuerySuccess(true, 'Se ha actualizado el usuario correctamente.', query);
+        } catch (e) {
+            console.warn(e)
+            throw e
         }
     };
 }

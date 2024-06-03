@@ -105,14 +105,8 @@ export class UserService {
     )
   }
 
-  activateUser = (user: UserItem) => {
-    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/activate/${user.id}`, {},{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.executed)
-    )
-  }
-
-  deactivateUser = (user: UserItem) => {
-    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/activate/${user.id}`, {},{params: {...sendTokenParam}}).pipe(
+  enableOrDisableUser = (user: UserItem, enabled: boolean) => {
+    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/enable-or-disable/${user.id}`, {enabled},{params: {...sendTokenParam}}).pipe(
       map(body => body.data.executed)
     )
   }

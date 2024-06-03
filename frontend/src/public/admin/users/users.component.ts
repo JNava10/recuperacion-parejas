@@ -42,22 +42,26 @@ export class UsersComponent implements OnInit {
     const user = event.item.data as UserItem;
 
     if (event.previousContainer.id === this.activatedUsersId) {
-      this.userService.activateUser(user).subscribe(executed => {
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex,
-        );
+      this.userService.enableOrDisableUser(user, true).subscribe(executed => {
+        if (executed) {
+          transferArrayItem(
+            event.previousContainer.data,
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex,
+          );
+        }
       })
     } else {
-      this.userService.deactivateUser(user).subscribe(executed => {
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex,
-        );
+      this.userService.enableOrDisableUser(user, false).subscribe(executed => {
+        if (executed) {
+          transferArrayItem(
+            event.previousContainer.data,
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex,
+          );
+        }
       })
     }
   }
