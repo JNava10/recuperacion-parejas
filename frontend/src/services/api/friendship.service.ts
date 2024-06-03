@@ -26,8 +26,8 @@ export class FriendshipService {
     );
   }
 
-  getLikableUsers = () => {
-    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/friendship/likables/`, {params: {...sendTokenParam}}).pipe(
+  getMatchableUsers = () => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/possible-matches/`, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     );
   }

@@ -27,12 +27,13 @@ export class DashboardComponent implements OnInit {
   constructor(private userService: UserService, private router: Router, private friendshipService: FriendshipService) {}
 
   ngOnInit(): void {
-    this.userService.getAllUsers().subscribe(users => {
+    this.friendshipService.getMatchableUsers().subscribe(users => {
       this.likableUsers = users;
     });
 
     this.friendshipService.getOwnMatches().subscribe(matches => {
       this.matches = matches;
+      console.log(matches)
     })
   }
 

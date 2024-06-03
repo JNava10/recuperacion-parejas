@@ -341,6 +341,80 @@ class UserController {
             )
         }
     };
+
+    static getPossibleMatches = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            // 1. Obtener preferencias del usuario
+            const userPreferences = await UserQuery.getUserPreferences(userId);
+
+            // 2. Obtener usuarios con algunos de mismos valores de preferencias de eleccion que el usuario
+            let choiceAffineUsers = await UserQuery.getUsersByChoicePrefs(userPreferences.query.choices, userId);
+
+            choiceAffineUsers = choiceAffineUsers.query.map(item => item.user);
+            choiceAffineUsers = [...new Set(choiceAffineUsers)] // Haciendo un Set a partir de los valores, podemos quitar elementos repetidos.
+
+            console.log(choiceAffineUsers)
+
+            // 3. Obtener valores de las preferencias de valor de los usuarios obtenidos en el paso anterior
+
+            let rangeAffineUsers = (await UserQuery.getValuesOfUserRangePrefs(choiceAffineUsers)).query;
+
+            // 4. Obtener las preferencias cuyos valores se acerquen los valores minimo y maximo de preferencias de rango del usuario.
+
+            // Al utilizar reduce, podemos iterar sobre el array y descartar los valores que no sean el que queremos de forma sencilla.
+            const userMaxPreferenceValue = userPreferences.query.values.reduce((previous, current) =>
+                previous && previous.value > current.value ? previous : current
+            ).value;
+
+            const userMinPreferenceValue = userPreferences.query.values.reduce((previous, current) =>
+                previous && previous.value < current.value ? previous : current
+            ).value;
+
+            // Estas serán las preferencias que se tendrán en cuenta a la hora de buscar usuarios (los usuarios dentro de rangeAffineUsers).
+            const userMaxPreferences = userPreferences.query.values.filter(item => item.value > userMaxPreferenceValue * 0.85);
+            const userMinPreferences = userPreferences.query.values.filter(item => item.value < userMinPreferenceValue * 1.15);
+
+            // 5. Obtener los IDs de los usuarios cuyos valores de preferencia se acerquen a las de userMaxPreferences y userMinPreferences.
+
+            const matchableUserIds = [];
+            // Borramos las preferencias repetidas, introduciendolas en un map.
+            const preferencesForFind = new Map([...userMaxPreferences, ...userMinPreferences].map(item => [item.preference, item.value]));
+
+            console.log(preferencesForFind)
+
+            preferencesForFind.forEach((value, preference) => {
+                rangeAffineUsers.forEach(user => {
+                    const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.75 && prefItem.value < value * 1.35))
+
+                    if (matchedPreference) matchableUserIds.push(user.user)
+                });
+            });
+
+            if (matchableUserIds.length === 0) {
+                preferencesForFind.forEach((value, preference) => {
+                    rangeAffineUsers.forEach(user => {
+                        const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.45 && prefItem.value < value * 1.65))
+
+                        if (matchedPreference) matchableUserIds.push(user.user)
+                    });
+                });
+            }
+
+            const {message, query} = await UserQuery.getUsersById(matchableUserIds)
+
+            return res.status(200).json(
+                new StdResponse(message,{executed: query !== null, query})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
 }
 
 module.exports = UserController

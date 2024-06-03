@@ -9,7 +9,7 @@ const {createCustom} = require("../factories/user.factory");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const factoryUserList = await userFactory.get(3);
+    const factoryUserList = await userFactory.get(process.env.DEAFULT_FACTORY_USERS);
     const customUserList = [];
 
     for (const customUser of customUsers) {

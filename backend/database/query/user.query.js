@@ -5,7 +5,8 @@ const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
 const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
 const RoleQuery = require("./role.query");
-const {roleNames} = require("../../constants/seed.const");
+const {roleNames, preferenceTypes} = require("../../constants/seed.const");
+const {it} = require("@faker-js/faker");
 
 class UserQuery {
     /**
@@ -246,6 +247,133 @@ class UserQuery {
             }
 
             return new QuerySuccess(true, 'Se ha registrado el usuario correctamente.', true);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getUserPreferences = async (user) => {
+        try {
+            const results = await models.sequelize.query(`SELECT up.user, up.preference, pt.text AS text, up.value FROM ${models.UserPreference.tableName} AS up 
+                JOIN ${models.Preference.tableName} AS p ON up.preference = p.id 
+                JOIN ${models.PreferenceType.tableName} AS pt ON p.type_id = pt.id
+                WHERE up.user = :user`,
+                {
+                type: QueryTypes.SELECT,
+                replacements: {
+                    user
+                }
+            });
+
+            const query = {
+                values: [],
+                choices: []
+            };
+
+            results.forEach(result => {
+                if (result.text === preferenceTypes.choice.text) {
+                    const {text, ...item} = result // Con esto podemos quitar la propiedad 'text' del objeto.
+                    query.choices.push(item)
+                } else {
+                    const {text, ...item} = result
+                    query.values.push(item)
+                }
+            })
+
+            return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.', query);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    /**
+     *
+     * @param {Object<preference: number, value: number>[]} preferenceValues
+     * @param userToIgnore
+     * @returns {Promise<QueryError|QuerySuccess>}
+     */
+    static getUsersByChoicePrefs = async (preferenceValues, userToIgnore) => {
+        try {
+            // Al usar 'map', tambien se puede desestructurar el objeto.
+            // Mapeamos así las preferencias para que tengan la estructura adecuada para el where posterior.
+            const whereClauses = preferenceValues.map(
+                ({value, preference}) => {
+                    return {[Op.and]: [{value}, {preference}]}
+                }
+            );
+
+            whereClauses.forEach(item => console.log(item));
+
+            const results = await models.UserPreference.findAll({
+                where: {
+                    [Op.and]: [
+                        {
+                            [Op.or]: whereClauses
+                        },
+                        {
+                            [Op.not]: {user: userToIgnore}
+                        }
+                    ]
+                },
+                attributes: ['user']
+            });
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios coincidentes correctamente.', results);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    /**
+     *
+     * @returns {Promise<QueryError|QuerySuccess>}
+     * @param {number[]} userIds
+     */
+    static getValuesOfUserRangePrefs = async (userIds) => {
+        try {
+            let results = await models.sequelize.query(`SELECT up.user, up.preference, pt.text AS text, up.value FROM ${models.UserPreference.tableName} AS up 
+                JOIN ${models.Preference.tableName} AS p ON up.preference = p.id 
+                JOIN ${models.PreferenceType.tableName} AS pt ON p.type_id = pt.id
+                WHERE up.user IN (:users) AND text = :preferenceText`,
+                {
+                    type: QueryTypes.SELECT,
+                    replacements: {
+                        preferenceText: preferenceTypes.range.text,
+                        users: userIds
+                    }
+                });
+
+            let query = new Map();
+
+            results.forEach(({user, preference, value}) => {
+                const item = query.get(user);
+
+                if (item) item.push({preference, value})
+                else query.set(user, [{preference, value}]);
+            });
+
+            query = Array.from(query).map(temp => {
+                const item = {};
+                item.user = temp[0]; // El ID del usuario (clave de cada item del map)
+                item.preferences = temp[1]; // Array de preferencias (valor de cada item del map)
+
+                return item
+            })
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios coincidentes correctamente.', Array.from(query));
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getUsersById = async (userIds) => {
+        try {
+            const results = await models.User.findAll({where: {id: {[Op.in]: userIds}}});
+            return new QuerySuccess(true, 'Se han obtenido los usuarios afínes correctamente.', results);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)

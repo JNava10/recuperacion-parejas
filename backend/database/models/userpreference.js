@@ -26,7 +26,7 @@ module.exports = (sequelize) => {
     },
     value: {
       allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.INTEGER
     },
   }, {
     sequelize,
