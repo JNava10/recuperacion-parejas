@@ -341,6 +341,37 @@ class UserController {
             )
         }
     };
+
+    static getPossibleMatches = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            // 1. Obtener preferencias del usuario
+            const userPreferences = await UserQuery.getUserPreferences(userId);
+
+            // 2. Obtener usuarios con algunos de mismos valores de preferencias de eleccion que el usuario
+            let choiceAffineUsers = await UserQuery.getUsersByChoicePrefs(userPreferences.query.choices);
+
+            choiceAffineUsers = choiceAffineUsers.query.map(item => item.user);
+            choiceAffineUsers = [...new Set(choiceAffineUsers)] // Haciendo un Set a partir de los valores, podemos quitar elementos repetidos.
+
+            // 3. Obtener valores de las preferencias de valor de los usuarios obtenidos en el paso anterior
+
+            let valueAffineUsers = await UserQuery.getValuesOfUserRangePrefs(choiceAffineUsers);
+
+            console.log(valueAffineUsers);
+
+            return res.status(200).json(
+                new StdResponse('Se han obtenido los usuarios afínes correctamente',{executed: true, query: valueAffineUsers})
+            )
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
 }
 
 module.exports = UserController
