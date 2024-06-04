@@ -349,6 +349,10 @@ class UserController {
             // 1. Obtener preferencias del usuario
             const userPreferences = await UserQuery.getUserPreferences(userId);
 
+            if (!userPreferences.executed) return res.status(400).json(
+                new StdResponse(userPreferences.error,{executed: false})
+            )
+
             // 2. Obtener usuarios con algunos de mismos valores de preferencias de eleccion que el usuario
             let choiceAffineUsers = await UserQuery.getUsersByChoicePrefs(userPreferences.query.choices, userId);
 
@@ -418,8 +422,6 @@ class UserController {
             const {enabled} = req.body;
 
             const {query, message, executed} = await UserQuery.enableOrDisableUser(userId, enabled);
-
-            console.log(query, message)
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})

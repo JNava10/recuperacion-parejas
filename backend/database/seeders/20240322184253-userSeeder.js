@@ -5,6 +5,7 @@ const {getRandomItem} = require("../../helpers/common.helper");
 const {fr} = require("@faker-js/faker");
 const {customUsers} = require("../../constants/seed.const");
 const {createCustom} = require("../factories/user.factory");
+const {DATE} = require("sequelize");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

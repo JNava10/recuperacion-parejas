@@ -10,6 +10,7 @@ import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Val
 import {PreferenceService} from "../../services/api/preference.service";
 import {MessageService} from "primeng/api";
 import {CustomToastComponent} from "../custom-toast/custom-toast.component";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-start-form',
@@ -26,7 +27,7 @@ import {CustomToastComponent} from "../custom-toast/custom-toast.component";
 })
 export class StartFormComponent implements OnInit {
 
-  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService, private messageService: MessageService,) {
+  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService, private messageService: MessageService, private router: Router) {
   }
 
   ngOnInit() {
@@ -86,13 +87,14 @@ export class StartFormComponent implements OnInit {
       preferences.push({preference: id, value: rangeValue});
     }
 
-    this.preferenceService.createUserPreferences(preferences).subscribe(body => {
-
+    this.preferenceService.createUserPreferences(preferences).subscribe(async body => {
       if (body.data.executed) {
         this.messageService.add({summary: 'Exito', detail: body.message, severity: 'success'});
       } else {
         this.messageService.add({summary: 'Error', detail: body.message, severity: 'error'});
       }
+
+      await this.router.navigate(['/dashboard']);
     })
   };
 

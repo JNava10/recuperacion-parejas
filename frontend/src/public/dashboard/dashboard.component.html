@@ -1,5 +1,7 @@
-<app-find-members/>
-<app-registered-events></app-registered-events>
+<section class="max-w-md">
+  <app-find-members/>
+  <app-registered-events></app-registered-events>
+</section>
 
 @if (likableUsers) {
   <app-users-to-match-list [users]="likableUsers" (isMatch)="handleMatch($event)"></app-users-to-match-list>

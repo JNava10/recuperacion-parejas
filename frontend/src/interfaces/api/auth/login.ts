@@ -8,6 +8,7 @@ export interface LoginRequest {
 export interface LoginResponseData {
   token: string,
   logged: boolean
+  firstLogin: boolean
 }
 
 export interface LoginResponse extends ApiResponse {
