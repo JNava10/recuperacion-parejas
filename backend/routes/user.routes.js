@@ -25,5 +25,6 @@ router.put('/enable-or-disable/:userId', [validateToken], UserController.enableO
 
 router.get('/:id', [validateToken], UserController.findById)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
+router.delete('/:id', [validateToken], UserController.deleteUser)
 
 module.exports = router;

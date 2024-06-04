@@ -59,11 +59,11 @@ export class EditEventComponent implements OnInit {
     scheduledTime: new FormControl('', [
       Validators.required, Validators.pattern(regex.event.scheduledTime)
     ]),
-  }, {updateOn: "submit"});
+  }, {updateOn: "change"});
 
   editEventPlaceForm = new FormGroup({
     latLng: new FormControl(this.latLng, [Validators.required])
-  }, {updateOn: "submit"});
+  }, {updateOn: "change"});
 
   handleEditDetailsForm() {
     const {name, description, scheduledDate, scheduledTime} = this.editEventForm.value;

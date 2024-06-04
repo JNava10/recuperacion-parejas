@@ -13,6 +13,7 @@ const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const jwt = require("jsonwebtoken");
+const models = require("../database/models");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -139,15 +140,15 @@ class UserController {
     static createUser = async (req, res) => {
         const user = req.body;
 
-        const emailExists = await UserQuery.checkIfEmailExists(user.email).query; // TODO: Pasar al middleware
+        const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
 
-        if (emailExists) return res.status(409).json(
+        if (emailExists) return res.status(200).json(
             new StdResponse("El correo indicado ya existe",{executed: false})
         )
 
-        const nicknameExists = await UserQuery.checkIfEmailExists(user.nickname).query; // TODO: Pasar al middleware
+        const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
 
-        if (nicknameExists) return res.status(409).json(
+        if (nicknameExists) return res.status(200).json(
             new StdResponse("El nick del usuario indicado ya existe",{executed: false})
         )
 
@@ -349,6 +350,10 @@ class UserController {
             // 1. Obtener preferencias del usuario
             const userPreferences = await UserQuery.getUserPreferences(userId);
 
+            if (!userPreferences.executed) return res.status(400).json(
+                new StdResponse(userPreferences.error,{executed: false})
+            )
+
             // 2. Obtener usuarios con algunos de mismos valores de preferencias de eleccion que el usuario
             let choiceAffineUsers = await UserQuery.getUsersByChoicePrefs(userPreferences.query.choices, userId);
 
@@ -419,8 +424,6 @@ class UserController {
 
             const {query, message, executed} = await UserQuery.enableOrDisableUser(userId, enabled);
 
-            console.log(query, message)
-
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
@@ -429,6 +432,25 @@ class UserController {
 
             return res.status(500).json(
                 new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static deleteUser = async (req, res) => {
+        const {message, executed, query, error} = await UserQuery.deleteUser(req.params.id);
+
+        if (executed) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!executed && query) {
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } else if (!query) {
+            console.log(error);
+            return res.status(500).json(
+                new StdResponse(message,{executed, error})
             )
         }
     };

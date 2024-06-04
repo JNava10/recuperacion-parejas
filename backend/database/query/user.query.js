@@ -7,6 +7,8 @@ const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
 const RoleQuery = require("./role.query");
 const {roleNames, preferenceTypes} = require("../../constants/seed.const");
 const {it, en} = require("@faker-js/faker");
+const bcrypt = require("bcrypt");
+const {hashPassword} = require("../../helpers/common.helper");
 
 class UserQuery {
     /**
@@ -63,7 +65,7 @@ class UserQuery {
 
     static checkIfEmailExists = async (email) => {
         try {
-            const query = await models.User.findOne({where: {email}}) !== null;
+            const query = await models.User.findOne({where: {email}});
 
             if (!query) return new QuerySuccess(true, 'No existe el correo introducido.', query);
 
@@ -121,7 +123,7 @@ class UserQuery {
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', true);
         } catch (e) {
             console.warn(e)
-            return new QueryError(false, e)
+            return new QueryError(false, e.message)
         }
     };
 
@@ -141,6 +143,28 @@ class UserQuery {
             const edited = await models.User.update(data, {where: {id}});
 
             return new QuerySuccess(true, 'Se ha actualizado la contraseña correctamente.', edited);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static updateUserLogin = async (id) => {
+        try {
+            const logged = await models.User.update({lastLogin: new Date(Date.now())}, {where: {id}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', logged);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static isFirstUserLogin = async (id) => {
+        try {
+            const firstLogin = await models.User.findOne({where: {id}, attributes: ['lastLogin']});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', firstLogin === true);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -238,7 +262,7 @@ class UserQuery {
         try {
             const memberRole = await RoleQuery.getRole(roleNames.member.name)
 
-            console.log(memberRole)
+            user.password = await hashPassword(user.password)
 
             const created = await models.User.create(user);
 
@@ -266,6 +290,10 @@ class UserQuery {
                 }
             });
 
+            console.log('Results', results)
+
+            if (results.length === 0) throw new Error('El usuario no tiene preferencias.')
+
             const query = {
                 values: [],
                 choices: []
@@ -283,8 +311,9 @@ class UserQuery {
 
             return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.', query);
         } catch (e) {
+
             console.warn(e)
-            return new QueryError(false, e)
+            return new QueryError(false, e.message)
         }
     };
 
@@ -384,12 +413,20 @@ class UserQuery {
         try {
             const query = await models.User.update({enabled}, {where: {id: userId}});
 
-            console.log(query)
-
             return new QuerySuccess(true, 'Se ha actualizado el usuario correctamente.', query);
         } catch (e) {
             console.warn(e)
             throw e
+        }
+    };
+
+    static deleteUser = async (id) => {
+        try {
+            const query = await models.User.destroy({where: {id}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
         }
     };
 }

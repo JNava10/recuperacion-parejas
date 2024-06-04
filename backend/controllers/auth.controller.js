@@ -34,12 +34,17 @@ class AuthController {
         }
 
         const token = generateToken({userId: user.id, userEmail: user.email});
-        console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
 
+        const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id);
+
+        await UserQuery.updateUserLogin(user.id)
+
+        console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
+        
         return res.status(200).json(
             new StdResponse(
                 'Se ha iniciado sesión correctamente.',
-                {logged: true, token: token}
+                {logged: true, token: token, firstLogin: isFirstUserLogin}
             )
         )
     };

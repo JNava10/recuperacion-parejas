@@ -43,21 +43,21 @@ export interface UserMessagesResponse extends ApiResponse {
   user: User
 }
 
-export interface GetUsersResponse {
+export interface GetUsersResponse extends ApiResponse {
   data: {
     executed: true
     query: UserItem[]
   }
 }
 
-export interface GetUserResponse {
+export interface GetUserResponse  extends ApiResponse{
   data: {
     executed: true
     query: UserItem
   }
 }
 
-export interface ManageUserResponse {
+export interface ManageUserResponse extends ApiResponse {
   data: {
     executed: true
     query: boolean
@@ -70,9 +70,16 @@ export interface RoleItem {
   display_name?: string
 }
 
-export interface GetRolesResponse {
+export interface GetRolesResponse extends ApiResponse {
   data: {
     executed: true
     query: RoleItem[]
+  }
+}
+
+export interface DeleteUserResponse {
+  data: {
+    executed: true
+    query: boolean
   }
 }

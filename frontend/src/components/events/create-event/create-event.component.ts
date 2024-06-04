@@ -59,7 +59,7 @@ export class CreateEventComponent {
 
   @Output() created = new EventEmitter<boolean>();
 
-  handleCreateForm = (mouseEvent: MouseEvent) => {
+  handleCreateForm = (mouseEvent: SubmitEvent) => {
     const validations = {
       name: regex.event.name.test(this.createEventForm.value.name!),
       description: regex.event.description.test(this.createEventForm.value.description!),

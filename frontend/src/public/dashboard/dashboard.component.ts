@@ -27,13 +27,10 @@ export class DashboardComponent implements OnInit {
   constructor(private userService: UserService, private router: Router, private friendshipService: FriendshipService) {}
 
   ngOnInit(): void {
-    this.friendshipService.getMatchableUsers().subscribe(users => {
-      this.likableUsers = users;
-    });
+    this.getMatchedUsers();
 
     this.friendshipService.getOwnMatches().subscribe(matches => {
       this.matches = matches;
-      console.log(matches)
     })
   }
 
@@ -45,9 +42,16 @@ export class DashboardComponent implements OnInit {
   handleMatch(matchedUser: UserItem) {
     this.matchedUser = matchedUser;
     this.isMatch = true;
+
   }
 
   goToChat = async (user: UserItem) => {
     await this.router.navigate(['chat', {id: user.id}]);
   };
+
+  private getMatchedUsers() {
+    this.friendshipService.getMatchableUsers().subscribe(users => {
+      this.likableUsers = users;
+    });
+  }
 }

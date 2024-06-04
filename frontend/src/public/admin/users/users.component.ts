@@ -27,6 +27,10 @@ export class UsersComponent implements OnInit {
   nonActivatedUsersId = "nonActivatedUsers"
 
   ngOnInit() {
+    this.getUsers();
+  }
+
+  protected getUsers() {
     this.userService.getNotDeletedWithRoles().subscribe(users => {
       this.nonActivatedUsers = users.filter(user => user.enabled === false)
       this.activatedUsers = users.filter(user => user.enabled === true)
@@ -42,7 +46,7 @@ export class UsersComponent implements OnInit {
     const user = event.item.data as UserItem;
 
     if (event.previousContainer.id === this.activatedUsersId) {
-      this.userService.enableOrDisableUser(user, true).subscribe(executed => {
+      this.userService.enableOrDisableUser(user, false).subscribe(executed => {
         if (executed) {
           transferArrayItem(
             event.previousContainer.data,
@@ -53,7 +57,7 @@ export class UsersComponent implements OnInit {
         }
       })
     } else {
-      this.userService.enableOrDisableUser(user, false).subscribe(executed => {
+      this.userService.enableOrDisableUser(user, true).subscribe(executed => {
         if (executed) {
           transferArrayItem(
             event.previousContainer.data,

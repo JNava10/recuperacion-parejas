@@ -1,10 +1,19 @@
 <h3>Eventos en los que estás registrado</h3>
 @if (eventsFetched) {
-  <ul class="max-w-sm flex-col bg-gray-900 items-center rounded-lg p-2">
-    @for (event of this.events; track event.id) {
-      <li>
-        <app-registered-event-card [event]="event"></app-registered-event-card>
-      </li>
+  <ul class="max-w-sm min-h-sm flex-col bg-gray-900 items-center rounded-lg p-2">
+    @if (this.events?.length == 0) {
+      <li><p class="mb-2 text-sm text-gray-500 dark:text-gray-400">No se han encontrado eventos.</p></li>
+    } @else {
+        @for (event of this.events; track event.id) {
+          <li>
+            <app-registered-event-card [event]="event"></app-registered-event-card>
+          </li>
+        }
     }
   </ul>
 }
+
+
+<button type="button" (click)="goToFindEvents()" class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
+  Buscar eventos
+</button>
