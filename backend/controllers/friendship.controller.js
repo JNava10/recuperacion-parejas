@@ -30,7 +30,7 @@ class FriendshipController {
         try {
             const alreadyLiked = await FriendshipQuery.checkIfIsLiked(req.payload.userId, req.params.id);
 
-            if (alreadyLiked.query) {
+            if (alreadyLiked.query.isMatch) {
                 await FriendshipQuery.likeUser(req.payload.userId, req.params.id);
                 await FriendshipQuery.setMatch(req.payload.userId, req.params.id)
 

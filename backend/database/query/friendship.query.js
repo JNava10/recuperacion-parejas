@@ -17,9 +17,9 @@ class FriendshipQuery {
                 attributes: ['requesting_user', 'requested_user']
             });
 
-            console.log(liked)
+            console.log('liked', liked, liked !== null)
 
-            if (liked) return new QuerySuccess(true, "Ya se habia dado `me gusta' anteriormente.", {isMatch: true});
+            if (liked !== null) return new QuerySuccess(true, "Ya se habia dado `me gusta' anteriormente.", {isMatch: true});
             else return new QuerySuccess(true, "No se ha encontrado ningun 'me gusta' con los usuarios indicados.", {isMatch: false});
         } catch (e) {
             console.warn(e)

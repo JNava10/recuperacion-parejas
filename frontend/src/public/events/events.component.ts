@@ -4,6 +4,7 @@ import {FormsModule} from "@angular/forms";
 import {EventService} from "../../services/api/event.service";
 import {EventItem} from "../../interfaces/api/event/event";
 import {EventCardComponent} from "../../app/components/events/event-card/event-card.component";
+import {DialogModule} from "primeng/dialog";
 
 
 @Component({
@@ -12,7 +13,8 @@ import {EventCardComponent} from "../../app/components/events/event-card/event-c
   imports: [
     CreateEventComponent,
     FormsModule,
-    EventCardComponent
+    EventCardComponent,
+    DialogModule
   ],
   templateUrl: './events.component.html',
   styleUrl: './events.component.css'
@@ -36,5 +38,7 @@ export class EventsComponent implements OnInit {
       this.eventsFetched = true;
     });
   }
+
+  creatingEvent = false;
 }
 

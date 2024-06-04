@@ -13,6 +13,7 @@ const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const jwt = require("jsonwebtoken");
+const models = require("../database/models");
 
 class UserController {
     static findUser = async (req, res) => {
