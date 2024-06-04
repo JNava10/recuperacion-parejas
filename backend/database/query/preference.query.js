@@ -5,6 +5,7 @@ const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
 const PreferenceOption = require("../../classes/preferenceOption");
 const {preferenceTypes} = require("../../constants/seed.const");
+const {el} = require("@faker-js/faker");
 
 class PreferenceQuery {
     static getActivatedPreferences = async () => {
@@ -75,6 +76,35 @@ class PreferenceQuery {
             }
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getAllPreferences = async (preference) => {
+        try {
+            const query = await models.Preference.findAll({ include: {
+                    model: models.PreferenceType,
+                    as: 'type'
+                }}
+            );
+
+            let preferences = {
+                choice: [],
+                range: []
+            };
+
+            query.forEach(preference => {
+                if (preference.type.text === preferenceTypes.choice.text) {
+                    preferences.choice.push(preference)
+                }
+                else {
+                    preferences.range.push(preference)
+                }
+            })
+
+            return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.');
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)

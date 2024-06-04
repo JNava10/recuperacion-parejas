@@ -7,6 +7,13 @@ export interface GetPreferenceResponse extends ApiResponse {
   }
 }
 
+export interface GetPreferencesResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: PreferenceList
+  }
+}
+
 export interface PreferenceItem {
   id?: number
   name?: string,
@@ -15,6 +22,11 @@ export interface PreferenceItem {
   created_at?: string
   updated_at?: string
   deleted_at?: string
+}
+
+export interface PreferenceList {
+  choice: PreferenceItem[],
+  range: PreferenceItem[],
 }
 
 export interface CreatePreferenceItem {

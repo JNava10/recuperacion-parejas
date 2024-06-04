@@ -7,7 +7,7 @@ import {HttpClient} from "@angular/common/http";
 import {
   CreateChoicePreferenceItem,
   CreateRangePreferenceItem,
-  GetPreferenceResponse
+  GetPreferenceResponse, GetPreferencesResponse
 } from "../../interfaces/api/preference/preferenceItem";
 
 @Injectable({
@@ -30,6 +30,12 @@ export class PreferenceService {
   }
   saveRangePreference = (preference: CreateRangePreferenceItem) => {
     return this.http.post<GetPreferenceResponse>(`${environment.apiUrl}/preference/save/range`, preference, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    );
+  }
+
+  getAllPreferences = () => {
+    return this.http.get<GetPreferencesResponse>(`${environment.apiUrl}/preference/`, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     );
   }
