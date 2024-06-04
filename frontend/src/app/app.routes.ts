@@ -24,18 +24,16 @@ import {
   SendPasswordFormComponent
 } from "../components/recover-password/send-password-form/send-password-form.component";
 import {StartComponent} from "../public/start/start.component";
+import {AdminComponent} from "../public/admin/admin.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'chat', component: ChatComponent },
-  { path: 'events', component: EventsComponent },
   { path: 'available-events', component: FindAvailableEventsComponent },
   { path: 'event-info', component: EventInfoComponent },
-  { path: 'users', component: UsersComponent },
   { path: 'add-user', component: AddUserComponent },
   { path: 'edit-user', component: EditUserComponent },
-  { path: 'preferences', component: PreferencesComponent },
   { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
   { path: 'create-range-preference', component: CreateRangePreferenceComponent },
   { path: 'register', component: RegisterComponent },
@@ -43,6 +41,10 @@ export const routes: Routes = [
   { path: 'recover-password/code', component: SendCodeFormComponent },
   { path: 'recover-password/password', component: SendPasswordFormComponent },
   { path: 'start', component: StartComponent },
+  { path: 'admin', component: AdminComponent },
+  { path: 'admin/users', component: UsersComponent },
+  { path: 'admin/events', component: EventsComponent },
+  { path: 'admin/preferences', component: PreferencesComponent },
   { path: 'recover-password',   redirectTo: '/recover-password/email', pathMatch: 'full' },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];
