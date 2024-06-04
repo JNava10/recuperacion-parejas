@@ -1,5 +1,5 @@
 @if (usersFetched) {
-  <app-user-table [users]="activatedUsers!"></app-user-table>
+  <app-user-table [users]="activatedUsers!" (refresh)="getUsers()"></app-user-table>
 
   <h2>Activar/desactivar usuarios</h2>
 

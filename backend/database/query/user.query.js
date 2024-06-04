@@ -413,12 +413,20 @@ class UserQuery {
         try {
             const query = await models.User.update({enabled}, {where: {id: userId}});
 
-            console.log(query)
-
             return new QuerySuccess(true, 'Se ha actualizado el usuario correctamente.', query);
         } catch (e) {
             console.warn(e)
             throw e
+        }
+    };
+
+    static deleteUser = async (id) => {
+        try {
+            const query = await models.User.destroy({where: {id}});
+
+            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
         }
     };
 }

@@ -76,3 +76,10 @@ export interface GetRolesResponse extends ApiResponse {
     query: RoleItem[]
   }
 }
+
+export interface DeleteUserResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
+}

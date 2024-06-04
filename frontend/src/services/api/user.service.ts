@@ -8,7 +8,7 @@ import {
   GetUserResponse,
   GetUsersResponse,
   User,
-  UserResponse, UserItem
+  UserResponse, UserItem, DeleteUserResponse
 } from "../../interfaces/api/user/user";
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
@@ -107,6 +107,12 @@ export class UserService {
   enableOrDisableUser = (user: UserItem, enabled: boolean) => {
     return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/enable-or-disable/${user.id}`, {enabled},{params: {...sendTokenParam}}).pipe(
       map(body => body.data.executed)
+    )
+  }
+
+  deleteUser = (user: UserItem) => {
+    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
     )
   }
 }
