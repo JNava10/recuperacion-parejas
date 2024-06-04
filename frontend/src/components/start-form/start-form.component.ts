@@ -3,10 +3,13 @@ import {
   ChoicePreference,
   PreferenceItem,
   PreferenceList,
-  RangePreference
+  RangePreference, UserPreferenceItem
 } from "../../interfaces/api/preference/preferenceItem";
 import {NgForOf, NgIf, TitleCasePipe} from "@angular/common";
 import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {PreferenceService} from "../../services/api/preference.service";
+import {MessageService} from "primeng/api";
+import {CustomToastComponent} from "../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-start-form',
@@ -15,13 +18,15 @@ import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Val
     TitleCasePipe,
     ReactiveFormsModule,
     NgForOf,
-    NgIf
+    NgIf,
+    CustomToastComponent
   ],
   templateUrl: './start-form.component.html',
   styleUrl: './start-form.component.css'
 })
 export class StartFormComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder) {
+
+  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService, private messageService: MessageService,) {
   }
 
   ngOnInit() {
@@ -67,23 +72,28 @@ export class StartFormComponent implements OnInit {
   }
 
   submitStartPreferences = () => {
-    console.log(this.startForm.valid)
-
-    const preferences = [];
+    const preferences: UserPreferenceItem[] = [];
 
     for (const i in this.choices.value) {
       const {choice, id} = this.choices.value[i];
 
-      preferences.push({id, value: choice});
+      preferences.push({preference: id, value: choice});
     }
 
     for (const i in this.ranges.value) {
       const {rangeValue, id} = this.ranges.value[i];
 
-      preferences.push({id, value: rangeValue});
+      preferences.push({preference: id, value: rangeValue});
     }
 
-    console.log(preferences)
+    this.preferenceService.createUserPreferences(preferences).subscribe(body => {
+
+      if (body.data.executed) {
+        this.messageService.add({summary: 'Exito', detail: body.message, severity: 'success'});
+      } else {
+        this.messageService.add({summary: 'Error', detail: body.message, severity: 'error'});
+      }
+    })
   };
 
   setChoice($event: Event, i: number) {

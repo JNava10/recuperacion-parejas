@@ -14,6 +14,14 @@ export interface GetPreferencesResponse extends ApiResponse {
   }
 }
 
+
+export interface CreatePreferencesResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
+}
+
 export interface PreferenceItem {
   id?: number
   name?: string,
@@ -81,6 +89,11 @@ export interface PreferenceValue {
   max_value?: number
 }
 
+export interface UserPreferenceItem {
+  user?: number
+  preference?: number
+  value?: number
+}
 
 export interface PreferenceType {
   id?: number

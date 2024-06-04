@@ -123,6 +123,19 @@ class PreferenceQuery {
             return new QueryError(false, e)
         }
     };
+
+    static createUserPreferences = async (preferences, userId) => {
+        try {
+            preferences.forEach(preference => preference.user = userId);
+
+            const created = await models.UserPreference.bulkCreate(preferences);
+
+            return new QuerySuccess(created.length > 0, 'Se han creado las preferencias de usuario correctamente.', created.length > 0);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = PreferenceQuery

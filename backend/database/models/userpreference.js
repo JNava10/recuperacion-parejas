@@ -32,6 +32,7 @@ module.exports = (sequelize) => {
     sequelize,
     modelName: 'UserPreference',
     tableName: 'user_preferences',
+    timestamps: false
   });
   return UserPreferences;
 };
