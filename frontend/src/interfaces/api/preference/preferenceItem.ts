@@ -25,8 +25,8 @@ export interface PreferenceItem {
 }
 
 export interface PreferenceList {
-  choice: PreferenceItem[],
-  range: PreferenceItem[],
+  choice: ChoicePreference[],
+  range: RangePreference[],
 }
 
 export interface CreatePreferenceItem {
@@ -48,6 +48,39 @@ export interface CreateRangePreferenceItem extends CreatePreferenceItem {
 export interface PreferenceItemWithType extends PreferenceItem {
   type: PreferenceType
 }
+
+
+export interface ChoicePreference {
+  id: number
+  name?: string
+  description?: string
+  type?: {
+    text?: string
+  }
+  options?: Option[]
+}
+
+export interface Option {
+  preference: number
+  option_name: string
+  option_value: number
+}
+
+export interface RangePreference {
+  id: number
+  name?: string
+  description?: string
+  type?: {
+    text?: string
+  }
+  values?: PreferenceValue
+}
+export interface PreferenceValue {
+  preference?: number
+  min_value?: number
+  max_value?: number
+}
+
 
 export interface PreferenceType {
   id?: number

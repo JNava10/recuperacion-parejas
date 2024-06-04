@@ -23,6 +23,7 @@ import {SendCodeFormComponent} from "../components/recover-password/send-code-fo
 import {
   SendPasswordFormComponent
 } from "../components/recover-password/send-password-form/send-password-form.component";
+import {StartComponent} from "../public/start/start.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -41,6 +42,7 @@ export const routes: Routes = [
   { path: 'recover-password/email', component: SendEmailFormComponent },
   { path: 'recover-password/code', component: SendCodeFormComponent },
   { path: 'recover-password/password', component: SendPasswordFormComponent },
+  { path: 'start', component: StartComponent },
   { path: 'recover-password',   redirectTo: '/recover-password/email', pathMatch: 'full' },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];

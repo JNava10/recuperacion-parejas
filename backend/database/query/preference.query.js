@@ -82,12 +82,25 @@ class PreferenceQuery {
         }
     };
 
-    static getAllPreferences = async (preference) => {
+    static getAllPreferences = async () => {
         try {
-            const query = await models.Preference.findAll({ include: {
-                    model: models.PreferenceType,
-                    as: 'type'
-                }}
+            const query = await models.Preference.findAll({ include: [
+                    {
+                        model: models.PreferenceType,
+                        as: 'type',
+                        attributes: ['text']
+                    },
+                    {
+                        model: models.PreferenceValue,
+                        as: 'values',
+                        attributes: ['preference', 'min_value', 'max_value']
+                    },
+                    {
+                        model: models.PreferenceOption,
+                        as: 'options',
+                        attributes: ['preference', 'option_name', 'option_value']
+                    },
+                ], attributes: ['id', 'name', 'description']}
             );
 
             let preferences = {
@@ -104,7 +117,7 @@ class PreferenceQuery {
                 }
             })
 
-            return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.');
+            return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.', preferences);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
