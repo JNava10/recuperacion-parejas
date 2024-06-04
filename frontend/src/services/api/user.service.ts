@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../../environments/environment";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {
   CreateUserItem,
@@ -12,19 +12,20 @@ import {
 } from "../../interfaces/api/user/user";
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {map, tap} from "rxjs";
+import {catchError, map, tap} from "rxjs";
 import {
   RecoverPasswordResponse,
   SendRecoverCodeResponse,
   SendRecoverEmailResponse
 } from "../../interfaces/recover-password";
+import {MessageService} from "primeng/api";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private messageService: MessageService) { }
 
   searchMember = (input: string) => {
     const body = {input}
@@ -51,9 +52,7 @@ export class UserService {
   }
 
   createUser = (user: CreateUserItem) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}})
   }
 
   registerUser = (user: CreateUserItem) => {

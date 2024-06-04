@@ -7,6 +7,8 @@ import * as customValidators from "../../../utils/validators/customValidators";
 import {NgIf} from "@angular/common";
 import {SelectRolesEditComponent} from "../../roles/select-roles/select-roles.component";
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
+import {Message, MessageService} from "primeng/api";
+import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-user-form',
@@ -15,13 +17,14 @@ import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
     ReactiveFormsModule,
     NgIf,
     SelectRolesEditComponent,
-    RoleBadgeComponent
+    RoleBadgeComponent,
+    CustomToastComponent
   ],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
 })
 export class UserFormComponent {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private messageService: MessageService) {}
 
   @Input() roles: RoleItem[] = [];
 
@@ -35,9 +38,10 @@ export class UserFormComponent {
       password: new FormControl('', Validators.pattern(regex.user.password)),
       confirmPassword: new FormControl('', Validators.pattern(regex.user.password)),
     }),
-    roles: new FormControl(new Array<RoleItem>(), Validators.required),
+    role: new FormControl('',[Validators.required, Validators.pattern(/[0-9]$/)]),
   }, {
     validators: [customValidators.passwordsMatch('password', 'confirmPassword')],
+    updateOn: "submit"
   });
 
   createUser = (event: SubmitEvent) => {
@@ -47,12 +51,16 @@ export class UserFormComponent {
 
     const user = this.getUserData();
 
-    this.userService.createUser(user).subscribe();
+    this.userService.createUser(user).subscribe(res => {  const message: Message = {summary: res.message}
+      message.severity = res.data.executed ? "success" : "error"
+
+      this.messageService.add(message);
+
+    });
   };
 
   private getUserData = () => {
     const formData = this.userForm.value;
-    const roles = formData.roles?.map(role => role.id!);
 
     const user: CreateUserItem = {
       name: formData.name!,
@@ -62,7 +70,7 @@ export class UserFormComponent {
       email: formData.email!,
       password: formData.passwords!.password!,
       picUrl: "https://www.mundodeportivo.com/files/image_449_220/files/fp/uploads/2024/05/24/6650bdf5b973a.r_d.2397-2343-902.jpeg",
-      roleIds: roles!
+      roleIds: [Number(formData.role)]
     }
 
     return user;

@@ -65,7 +65,7 @@ class UserQuery {
 
     static checkIfEmailExists = async (email) => {
         try {
-            const query = await models.User.findOne({where: {email}}) !== null;
+            const query = await models.User.findOne({where: {email}});
 
             if (!query) return new QuerySuccess(true, 'No existe el correo introducido.', query);
 
@@ -123,7 +123,7 @@ class UserQuery {
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', true);
         } catch (e) {
             console.warn(e)
-            return new QueryError(false, e)
+            return new QueryError(false, e.message)
         }
     };
 
