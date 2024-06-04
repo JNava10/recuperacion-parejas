@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.Preference)
+      this.belongsTo(models.Preference, {as: "values"})
     }
   }
   Preferences.init({

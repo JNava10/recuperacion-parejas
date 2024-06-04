@@ -5,9 +5,9 @@ import {sendTokenParam} from "../../utils/const/url.constants";
 import {map} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {
-  CreateChoicePreferenceItem,
+  CreateChoicePreferenceItem, CreatePreferencesResponse,
   CreateRangePreferenceItem,
-  GetPreferenceResponse
+  GetPreferenceResponse, GetPreferencesResponse, UserPreferenceItem
 } from "../../interfaces/api/preference/preferenceItem";
 
 @Injectable({
@@ -34,4 +34,13 @@ export class PreferenceService {
     );
   }
 
+  getAllPreferences = () => {
+    return this.http.get<GetPreferencesResponse>(`${environment.apiUrl}/preference/`, {params: {...sendTokenParam}}).pipe(
+      map(body => body.data.query)
+    );
+  }
+
+  createUserPreferences = (preferences: UserPreferenceItem[]) => {
+    return this.http.post<CreatePreferencesResponse>(`${environment.apiUrl}/preference/user-preferences`, preferences, {params: {...sendTokenParam}});
+  }
 }
