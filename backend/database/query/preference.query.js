@@ -136,6 +136,42 @@ class PreferenceQuery {
             return new QueryError(false, e)
         }
     };
+
+    static deletePreference = async (id) => {
+        try {
+            const preference = await models.Preference.findOne(
+                {
+                    where: {id},
+                    include: {
+                        model: models.PreferenceType,
+                        as: 'type'
+                    }
+                }
+            )
+
+
+            if (!preference) return new QuerySuccess(false, 'La preferencia no existe o ya está borrada.', false);
+
+            const deleted = await models.Preference.destroy({where: {id}});
+
+            if (deleted) {
+                console.log(preference)
+
+                if (preference.type.text === preferenceTypes.choice.text) {
+                    await models.PreferenceOption.destroy({where: {preference: id}})
+                } else {
+                    await models.PreferenceValue.destroy({where: {preference: id}})
+                }
+
+                await models.UserPreference.destroy({where: {preference: id}})
+            }
+
+            return new QuerySuccess(true, 'Se ha borrado la preferencia correctamente   .', deleted);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = PreferenceQuery
