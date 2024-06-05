@@ -18,3 +18,9 @@ Como alternativa, instalar el archivo .sql de la entrega/release en cualquier se
 1. En el directorio `client/`: `ng s`
 2. En el directorio `server/`: `npm run serve`
 3. En cualquier navegador, abrir la ruta `http://localhost:8000/login`.
+
+### Credenciales
+- Todas las cuentas creadas tienen como contraseña `daw`.
+- Las cuentas ya predefinidas son:
+  - `admin@gmail.com`
+  - `member@gmail.com`
