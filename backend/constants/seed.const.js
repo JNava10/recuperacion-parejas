@@ -17,7 +17,7 @@ const roleNames = {
 // Usuarios por defecto
 const customUsers = [
     {
-        email: 'juannr2002@gmail.com',
+        email: 'admin@gmail.com',
         name: 'Juan',
         firstSurname: 'Navarrete',
         secondSurname: 'Rivero',
@@ -25,7 +25,7 @@ const customUsers = [
         roles:  [roleNames.admin.name]
     },
     {
-        email: 'jnava26@gmail.com',
+        email: 'member@gmail.com',
         name: 'Juan',
         firstSurname: 'Navarrete',
         secondSurname: 'Rivero',
