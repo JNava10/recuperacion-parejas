@@ -2,7 +2,7 @@
 
 ## Instalación
 1. Extraer el archivo .zip de la release.
-2. Es recomendable copiar el .env de la entrega y pegarlo en el directorio `backend/`.
+2. Es recomendable copiar el .env de la entrega (cambiar el nombre a .env) y pegarlo en el directorio `backend/`.
 3. Introducir los siguientes comandos:
 ```
 cd server
