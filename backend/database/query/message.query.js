@@ -27,7 +27,7 @@ class MessageQuery {
                 },
             });
 
-            return new QuerySuccess(true, {emitterUser, receiverUser, messages});
+            return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -47,7 +47,7 @@ class MessageQuery {
 
             const query = await models.Message.create(data);
 
-            return new QuerySuccess(true, query);
+            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }
@@ -65,7 +65,7 @@ class MessageQuery {
                 }, attributes: ['id']
             });
 
-            return new QuerySuccess(true, query);
+            return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }
@@ -75,7 +75,7 @@ class MessageQuery {
         try {
             const query = await models.Message.update({read: true}, {where: {id}});
 
-            return new QuerySuccess(true, query);
+            return new QuerySuccess(true, 'Se han leido los mensajes correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }

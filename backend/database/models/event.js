@@ -37,12 +37,16 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    pic_url: {
+    picUrl: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    summary_url: {
+    summaryUrl: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    scheduledDateTime: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
     latitude: {
@@ -59,9 +63,7 @@ module.exports = (sequelize) => {
     tableName: 'events',
     timestamps: true,
     paranoid: true,
-    deletedAt: 'deleted_at',
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true
   });
   return Event;
 };

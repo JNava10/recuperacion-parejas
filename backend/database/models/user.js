@@ -14,6 +14,7 @@ module.exports = (sequelize) => {
       this.belongsToMany(models.Role, {
         through: models.AssignedRole,
         foreignKey: 'user',
+        otherKey: 'role',
         as: 'roles'
       });
 
@@ -38,6 +39,16 @@ module.exports = (sequelize) => {
         as: 'friendships',
       });
 
+      this.hasMany(models.Match, {
+        foreignKey: 'userWhoMatched',
+        as: 'userWhoMatch',
+      });
+
+      this.hasMany(models.Match, {
+        foreignKey: 'userToMatched',
+        as: 'userMatch',
+      });
+
       this.belongsToMany(models.Preference, {
         through: models.UserPreference,
         as: 'preferences',
@@ -60,11 +71,11 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    first_surname: {
+    firstSurname: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    second_surname: {
+    secondSurname: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -82,27 +93,28 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: false
     },
-    pic_url: {
+    picUrl: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    last_login: {
+    lastLogin: {
       type: DataTypes.DATE,
       allowNull: true,
     },
     connected: {
       type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: false,
     },
-    created_at: {
-      allowNull: false,
-      type: DataTypes.DATE
-    },
-    updated_at: {
+    createdAt: {
       allowNull: false,
       type: DataTypes.DATE
     },
-    deleted_at: {
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    deletedAt: {
       allowNull: true,
       type: DataTypes.DATE
     }
@@ -112,9 +124,7 @@ module.exports = (sequelize) => {
     tableName: 'users',
     timestamps: true,
     paranoid: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-    deletedAt: 'deleted_at',
+    underscored: true
   });
   return User;
 };

@@ -22,19 +22,12 @@ module.exports = (sequelize) => {
     requested_user: {
       type: DataTypes.INTEGER,
       primaryKey: true
-    },
-    accepted: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
-    },
+    }
   }, {
     sequelize,
     modelName: 'Friendship',
     tableName: 'friendships',
     timestamps: true,
-    paranoid: true,
-    deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });

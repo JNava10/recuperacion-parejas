@@ -11,15 +11,17 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.Preference)
-
+      this.belongsTo(models.Preference, {as: "options", foreignKey: 'preference'})
     }
   }
   PreferenceOptions.init({
-    preference: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: false,
+      autoIncrement: true,
+    },
+    preference: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     option_name: DataTypes.STRING,
@@ -27,7 +29,8 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'PreferenceOption',
-    tableName: 'preference_options'
+    tableName: 'preference_options',
+    timestamps: false
   });
   return PreferenceOptions;
 };

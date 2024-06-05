@@ -12,6 +12,11 @@ class Server {
         this.app = express();
         this.authPath = `/${process.env.API_ROOT_ENDPOINT}/auth`;
         this.userPath = `/${process.env.API_ROOT_ENDPOINT}/user`;
+        this.eventPath = `/${process.env.API_ROOT_ENDPOINT}/event`;
+        this.rolesPath = `/${process.env.API_ROOT_ENDPOINT}/roles`;
+        this.friendshipPath = `/${process.env.API_ROOT_ENDPOINT}/friendship`;
+        this.preferencePath = `/${process.env.API_ROOT_ENDPOINT}/preference`;
+
         this.server = require('http').createServer(this.app);
         this.io = require('socket.io')(this.server, {
             cors: {
@@ -34,6 +39,10 @@ class Server {
     routes(){
         this.app.use(this.authPath, require('../routes/auth.routes'));
         this.app.use(this.userPath, require('../routes/user.routes'));
+        this.app.use(this.rolesPath, require('../routes/role.routes'));
+        this.app.use(this.eventPath, require('../routes/event.routes'));
+        this.app.use(this.friendshipPath, require('../routes/friendship.routes'));
+        this.app.use(this.preferencePath, require('../routes/preference.routes'));
     }
 
     listen() {

@@ -1,4 +1,5 @@
 import {ApiResponse} from "../apiResponse";
+import {EventItem} from "../event/event";
 
 export interface User {
   id: number
@@ -13,10 +14,72 @@ export interface User {
   created_at: string
 }
 
+export interface UserItem {
+  id?: number
+  email?: string
+  name?: string
+  enabled?: boolean
+  firstSurname?: string
+  secondSurname?: string
+  nickname?: string
+  picUrl?: string
+  lastLogin?: any
+  connected?: boolean
+  createdAt?: string
+  updatedAt?: string
+  roles?: RoleItem[]
+  roleIds?: number[]
+}
+
+export interface CreateUserItem extends UserItem {
+  password?: string
+}
+
 export interface UserResponse extends ApiResponse {
   user: User
 }
 
 export interface UserMessagesResponse extends ApiResponse {
   user: User
+}
+
+export interface GetUsersResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: UserItem[]
+  }
+}
+
+export interface GetUserResponse  extends ApiResponse{
+  data: {
+    executed: true
+    query: UserItem
+  }
+}
+
+export interface ManageUserResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
+}
+
+export interface RoleItem {
+  id?: number,
+  name?: string,
+  display_name?: string
+}
+
+export interface GetRolesResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: RoleItem[]
+  }
+}
+
+export interface DeleteUserResponse {
+  data: {
+    executed: true
+    query: boolean
+  }
 }

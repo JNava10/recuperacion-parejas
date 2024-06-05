@@ -10,8 +10,10 @@ const {QueryTypes} = require("sequelize");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
+    const preferenceTypes = await models.PreferenceType.findAll();
+
     const preferenceList =  Object.values(defaultPreferences)
-    const preferences = await preferenceFactory.make(preferenceList);
+    const preferences = await preferenceFactory.make(preferenceList, preferenceTypes);
 
     await queryInterface.bulkInsert(models.Preference.tableName, preferences, {});
 
@@ -26,6 +28,7 @@ module.exports = {
 
     const userPreferences  = userPreferenceFactory.make(insertedPreferences, values, insertedUsers, options);
 
+    console.log('a')
 
     await queryInterface.bulkInsert(models.PreferenceValue.tableName, values, {});
     await queryInterface.bulkInsert(models.PreferenceOption.tableName, options, {});

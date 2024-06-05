@@ -3,6 +3,7 @@ const {
   Model,
   DataTypes
 } = require('sequelize');
+const {fa} = require("@faker-js/faker");
 module.exports = (sequelize) => {
   class Preferences extends Model {
     /**
@@ -11,7 +12,7 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.Preference)
+      this.belongsTo(models.Preference, {as: "values"})
     }
   }
   Preferences.init({
@@ -28,11 +29,7 @@ module.exports = (sequelize) => {
     sequelize,
     modelName: 'PreferenceValue',
     tableName: 'preference_values',
-    timestamps: true,
-    paranoid: true,
-    deletedAt: 'deleted_at',
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    timestamps: false
   });
   return Preferences;
 };

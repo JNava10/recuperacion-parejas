@@ -26,12 +26,13 @@ module.exports = (sequelize) => {
     },
     value: {
       allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.INTEGER
     },
   }, {
     sequelize,
     modelName: 'UserPreference',
     tableName: 'user_preferences',
+    timestamps: false
   });
   return UserPreferences;
 };

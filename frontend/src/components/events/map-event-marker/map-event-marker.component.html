@@ -1,0 +1,5 @@
+<google-map [zoom]="zoom" class="w-full" [center]="center" (mapClick)="addMarker($event)">
+  @if (markerPosition) {
+    <map-marker [position]="markerPosition!" [options]="markerOptions" />
+  }
+</google-map>

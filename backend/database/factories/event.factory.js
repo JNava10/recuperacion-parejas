@@ -6,10 +6,13 @@ const {hashPassword, getRandomItem} = require("../../helpers/common.helper");
 const get = async (number) => {
     const events = [];
     const userFields = await models.User.findAll({attributes: ['id']});
+    const scheduledOffset = 4; // Numero de dias hasta que caduque el evento.
+    const date = new Date(Date.now());
+    const scheduledDate = new Date(date.setDate(date.getDate() + scheduledOffset));
 
     for (let i = 0; i < number; i++) {
         const randomUser = getRandomItem(userFields);
-        const role = {
+        const event = {
             name: fakerES.lorem.sentences(1),
             description: faker.lorem.lines({min: 1, max: 3}),
             author: randomUser.id,
@@ -17,10 +20,10 @@ const get = async (number) => {
             summary_url: faker.image.url(),
             latitude: faker.location.latitude(),
             longitude: faker.location.longitude(),
-            updated_at: new Date(),
+            scheduled_date_time: scheduledDate,
         }
 
-        events.push(role);
+        events.push(event);
     }
 
     return events

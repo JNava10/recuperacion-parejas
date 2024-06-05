@@ -7,7 +7,9 @@ import {NgIf} from "@angular/common";
 import {MessageService} from "primeng/api";
 import {MessagesModule} from "primeng/messages";
 import {StorageService} from "../../services/storage.service";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
+import {CustomToastComponent} from "../custom-toast/custom-toast.component";
+import {ignoreElements} from "rxjs";
 
 @Component({
   selector: 'app-login-form',
@@ -17,6 +19,8 @@ import {Router} from "@angular/router";
     NgIf,
     // FormErrorComponent,
     MessagesModule,
+    CustomToastComponent,
+    RouterLink,
   ],
   providers: [MessageService],
   templateUrl: './login-form.component.html',
@@ -47,15 +51,17 @@ export class LoginFormComponent {
 
     this.authService.sendLoginData(email, password).subscribe(async res => {
       if (res.data.logged) {
-        await this.handleToken(res.data.token);
+        await this.handleLogin(res.data.token, res.data.firstLogin);
       } else {
         this.messageService.add({summary: 'Error', detail: res.message, severity: 'error'})
       }
     })
   }
 
-  private handleToken = async (token: string) => {
+  private handleLogin = async (token: string, firstLogin: boolean) => {
     this.storageService.save('token', token);
-    await this.router.navigate(['/dashboard']);
+
+    if (firstLogin) await this.router.navigate(['/start']);
+    else await this.router.navigate(['/dashboard']);
   }
 }

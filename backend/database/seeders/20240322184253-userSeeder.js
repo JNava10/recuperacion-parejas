@@ -5,11 +5,12 @@ const {getRandomItem} = require("../../helpers/common.helper");
 const {fr} = require("@faker-js/faker");
 const {customUsers} = require("../../constants/seed.const");
 const {createCustom} = require("../factories/user.factory");
+const {DATE} = require("sequelize");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const factoryUserList = await userFactory.get(3);
+    const factoryUserList = await userFactory.get(process.env.DEAFULT_FACTORY_USERS);
     const customUserList = [];
 
     for (const customUser of customUsers) {
@@ -36,15 +37,15 @@ module.exports = {
       // podemos aprovechar esto para obtener un boolean aleatorio.
       const accepted = Boolean(Math.round(Math.random()));
 
-      const friendUser = getRandomItem(userFields);
-
-      await models.Friendship.create({
-        requesting_user: userField.id,
-        requested_user: friendUser.id,
-        accepted: accepted,
-        created_at: new Date(),
-        updated_at: new Date()
-      });
+      // const friendUser = getRandomItem(userFields);
+      //
+      // await models.Friendship.create({
+      //   requesting_user: userField.id,
+      //   requested_user: friendUser.id,
+      //   accepted: accepted,
+      //   created_at: new Date(),
+      //   updated_at: new Date()
+      // });
     }
   },
 

@@ -10,6 +10,16 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
+      type_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: {
+            tableName: models.PreferenceType.tableName
+          },
+          key: 'id'
+        }
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -20,11 +30,14 @@ module.exports = {
       },
       created_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        default: new Date(Date.now())
+
       },
       updated_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        default: new Date(Date.now())
       },
       deleted_at: {
         allowNull: true,

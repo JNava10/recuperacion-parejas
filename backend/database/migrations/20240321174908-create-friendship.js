@@ -26,21 +26,12 @@ module.exports = {
           key: 'id'
         }
       },
-      accepted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
       created_at: {
         allowNull: false,
         type: DataTypes.DATE
       },
       updated_at: {
         allowNull: false,
-        type: DataTypes.DATE
-      },
-      deleted_at: {
-        allowNull: true,
         type: DataTypes.DATE
       }
     });
