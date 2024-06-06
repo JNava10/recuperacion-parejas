@@ -137,6 +137,53 @@ class PreferenceQuery {
         }
     };
 
+    static getPreferenceById = async (id) => {
+        try {
+            let choice, range;
+
+            const preference = await models.Preference.findOne(
+                {
+                    where: {id},
+                    include: {
+                        model: models.PreferenceType,
+                        as: 'type'
+                    }
+                }
+            );
+
+            if (!preference) return new QuerySuccess(
+                true,
+                'No se ha encontrado ninguna preferencia con el ID indicado.',
+                null
+            );
+
+            if (preference.type.text === preferenceTypes.choice.text) {
+                const options = await models.PreferenceOption.findAll({where: {preference: id},  attributes: ['option_name', 'option_value']})
+
+                if (!options) throw new Error('La preferencia indicada no está correctamente definida.')
+
+                preference.options = options
+
+                console.log(preference)
+
+                choice = preference;
+            } else {
+                const {min_value, max_value} = await models.PreferenceValue.findOne({where: {preference: id}, attributes: ['min_value', 'max_value']})
+
+                if (!min_value || !max_value) throw new Error('La preferencia indicada no está correctamente definida.')
+
+                preference.min_value = min_value;
+                preference.max_value = max_value;
+                range = preference;
+            }
+
+            return new QuerySuccess(true, 'Se ha obtenido la preferencia correctamente.', {choice, range});
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
     static deletePreference = async (id) => {
         try {
             const preference = await models.Preference.findOne(
@@ -154,8 +201,6 @@ class PreferenceQuery {
             const deleted = await models.Preference.destroy({where: {id}});
 
             if (deleted) {
-                console.log(preference)
-
                 if (preference.type.text === preferenceTypes.choice.text) {
                     await models.PreferenceOption.destroy({where: {preference: id}})
                 } else {

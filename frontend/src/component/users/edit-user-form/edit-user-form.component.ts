@@ -22,9 +22,9 @@ import * as customValidators from "../../../utils/validators/customValidators";
 export class EditUserFormComponent implements OnInit {
   constructor(private userService: UserService) {}
 
- ngOnInit() {
-   this.setUserData()
- }
+   ngOnInit() {
+     this.setUserData()
+   }
 
   @Input() roles?: RoleItem[];
   @Input() user?: UserItem;

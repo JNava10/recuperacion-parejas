@@ -91,6 +91,22 @@ class PreferenceController {
             )
         }
     };
+
+    static getPreference = async (req, res) => {
+        try {
+            const {message, executed, query} = await PreferenceQuery.getPreferenceById(req.params.id);
+
+            console.log(query.choice.options)
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al borrar la preferencia.',{executed: false, error: e.toString()})
+            )
+        }
+    };
 }
 
 module.exports = PreferenceController

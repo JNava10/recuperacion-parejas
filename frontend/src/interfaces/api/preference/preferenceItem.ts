@@ -1,6 +1,6 @@
 import {ApiResponse} from "../apiResponse";
 
-export interface GetPreferenceResponse extends ApiResponse {
+export interface GetPreferenceDataResponse extends ApiResponse {
   data: {
     executed: true
     query: PreferenceItemWithType[]
@@ -13,7 +13,15 @@ export interface GetPreferencesResponse extends ApiResponse {
     query: PreferenceList
   }
 }
-
+export interface GetPreferenceResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: {
+      choice?: ChoicePreference
+      range?: RangePreference
+    }
+  }
+}
 
 export interface PreferenceQueryResponse extends ApiResponse {
   data: {
@@ -69,9 +77,9 @@ export interface ChoicePreference {
 }
 
 export interface Option {
-  preference: number
-  option_name: string
-  option_value: number
+  preference?: number
+  option_name?: string
+  option_value?: number
 }
 
 export interface RangePreference {

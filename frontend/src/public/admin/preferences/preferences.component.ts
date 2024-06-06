@@ -61,6 +61,6 @@ export class PreferencesComponent implements OnInit {
   // Editar preferencias
 
   goToEdit = async (preference: PreferenceItemWithType) => {
-    await this.router.navigate( [`./edit`], {queryParams: {id: preference.id}});
+    await this.router.navigate( [`admin/preferences/edit`], {queryParams: {id: preference.id}});
   };
 }
