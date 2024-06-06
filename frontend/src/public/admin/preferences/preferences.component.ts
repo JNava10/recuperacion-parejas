@@ -6,7 +6,7 @@ import {
 } from "../../../interfaces/api/preference/preferenceItem";
 import {PreferenceService} from "../../../services/api/preference.service";
 import {TitleCasePipe} from "@angular/common";
-import {Router} from "@angular/router";
+import {Router, RouterOutlet} from "@angular/router";
 import {Message, MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../../components/custom-toast/custom-toast.component";
 
@@ -15,7 +15,8 @@ import {CustomToastComponent} from "../../../components/custom-toast/custom-toas
   standalone: true,
   imports: [
     TitleCasePipe,
-    CustomToastComponent
+    CustomToastComponent,
+    RouterOutlet
   ],
   templateUrl: './preferences.component.html',
   styleUrl: './preferences.component.css'
@@ -33,17 +34,19 @@ export class PreferencesComponent implements OnInit {
     this.router.navigate(['create-choice-preference'])
   };
 
-
-  removePreference(preference: PreferenceItemWithType) {
-    this.preferenceService.removePreference(preference.id!).subscribe(this.handleRemovePreference)
-  }
-
   private getPreferences() {
     this.preferenceService.getActivatedPreferences().subscribe(preferences => {
         this.preferences = preferences
       }
     )
   }
+
+  // Borrado de preferencias
+
+  removePreference(preference: PreferenceItemWithType) {
+    this.preferenceService.removePreference(preference.id!).subscribe(this.handleRemovePreference)
+  }
+
 
   private handleRemovePreference = (body: PreferenceQueryResponse) => {
     const message: Message = {detail: body.message}
@@ -54,4 +57,10 @@ export class PreferencesComponent implements OnInit {
 
     this.getPreferences()
   }
+
+  // Editar preferencias
+
+  goToEdit = async (preference: PreferenceItemWithType) => {
+    await this.router.navigate( [`./edit`], {queryParams: {id: preference.id}});
+  };
 }

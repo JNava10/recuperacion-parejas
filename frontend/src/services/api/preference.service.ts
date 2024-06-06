@@ -7,7 +7,7 @@ import {HttpClient} from "@angular/common/http";
 import {
   CreateChoicePreferenceItem, PreferenceQueryResponse,
   CreateRangePreferenceItem,
-  GetPreferenceResponse, GetPreferencesResponse, UserPreferenceItem
+  GetPreferenceResponse, GetPreferencesResponse, UserPreferenceItem, PreferenceItem
 } from "../../interfaces/api/preference/preferenceItem";
 
 @Injectable({
@@ -45,5 +45,13 @@ export class PreferenceService {
   }
   removePreference = (id: number) => {
     return this.http.delete<PreferenceQueryResponse>(`${environment.apiUrl}/preference/${id}`, {params: {...sendTokenParam}});
+  }
+
+  editPreference = (preference: PreferenceItem) => {
+    return this.http.put<PreferenceQueryResponse>(`${environment.apiUrl}/preference/${preference.id}`, {preference}, {params: {...sendTokenParam}});
+  }
+
+  getPreference(id: number) {
+    return this.http.get<PreferenceQueryResponse>(`${environment.apiUrl}/preference/${id}`, {params: {...sendTokenParam}});
   }
 }
