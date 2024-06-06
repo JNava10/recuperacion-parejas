@@ -115,4 +115,13 @@ export class UserService {
       map(body => body.data.query)
     )
   }
+
+
+  editProfileData = (user: UserItem) => {
+    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/profile/data/${user.id}`, user, {params: {...sendTokenParam}});
+  }
+
+  getOwnData = () => {
+    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/own`, {params: {...sendTokenParam}});
+  }
 }

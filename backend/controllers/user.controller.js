@@ -454,6 +454,53 @@ class UserController {
             )
         }
     };
+
+    static editProfileData = async (req, res) => {
+        try {
+            const {message, executed, query, error} = await UserQuery.editProfileData(req.payload.userId, req.body);
+
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            } else if (!executed && query) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            } else if (!query) {
+                console.log(error);
+                return res.status(500).json(
+                    new StdResponse(message,{executed, error})
+                )
+            }
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static getOwnData = async (req, res) => {
+        try {
+            const {userId} = req.payload;
+
+            console.log(userId)
+
+            const {query, message, executed} = await UserQuery.getUsersById([userId]);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
 }
 
 module.exports = UserController
