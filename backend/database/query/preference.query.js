@@ -11,7 +11,7 @@ class PreferenceQuery {
     static getActivatedPreferences = async () => {
         try {
             const activatedPreferences = await models.Preference.findAll({
-                attributes: ['name', 'description', 'typeId', 'createdAt', 'updatedAt'],
+                attributes: ['id', 'name', 'description', 'typeId', 'createdAt', 'updatedAt'],
                 include: {
                     model: models.PreferenceType,
                     as: 'type'
@@ -148,7 +148,6 @@ class PreferenceQuery {
                     }
                 }
             )
-
 
             if (!preference) return new QuerySuccess(false, 'La preferencia no existe o ya está borrada.', false);
 

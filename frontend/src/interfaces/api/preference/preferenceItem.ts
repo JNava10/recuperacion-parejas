@@ -15,7 +15,7 @@ export interface GetPreferencesResponse extends ApiResponse {
 }
 
 
-export interface CreatePreferencesResponse extends ApiResponse {
+export interface PreferenceQueryResponse extends ApiResponse {
   data: {
     executed: true
     query: boolean

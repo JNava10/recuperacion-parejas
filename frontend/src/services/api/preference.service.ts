@@ -5,7 +5,7 @@ import {sendTokenParam} from "../../utils/const/url.constants";
 import {map} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {
-  CreateChoicePreferenceItem, CreatePreferencesResponse,
+  CreateChoicePreferenceItem, PreferenceQueryResponse,
   CreateRangePreferenceItem,
   GetPreferenceResponse, GetPreferencesResponse, UserPreferenceItem
 } from "../../interfaces/api/preference/preferenceItem";
@@ -41,6 +41,9 @@ export class PreferenceService {
   }
 
   createUserPreferences = (preferences: UserPreferenceItem[]) => {
-    return this.http.post<CreatePreferencesResponse>(`${environment.apiUrl}/preference/user-preferences`, preferences, {params: {...sendTokenParam}});
+    return this.http.post<PreferenceQueryResponse>(`${environment.apiUrl}/preference/user-preferences`, preferences, {params: {...sendTokenParam}});
+  }
+  removePreference = (id: number) => {
+    return this.http.delete<PreferenceQueryResponse>(`${environment.apiUrl}/preference/${id}`, {params: {...sendTokenParam}});
   }
 }
