@@ -512,9 +512,9 @@ class UserController {
 
     static updateUserAvatar = async (req, res) => {
         try {
-            console.log(req.files)
+            const key = 'file'
 
-            if (!req.files || !req.files['file']) return res.status(400).json(
+            if (!req.files || !req.files[key]) return res.status(400).json(
                 new StdResponse(
                     "No se ha subido ningun archivo.",
                     {
@@ -522,15 +522,19 @@ class UserController {
                     })
             );
 
-            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg']})
+            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg']});
+
+            const avatarUrl = uploadedNames.get(key).secure_url;
+
+            const {id} = req.params;
+
+            const {message, query, executed} = await UserQuery.editProfileAvatar(id, avatarUrl)
 
             return res.status(200).json(
-                new StdResponse(
-                    "Se ha cambiado el avatar correctamente",
-                    {
-                        executed: true,
-                        uploadedNames
-                    })
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
             );
         } catch (e) {
             console.log(e)

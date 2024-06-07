@@ -9,6 +9,7 @@ cloudinary.config( process.env.CLOUDINARY_URL);
  * @param settings
  * @param {string[]} settings.fileExtension - Extensiones permitidas en los archivos
  * @param {string} settings.dir - Directorio donde se guardarán los archivos
+ * @param {number} settings.numberLimit - Cantidad limite de archivos que deberian subirse.
  * @returns {Promise<*>}
  */
 const uploadFiles = async (requestFiles, settings) => {
@@ -16,15 +17,19 @@ const uploadFiles = async (requestFiles, settings) => {
         const filesUploaded = new Map();
         const files = Object.entries(requestFiles);
 
-        const filesValid = files.every(([key, file]) => {
+        const fileExtsValid = files.every(([key, file]) => {
             const fileNameArray = file.name.split('.');
             const fileExt = fileNameArray[fileNameArray.length - 1];
 
             return settings.fileExtension.includes(fileExt)
         });
 
-        if (!filesValid) {
+        const fileQuantityExceeded = settings.numberLimit !== undefined && files.length > settings.numberLimit;
+
+        if (!fileExtsValid) {
             throw new Error('Los archivos subidos no tienen las extensiones correctas.')
+        } else if (fileQuantityExceeded) {
+            throw new Error(`Se han subido demasiados archivos. (Max. ${settings.numberLimit}})`)
         }
 
         for (const [key, file] of files) {
@@ -37,12 +42,9 @@ const uploadFiles = async (requestFiles, settings) => {
             filesUploaded.set(key, uploaded)
         }
 
-        console.log('names', filesUploaded)
-
         return filesUploaded
     } catch (error) {
-        console.warn(error)
-        return false;
+        throw error
     }
 }
 
