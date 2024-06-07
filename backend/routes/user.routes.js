@@ -22,9 +22,12 @@ router.post('/send-recover-email', UserController.sendRecoverEmail)
 router.post('/send-recover-code', UserController.checkRecoverCode)
 router.put('/recover-account/password', UserController.changePasswordRecovering)
 router.put('/enable-or-disable/:userId', [validateToken], UserController.enableOrDisableUser)
+router.put('/profile/data/:id', [validateToken], UserController.editProfileData)
 
+router.get('/profile', [validateToken], UserController.getEditableProfileData)
 router.get('/:id', [validateToken], UserController.findById)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
+router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
 router.delete('/:id', [validateToken], UserController.deleteUser)
 
 module.exports = router;

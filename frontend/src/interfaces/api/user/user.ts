@@ -1,5 +1,6 @@
 import {ApiResponse} from "../apiResponse";
 import {EventItem} from "../event/event";
+import {PreferenceList} from "../preference/preferenceItem";
 
 export interface User {
   id: number
@@ -81,5 +82,15 @@ export interface DeleteUserResponse {
   data: {
     executed: true
     query: boolean
+  }
+}
+
+export interface GetProfileResponse extends ApiResponse{
+  data: {
+    executed: true
+    query: {
+      user: UserItem,
+      preferences: PreferenceList
+    }
   }
 }

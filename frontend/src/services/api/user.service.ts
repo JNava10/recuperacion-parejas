@@ -8,7 +8,7 @@ import {
   GetUserResponse,
   GetUsersResponse,
   User,
-  UserResponse, UserItem, DeleteUserResponse
+  UserResponse, UserItem, DeleteUserResponse, GetProfileResponse
 } from "../../interfaces/api/user/user";
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
@@ -114,5 +114,14 @@ export class UserService {
     return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     )
+  }
+
+
+  editProfileData = (user: UserItem) => {
+    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/profile/data/${user.id}`, user, {params: {...sendTokenParam}});
+  }
+
+  getOwnData = () => {
+    return this.http.get<GetProfileResponse>(`${environment.apiUrl}/user/profile`, {params: {...sendTokenParam}});
   }
 }

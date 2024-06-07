@@ -7,13 +7,14 @@ const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
-const {el} = require("@faker-js/faker");
+const {el, fi} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const jwt = require("jsonwebtoken");
 const models = require("../database/models");
+const {uploadFiles} = require("../helpers/cloudinary.helper");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -451,6 +452,95 @@ class UserController {
             console.log(error);
             return res.status(500).json(
                 new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static editProfileData = async (req, res) => {
+        try {
+            const {message, executed, query, error} = await UserQuery.editProfileData(req.payload.userId, req.body);
+
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            } else if (!executed && query) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            } else if (!query) {
+                console.log(error);
+                return res.status(500).json(
+                    new StdResponse(message,{executed, error})
+                )
+            }
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static getEditableProfileData = async (req, res) => {
+        try {
+            const {userId} = req.payload;
+
+            const userData = (await UserQuery.getUsersById([userId])).query[0];
+            const userPreferences = (await PreferenceQuery.getUserPreferences(userId)).query;
+
+            return res.status(200).json(
+                new StdResponse(
+                    "Se han obtenido los datos editables correctamente",
+                    {
+                        executed: true,
+                        query: {
+                            user: userData,
+                            preferences: userPreferences
+                        }
+                    })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static updateUserAvatar = async (req, res) => {
+        try {
+            const key = 'file'
+
+            if (!req.files || !req.files[key]) return res.status(400).json(
+                new StdResponse(
+                    "No se ha subido ningun archivo.",
+                    {
+                        executed: false,
+                    })
+            );
+
+            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg']});
+
+            const avatarUrl = uploadedNames.get(key).secure_url;
+
+            const {id} = req.params;
+
+            const {message, query, executed} = await UserQuery.editProfileAvatar(id, avatarUrl)
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
