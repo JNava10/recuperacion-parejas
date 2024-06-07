@@ -65,6 +65,7 @@ export interface ChoicePreference {
   type?: {
     text?: string
   }
+  userValues?: UserValue
   options?: Option[]
 }
 
@@ -82,7 +83,13 @@ export interface RangePreference {
     text?: string
   }
   values?: PreferenceValue
+  userValues?: UserValue
 }
+
+export interface UserValue {
+  value?: number
+}
+
 export interface PreferenceValue {
   preference?: number
   min_value?: number

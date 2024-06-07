@@ -454,6 +454,60 @@ class UserController {
             )
         }
     };
+
+    static editProfileData = async (req, res) => {
+        try {
+            const {message, executed, query, error} = await UserQuery.editProfileData(req.payload.userId, req.body);
+
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            } else if (!executed && query) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            } else if (!query) {
+                console.log(error);
+                return res.status(500).json(
+                    new StdResponse(message,{executed, error})
+                )
+            }
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static getEditableProfileData = async (req, res) => {
+        try {
+            const {userId} = req.payload;
+
+            const userData = (await UserQuery.getUsersById([userId])).query[0];
+            const userPreferences = (await PreferenceQuery.getUserPreferences(userId)).query;
+
+            return res.status(200).json(
+                new StdResponse(
+                    "Se han obtenido los datos editables correctamente",
+                    {
+                        executed: true,
+                        query: {
+                            user: userData,
+                            preferences: userPreferences
+                        }
+                    })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
 }
 
 module.exports = UserController

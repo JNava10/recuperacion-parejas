@@ -11,6 +11,7 @@ module.exports = (sequelize) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      this.belongsTo(models.Preference, {as: "options", foreignKey: 'preference'})
     }
   }
   UserPreferences.init({

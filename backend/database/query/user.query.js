@@ -429,6 +429,22 @@ class UserQuery {
             return new QueryError(false, e)
         }
     };
+
+    static editProfileData = async (id, user) => {
+        const userExists = models.User.findOne({where: {id}}) // TODO: Middleware
+
+        if (!userExists) return new QuerySuccess(false, 'El usuario indicado no existe.');
+
+        const {name, firstSurname, secondSurname, nickname} = user
+
+        try {
+            const query = await models.User.update({name, firstSurname, secondSurname, nickname}, {where: {id}});
+
+            return new QuerySuccess(true, 'Se ha editado el usuario correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = UserQuery

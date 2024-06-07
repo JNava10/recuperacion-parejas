@@ -25,6 +25,7 @@ import {
 } from "../components/recover-password/send-password-form/send-password-form.component";
 import {StartComponent} from "../public/start/start.component";
 import {AdminComponent} from "../public/admin/admin.component";
+import {EditProfileComponent} from "../public/edit-profile/edit-profile.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -45,6 +46,7 @@ export const routes: Routes = [
   { path: 'admin/users', component: UsersComponent },
   { path: 'admin/events', component: EventsComponent },
   { path: 'admin/preferences', component: PreferencesComponent },
+  { path: 'edit-profile', component: EditProfileComponent },
   { path: 'recover-password',   redirectTo: '/recover-password/email', pathMatch: 'full' },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
 ];

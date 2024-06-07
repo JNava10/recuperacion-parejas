@@ -136,6 +136,59 @@ class PreferenceQuery {
             return new QueryError(false, e)
         }
     };
+
+    static getUserPreferences = async (user) => {
+        try {
+            const rangePreferences = await models.Preference.findAll({
+                include: [
+                    {
+                        model: models.PreferenceType,
+                        as: 'type',
+                        attributes: ['text'],
+                        where: {text: preferenceTypes.range.text}
+                    },
+                    {
+                        model: models.PreferenceValue,
+                        as: 'values',
+                        attributes: ['min_value', 'max_value']
+                    },
+                    {
+                        model: models.UserPreference,
+                        as: 'userValues',
+                        attributes: ['value'],
+                        where: {user}
+                    },
+                ]
+            });
+
+            const choicePreferences = await models.Preference.findAll({
+                include: [
+                    {
+                        model: models.PreferenceType,
+                        as: 'type',
+                        attributes: ['text'],
+                        where: {text: preferenceTypes.choice.text}
+                    },
+                    {
+                        model: models.PreferenceOption,
+                        as: 'options',
+                        attributes: ['option_name', 'option_value']
+                    },
+                    {
+                        model: models.UserPreference,
+                        as: 'userValues',
+                        attributes: ['value'],
+                        where: {user}
+                    },
+                ]
+            });
+
+            return new QuerySuccess(true, 'Se han creado las preferencias de usuario correctamente.', {choice: choicePreferences, range: rangePreferences});
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = PreferenceQuery
