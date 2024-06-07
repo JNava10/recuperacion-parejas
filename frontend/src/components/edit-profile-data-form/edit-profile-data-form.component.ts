@@ -25,6 +25,8 @@ export class EditProfileDataFormComponent implements OnInit {
   constructor(private userService: UserService, private messageService: MessageService) {}
 
   ngOnInit() {
+    console.log(this.user)
+
     this.profileDataForm.patchValue({
       email: this.user?.email,
       name: this.user?.name,

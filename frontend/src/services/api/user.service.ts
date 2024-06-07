@@ -8,7 +8,7 @@ import {
   GetUserResponse,
   GetUsersResponse,
   User,
-  UserResponse, UserItem, DeleteUserResponse
+  UserResponse, UserItem, DeleteUserResponse, GetProfileResponse
 } from "../../interfaces/api/user/user";
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
@@ -122,6 +122,6 @@ export class UserService {
   }
 
   getOwnData = () => {
-    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/own`, {params: {...sendTokenParam}});
+    return this.http.get<GetProfileResponse>(`${environment.apiUrl}/user/profile`, {params: {...sendTokenParam}});
   }
 }

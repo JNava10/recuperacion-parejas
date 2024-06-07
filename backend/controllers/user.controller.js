@@ -482,16 +482,23 @@ class UserController {
         }
     };
 
-    static getOwnData = async (req, res) => {
+    static getEditableProfileData = async (req, res) => {
         try {
             const {userId} = req.payload;
 
-            console.log(userId)
-
-            const {query, message, executed} = await UserQuery.getUsersById([userId]);
+            const userData = (await UserQuery.getUsersById([userId])).query[0];
+            const userPreferences = (await PreferenceQuery.getUserPreferences(userId)).query;
 
             return res.status(200).json(
-                new StdResponse(message,{executed, query})
+                new StdResponse(
+                    "Se han obtenido los datos editables correctamente",
+                    {
+                        executed: true,
+                        query: {
+                            user: userData,
+                            preferences: userPreferences
+                        }
+                    })
             );
         } catch (e) {
             console.log(e)

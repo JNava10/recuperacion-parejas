@@ -1,0 +1,12 @@
+<div [formGroup]="choicePreferencesForm">
+  @for (preference of preferences?.choice!; track preference.id) {
+    <div>
+      <select>
+        @for (option of preference.options!; track $index) {
+          <option value="{{option.option_value}}">{{option.option_name}}</option>
+        }
+      </select>
+    </div>
+  }
+
+</div>
