@@ -140,44 +140,44 @@ class PreferenceQuery {
     static getUserPreferences = async (user) => {
         try {
             const rangePreferences = await models.Preference.findAll({
-                where: {user},
                 include: [
                     {
                         model: models.PreferenceType,
                         as: 'type',
-                        attributes: ['text']
+                        attributes: ['text'],
+                        where: {text: preferenceTypes.range.text}
                     },
                     {
                         model: models.PreferenceValue,
                         as: 'values',
-                        attributes: ['preference', 'min_value', 'max_value']
+                        attributes: ['min_value', 'max_value']
                     },
                     {
                         model: models.UserPreference,
-                        as: 'users',
-                        attributes: ['preference', 'min_value', 'max_value'],
+                        as: 'userValues',
+                        attributes: ['value'],
                         where: {user}
                     },
                 ]
             });
 
             const choicePreferences = await models.Preference.findAll({
-                where: {user},
                 include: [
                     {
                         model: models.PreferenceType,
                         as: 'type',
-                        attributes: ['text']
+                        attributes: ['text'],
+                        where: {text: preferenceTypes.choice.text}
                     },
                     {
                         model: models.PreferenceOption,
-                        as: 'values',
-                        attributes: ['preference', 'min_value', 'max_value']
+                        as: 'options',
+                        attributes: ['option_name', 'option_value']
                     },
                     {
-                        model: models.UserPreferences,
-                        as: 'users',
-                        attributes: ['preference', 'min_value', 'max_value'],
+                        model: models.UserPreference,
+                        as: 'userValues',
+                        attributes: ['value'],
                         where: {user}
                     },
                 ]

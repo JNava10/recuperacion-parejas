@@ -9,5 +9,6 @@ router.post('/save/choice', [validateToken], PreferenceController.createChoicePr
 router.post('/save/range', [validateToken], PreferenceController.createRangePreference);
 router.get('/', [validateToken], PreferenceController.getAllPreferences);
 router.post('/user-preferences', [validateToken], PreferenceController.createUserPreferences);
+router.get('/own', [validateToken], PreferenceController.getOwnPreferences);
 
 module.exports = router;
