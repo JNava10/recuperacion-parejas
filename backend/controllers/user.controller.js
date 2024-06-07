@@ -7,13 +7,14 @@ const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
-const {el} = require("@faker-js/faker");
+const {el, fi} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const jwt = require("jsonwebtoken");
 const models = require("../database/models");
+const {uploadFiles} = require("../helpers/cloudinary.helper");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -498,6 +499,37 @@ class UserController {
                             user: userData,
                             preferences: userPreferences
                         }
+                    })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static updateUserAvatar = async (req, res) => {
+        try {
+            console.log(req.files)
+
+            if (!req.files || !req.files['file']) return res.status(400).json(
+                new StdResponse(
+                    "No se ha subido ningun archivo.",
+                    {
+                        executed: false,
+                    })
+            );
+
+            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg']})
+
+            return res.status(200).json(
+                new StdResponse(
+                    "Se ha cambiado el avatar correctamente",
+                    {
+                        executed: true,
+                        uploadedNames
                     })
             );
         } catch (e) {
