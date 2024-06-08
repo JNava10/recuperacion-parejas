@@ -6,7 +6,18 @@
       <span class="text-sm font-semibold text-gray-900 dark:text-white"></span>
       <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{message!.created_at}}</span>
     </div>
-    <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{message!.text}}</p>
+    <div class="content">
+      @if (message?.text !== "") {
+        <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{message!.text}}</p>
+      } @else if (message!.files) {
+        <div>
+          @for (url of message?.files; track $index) {
+            <img src="{{url}}">
+          }
+        </div>
+      }
+
+    </div>
     @if (message!.read) {
       <span class="text-sm font-normal text-blue-500 dark:text-blue-400"><i class="fa-solid fa-check-double"></i></span>
     } @else {

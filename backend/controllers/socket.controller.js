@@ -25,19 +25,48 @@ class SocketController {
 
     static onMessage = async (socket, params) => {
         const roomController = new RoomController(socket);
+        const {content, idToSend} = params;
 
-        const inserted = await MessageQuery.pushMessage(socket.user.userId, params.idToSend, params.text);
-        let roomUuid;
-        roomUuid = roomController.findChatRoom(params.idToSend);
+        if (content.text) {
+            const inserted = await MessageQuery.pushMessage(socket.user.userId, idToSend, content.text);
 
-        if (inserted && !roomUuid) {
-            roomUuid = roomController.getUserFreeRoom(socket.user.userId);
-        } else if (!inserted) {
-            return false
+            let roomUuid;
+            roomUuid = roomController.findChatRoom(idToSend);
+
+            if (inserted && !roomUuid) {
+                roomUuid = roomController.getUserFreeRoom(socket.user.userId);
+            } else if (!inserted) {
+                return false
+            }
+
+            console.log(`Enviando mensaje a la room ${roomUuid}`);
+            SocketController.io.to(roomUuid).emit('msg', inserted.query)
+        } else if (content.urls) {
+            const message = (await MessageQuery.pushMessage(socket.user.userId, idToSend, "")).query;
+
+            const inserted = (await MessageQuery.pushMessageFiles(message.id, content.urls)).query;
+            let roomUuid;
+
+            if (inserted) {
+                roomUuid = roomController.findChatRoom(idToSend);
+            }
+
+            if (inserted && !roomUuid) {
+                roomUuid = roomController.getUserFreeRoom(socket.user.userId);
+            } else if (!inserted) {
+                return false
+            }
+
+            console.log(`Enviando mensaje con archivos a la room ${roomUuid}`);
+
+            SocketController.io.to(roomUuid).emit('msg-file', {
+                message,
+                urls: content
+            })
         }
 
-        console.log(`Enviando mensaje a la room ${roomUuid}`);
-        SocketController.io.to(roomUuid).emit('msg', inserted.query)
+
+
     }
 
     static onMessageRead = async (socket, params) => {

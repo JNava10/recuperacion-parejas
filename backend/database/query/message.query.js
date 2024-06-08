@@ -13,7 +13,7 @@ class MessageQuery {
             const emitterUser = await models.User.findOne({where: {id: emitter}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
             const receiverUser = await models.User.findOne({where: {id: receiver}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
 
-            const messages = await models.Message.findAll({
+            const query = await models.Message.findAll({
                 where: {
                     [Op.and]: [
                         // Deben obtenerse los mensajes de ambos, por ello se obtienen los mensajes de uno u otros, independientemente de si son emisores o receptores.
@@ -25,9 +25,14 @@ class MessageQuery {
                         },
                     ]
                 },
+                include: {
+                    model: models.MessageFile,
+                    as: 'files',
+                    attributes: ['file_link']
+                }
             });
 
-            return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages});
+            return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages: query});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -71,6 +76,7 @@ class MessageQuery {
 
             return new QuerySuccess(true, 'Se han añadido los archivos correctamente.', query);
         } catch (e) {
+            console.warn(e)
             return new QueryError(false, e)
         }
     };

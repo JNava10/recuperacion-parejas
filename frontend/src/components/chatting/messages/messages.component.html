@@ -4,7 +4,7 @@
       <div>
         <app-self-message-bubble [message]="message" [user]="self"></app-self-message-bubble>
       </div>
-    } @else {
+    } @else if (message.emitter === partner!.id)  {
       <div>
         <app-partner-message-bubble [message]="message" [user]="partner"></app-partner-message-bubble>
       </div>

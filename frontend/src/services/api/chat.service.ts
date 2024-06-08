@@ -16,7 +16,7 @@ export class ChatService {
     return this.http.get<ChatMessages>(`${environment.apiUrl}/user/member/messages/${partnerId}`, {params: {...sendTokenParam}});
   }
 
-  sendMessagesFile = (files: File[], partnerId: number) => {
+  uploadMessagesFile = (files: File[], partnerId: number) => {
     const formData = new FormData();
 
     files.forEach((file, index) => formData.append(`file_${index}`, file))

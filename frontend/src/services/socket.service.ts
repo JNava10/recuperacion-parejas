@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 import {environment} from "../environments/environment.development";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {StorageService} from "./storage.service";
-import {Message} from "../interfaces/api/chat/message";
+import {Message, SendMessageSocketParams} from "../interfaces/api/chat/message";
 @Injectable({
   providedIn: 'root'
 })
@@ -18,9 +18,8 @@ export class SocketService {
     this.socket.on('connect', () => console.log('Conectado al Websocket de la API'));
   }
 
-  sendMessage = (text: string, idToSend: number) => {
-    this.socket.emit('msg', {text, idToSend});
-    console.log('Mensaje enviado al usuario con ID', idToSend);
+  sendMessage = (content: SendMessageSocketParams, idToSend: number) => {
+    this.socket.emit('msg', {content, idToSend});
   }
 
   joinChat = (receiverId: number) => {
@@ -33,6 +32,10 @@ export class SocketService {
 
   listenMessages = (callback: Function) => {
     this.socket.on('msg', (params) => callback(params));
+  }
+
+  listenFileMessages = (callback: Function) => {
+    this.socket.on('msg-file', (params) => callback(params));
   }
 
   listenJoinChat = (callback: Function) => {

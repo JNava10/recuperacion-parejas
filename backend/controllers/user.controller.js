@@ -83,9 +83,6 @@ class UserController {
     // TODO: Mover a chat.controller.js
     static uploadMessageImages = async (req, res) => {
       try {
-          const receiverId = req.params.receiver;
-          const emitterId = req.payload.userId;
-
           const filesUploaded = await uploadFiles(req.files, {fileExtension: ['jpg', 'png', 'jpeg'], dir: 'chat_images', numberLimit: 4});
           const filesToSend = []
 
@@ -93,23 +90,12 @@ class UserController {
               filesToSend.push(file.secure_url)
           });
 
-          const message = await MessageQuery.pushMessage(emitterId, receiverId, "");
-          const imagesPushed = await MessageQuery.pushMessageFiles(message, filesToSend);
-
-          if (imagesPushed.query) {
-              return res.status(200).json(
-                  new StdResponse("Se han subido los archivos correctamente", {
-                      executed: true,
-                      files: filesToSend
-                  })
-              );
-          } else {
-              return res.status(200).json(
-                  new StdResponse("No se han subido los archivos correctamente", {
-                      executed: false,
-                  })
-              );
-          }
+          return res.status(200).json(
+              new StdResponse("Se han subido los archivos correctamente", {
+                  executed: true,
+                  files: filesToSend
+              })
+          );
       } catch (e) {
           console.log(e)
 

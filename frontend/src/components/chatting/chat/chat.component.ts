@@ -5,7 +5,13 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {UserService} from "../../../services/api/user.service";
 import {User} from "../../../interfaces/api/user/user";
 import {ChatService} from "../../../services/api/chat.service";
-import {ChatMessages, Message, MessageUser} from "../../../interfaces/api/chat/message";
+import {
+  ChatMessages, FileMessage,
+  Message,
+  MessageUser,
+  SendMessageApiParams,
+  SendMessageSocketParams
+} from "../../../interfaces/api/chat/message";
 import {MessagesComponent} from "../messages/messages.component";
 import {SocketService} from "../../../services/socket.service";
 import {ChatJoin, MessagesRead} from "../../../interfaces/socket/chat";
@@ -33,6 +39,12 @@ export class ChatComponent implements OnInit {
     this.socketService.listenMessages((message: Message) => {
       this.pushMessage(message)
       this.socketService.sendMessageRead(this.partnerId!);
+    })
+
+    this.socketService.listenFileMessages((fileMessage: FileMessage) => {
+      fileMessage.message.files = fileMessage.urls;
+      this.pushMessage(fileMessage.message)
+      this.socketService.sendMessageRead(this.partnerId!);
     });
 
     this.socketService.joinChat(this.partnerId!)
@@ -54,6 +66,7 @@ export class ChatComponent implements OnInit {
   joined = false;
 
   private getMessages = (body: ChatMessages) => {
+    console.log(body)
     body.data.query.messages.forEach(message => {
       this.messages.set(message.id, message)
     });
@@ -62,16 +75,20 @@ export class ChatComponent implements OnInit {
     this.self = body.data.query.emitterUser;
   }
 
-  sendMessage = (text: string) => {
-    this.socketService.sendMessage(text, this.partner!.id!);
+  sendMessage = (content: SendMessageSocketParams) => {
+    this.socketService.sendMessage(content, this.partner!.id!);
   }
 
   pushMessage = (message: Message) => {
     this.messages.set(message.id, message)
   }
 
-  handleNewMessage = (text: string) => {
-    this.sendMessage(text)
+  handleNewMessage = (content: SendMessageApiParams) => {
+    if (content.text && content.text.length > 0) {
+      this.sendMessage({text: content.text})
+    } else if (content.files && content.files.length > 0) {
+      this.handleFilesMessage(content.files)
+    }
   };
 
   handleJoining = (params: ChatJoin) => {
@@ -93,8 +110,10 @@ export class ChatComponent implements OnInit {
   }
 
   handleFilesMessage(files: File[]) {
-    this.chatService.sendMessagesFile(files, this.partnerId!).subscribe(body => {
-      console.log(body)
+    this.chatService.uploadMessagesFile(files, this.partnerId!).subscribe(body => {
+      if (body.data.files.length === files.length) {
+        this.sendMessage({urls: body.data.files})
+      }
     })
   }
 }

@@ -24,7 +24,8 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'MessageFile',
-    tableName: 'message_files'
+    tableName: 'message_files',
+    timestamps: false
   });
   return MessageFile;
 };

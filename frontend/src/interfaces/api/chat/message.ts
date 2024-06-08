@@ -14,7 +14,7 @@ export interface ChatMessages extends ApiResponse {
 export interface SendFilesResponse extends ApiResponse {
   data: {
     executed: boolean,
-    query: boolean // TODO: Cambiar a los attachments de los archivos
+    files: string[]
   }
 }
 
@@ -35,4 +35,26 @@ export interface Message {
   created_at: string
   updated_at: string
   deleted_at: any
+  files?: string[]
+}
+
+export interface FileMessage {
+  message: Message,
+  urls: string[]
+}
+
+export interface MessageFile {
+  file_link: string
+}
+
+
+export interface SendMessageApiParams {
+  text?: string,
+  files?: File[]
+}
+
+
+export interface SendMessageSocketParams {
+  text?: string,
+  urls?: string[]
 }
