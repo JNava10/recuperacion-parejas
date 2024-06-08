@@ -11,6 +11,13 @@ export interface ChatMessages extends ApiResponse {
   }
 }
 
+export interface SendFilesResponse extends ApiResponse {
+  data: {
+    executed: boolean,
+    query: boolean // TODO: Cambiar a los attachments de los archivos
+  }
+}
+
 export interface MessageUser {
   id: number
   email: string

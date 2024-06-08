@@ -81,11 +81,7 @@ class SocketController {
                 readedMessages.push(message.id);
             });
 
-            console.log(uuid);
-
             this.io.to(uuid).emit('message-read', {messages: readedMessages});
-
-            console.log('Se ha emitido la lectura de los mensajes:', {messages: readedMessages});
         }
 
         socket.emit('join-chat', {joined: true});

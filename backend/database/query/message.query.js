@@ -53,6 +53,28 @@ class MessageQuery {
         }
     };
 
+    /**
+     *
+     * @param {number} messageId
+     * @param {string[]} urls
+     * @returns {Promise<QueryError|QuerySuccess>}
+     */
+    static pushMessageFiles = async (messageId, urls) => {
+        try {
+            const messageFiles = []
+
+            urls.forEach(url => {
+                messageFiles.push({message: messageId, file_link: url})
+            })
+
+            const query = await models.MessageFile.bulkCreate(messageFiles);
+
+            return new QuerySuccess(true, 'Se han añadido los archivos correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
     static getUnreadedMessages = async (emitter, receiver) => {
         try {
             const query = await models.Message.findAll({

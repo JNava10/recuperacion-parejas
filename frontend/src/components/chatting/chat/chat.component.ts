@@ -25,16 +25,6 @@ import {StorageService} from "../../../services/storage.service";
 export class ChatComponent implements OnInit {
   constructor(private route: ActivatedRoute, private chatService: ChatService, private socketService: SocketService) { }
 
-  partnerId?: number
-  partner?: MessageUser
-  self?: MessageUser
-
-  messages: Map<number, Message> = new Map();
-  emitter?: MessageUser
-  receiver?: MessageUser
-  roomUuid?: string
-  joined = false;
-
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       this.partnerId = Number(params.get('id')!);
@@ -51,6 +41,18 @@ export class ChatComponent implements OnInit {
     this.socketService.listenJoinChat((params: ChatJoin) => this.handleJoining(params));
     this.socketService.listenReadMessages((params: MessagesRead) => this.handleMessagesRead(params));
   }
+
+  partnerId?: number
+  partner?: MessageUser
+
+  self?: MessageUser
+  messages: Map<number, Message> = new Map();
+  emitter?: MessageUser
+  receiver?: MessageUser
+  roomUuid?: string
+
+  joined = false;
+
   private getMessages = (body: ChatMessages) => {
     body.data.query.messages.forEach(message => {
       this.messages.set(message.id, message)
@@ -75,15 +77,11 @@ export class ChatComponent implements OnInit {
   handleJoining = (params: ChatJoin) => {
     if (params.joined) {
       this.joined = params.joined
-      console.log('uuid', this.roomUuid)
     }
   }
 
   handleMessagesRead = (params: MessagesRead) => {
     if (params.messages) {
-      console.log('Se han leido tus mensajes enviados anteriormente', params.messages);
-      console.log('a')
-
       params.messages.forEach(messageId => {
         const message = this.messages.get(messageId);
 
@@ -92,5 +90,11 @@ export class ChatComponent implements OnInit {
         this.messages.set(messageId, message!);
       })
     }
+  }
+
+  handleFilesMessage(files: File[]) {
+    this.chatService.sendMessagesFile(files, this.partnerId!).subscribe(body => {
+      console.log(body)
+    })
   }
 }
