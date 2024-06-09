@@ -36,9 +36,21 @@ export interface GetEventsResponse {
   }
 }
 
+export interface SummaryFile {
+  url: string,
+  name: string
+}
+
 export interface SubscribedToEventResponse {
   data: {
     executed: true
     query: boolean
+  }
+}
+
+export interface EventSummaryResponse {
+  data: {
+    executed: true
+    file: SummaryFile
   }
 }

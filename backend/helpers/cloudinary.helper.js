@@ -48,8 +48,26 @@ const uploadFiles = async (requestFiles, settings) => {
     }
 }
 
-
+/**
+ *
+ * @param {Buffer} buffer
+ * @param settings
+ * @param {string} settings.dir - Directorio donde se guardarán los archivos
+ * @returns {Promise<*>}
+ */
+const uploadBuffer = async (buffer, settings) => {
+    try {
+        return await new Promise((resolve) => {
+            cloudinary.uploader.upload_stream({folder: settings.dir}, (error, uploadResult) => {
+                return resolve(uploadResult);
+            }).end(buffer);
+        })
+    } catch (error) {
+        throw error
+    }
+}
 
 module.exports = {
-    uploadFiles
+    uploadFiles,
+    uploadBuffer
 }

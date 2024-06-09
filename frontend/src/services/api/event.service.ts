@@ -4,7 +4,7 @@ import {SearchResponse} from "../../interfaces/api/user/search";
 import {environment} from "../../environments/environment";
 import {
   EventItem,
-  EventResponse,
+  EventResponse, EventSummaryResponse,
   GetEventsResponse,
   SubscribedToEventResponse,
   SubscribeEventResponse
@@ -75,5 +75,9 @@ export class EventService {
     return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/withdraw/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
       map(body => body.data.query)
     )
+  }
+
+  getSummaryFile(event: EventItem) {
+    return this.http.get<EventSummaryResponse>(`${environment.apiUrl}/event/summary/${event.id}`, {params: {...sendTokenParam}})
   }
 }

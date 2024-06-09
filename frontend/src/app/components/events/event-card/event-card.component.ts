@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {EventItem} from "../../../../interfaces/api/event/event";
+import {EventItem, SummaryFile} from "../../../../interfaces/api/event/event";
 import {DatePipe, NgIf} from "@angular/common";
 import {CreateEventComponent} from "../../../../components/events/create-event/create-event.component";
 import {DialogModule} from "primeng/dialog";
@@ -31,12 +31,16 @@ export class EventCardComponent {
 
   constructor(private eventService: EventService) {}
 
+
+
   @Input() event?: EventItem;
 
   @Output() refresh = new EventEmitter<null>();
 
   protected editingEvent = false;
   protected deletingEvent = false;
+
+  summaryFile?: SummaryFile
 
   protected showEditEvent = () => {
     this.editingEvent = true;
@@ -51,6 +55,12 @@ export class EventCardComponent {
 
     this.eventService.deleteEvent(this.event!).subscribe(() => {
       this.refresh.emit()
+    })
+  };
+
+  getSummaryFile = (event: EventItem) => {
+    this.eventService.getSummaryFile(event).subscribe((body) => {
+      this.summaryFile = body.data.file;
     })
   };
 }
