@@ -76,11 +76,13 @@ class CreateEvent {
 
     static getEvent = async (id) => {
         try {
-            const query = await models.Event.findOne({where: {id: id}});
+            const query = await models.Event.findOne({where: {id}});
+
+            console.log(query)
 
             return new QuerySuccess(true, 'Se ha obtenido el evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            throw e
         }
     };
 

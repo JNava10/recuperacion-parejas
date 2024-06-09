@@ -1,9 +1,8 @@
 
 const EventQuery = require("../database/query/event.query");
 const StdResponse = require("../classes/stdResponse");
-const QuerySuccess = require("../classes/QuerySuccess");
-const {findRecentChatMessages} = require("../database/query/message.query");
-const {id_ID} = require("@faker-js/faker");
+const convertHTMLToPDF = require("pdf-puppeteer");
+const {uploadFiles, uploadBuffer} = require("../helpers/cloudinary.helper");
 
 class EventController {
 
@@ -219,6 +218,36 @@ class EventController {
             console.log(error)
             return res.status(500).json(
                 new StdResponse(message,{executed, error})
+            )
+        }
+    };
+
+    static getSummaryFile = async (req, res) => {
+        try {
+            const event = (await EventQuery.getEvent(req.params.id)).query;
+
+            if (!event) return res.status(200).json(
+                new StdResponse('No se ha encontrado ningun evento con el ID indicado.',{executed: false})
+            )
+
+            const summaryHtml = `<div>
+                <span>${event.name}</span>
+                <br>
+                <span>${event.description}</span>
+                <br>
+                <span>${new Date(event.scheduledDateTime)}</span>
+            </div>`
+
+            await convertHTMLToPDF(summaryHtml, async (file) => {
+                const {secure_url} = await uploadBuffer(file, {dir: 'event/summary'})
+
+                return res.status(200).json(
+                    new StdResponse('Se ha creado correctamente el archivo',{file: secure_url})
+                )
+            })
+        } catch (e) {
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al crear el archivo.',{executed: false, error: e.toString()})
             )
         }
     };
