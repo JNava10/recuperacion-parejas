@@ -35,12 +35,11 @@ export interface Message {
   created_at: string
   updated_at: string
   deleted_at: any
-  files?: string[]
+  files?: MessageFile[]
 }
 
 export interface FileMessage {
   message: Message,
-  urls: string[]
 }
 
 export interface MessageFile {

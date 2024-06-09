@@ -29,7 +29,10 @@ class MessageQuery {
                     model: models.MessageFile,
                     as: 'files',
                     attributes: ['file_link']
-                }
+                },
+                order: [
+                    ['created_at', 'ASC'],
+                ]
             });
 
             return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages: query});
@@ -52,7 +55,9 @@ class MessageQuery {
 
             const query = await models.Message.create(data);
 
-            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', query);
+            const message = query.get({plain: true})
+
+            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', message);
         } catch (e) {
             return new QueryError(false, e)
         }

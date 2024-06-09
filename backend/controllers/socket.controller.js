@@ -44,24 +44,37 @@ class SocketController {
         } else if (content.urls) {
             const message = (await MessageQuery.pushMessage(socket.user.userId, idToSend, "")).query;
 
-            const inserted = (await MessageQuery.pushMessageFiles(message.id, content.urls)).query;
+            const files = (await MessageQuery.pushMessageFiles(message.id, content.urls)).query;
+
             let roomUuid;
 
-            if (inserted) {
+            if (files) {
                 roomUuid = roomController.findChatRoom(idToSend);
             }
 
-            if (inserted && !roomUuid) {
+            // Reasignamos el uuid de la room si no está conectado el usuario que recibe los mensajes.
+            if (files && !roomUuid) {
                 roomUuid = roomController.getUserFreeRoom(socket.user.userId);
-            } else if (!inserted) {
+            } else if (!files) {
                 return false
             }
 
+            // Pusheamos los archivos al objeto del mensaje, para que coincida con la estructura
+            // que admite el listener de archivos de los mensajes en el front.
+
+            message.files = [];
+
+            files.forEach(file => {
+                message.files.push(file)
+            })
+
+            console.log(message)
+
             console.log(`Enviando mensaje con archivos a la room ${roomUuid}`);
 
+            // Enviamos el mensaje con sus archivos al front.
             SocketController.io.to(roomUuid).emit('msg-file', {
                 message,
-                urls: content
             })
         }
 

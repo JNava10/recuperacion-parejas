@@ -10,9 +10,9 @@
       @if (message?.text !== "") {
         <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{message!.text}}</p>
       } @else if (message!.files) {
-        <div>
-          @for (url of message?.files; track $index) {
-            <img src="{{url}}">
+        <div class="grid">
+          @for (file of message?.files!; track $index) {
+            <img class="object-cover h-48 w-48 rounded-lg" src="{{file.file_link}}" alt="message_image">
           }
         </div>
       }

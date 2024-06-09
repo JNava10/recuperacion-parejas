@@ -42,7 +42,7 @@ export class ChatComponent implements OnInit {
     })
 
     this.socketService.listenFileMessages((fileMessage: FileMessage) => {
-      fileMessage.message.files = fileMessage.urls;
+      console.log(fileMessage.message)
       this.pushMessage(fileMessage.message)
       this.socketService.sendMessageRead(this.partnerId!);
     });
@@ -61,14 +61,12 @@ export class ChatComponent implements OnInit {
   messages: Map<number, Message> = new Map();
   emitter?: MessageUser
   receiver?: MessageUser
-  roomUuid?: string
 
   joined = false;
 
   private getMessages = (body: ChatMessages) => {
-    console.log(body)
     body.data.query.messages.forEach(message => {
-      this.messages.set(message.id, message)
+      this.pushMessage(message)
     });
 
     this.partner = body.data.query.receiverUser;
