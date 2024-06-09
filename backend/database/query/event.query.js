@@ -5,6 +5,7 @@ const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
 const {logger} = require("sequelize/lib/utils/logger");
 const {mode} = require("@cloudinary/url-gen/actions/rotate");
+const {fi} = require("@faker-js/faker");
 
 class CreateEvent {
     static createEvent = async (event) => {
@@ -149,6 +150,20 @@ class CreateEvent {
             ) !== null;
 
             return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static updateEventSummary = async (eventId, fileLink) => {
+        try {
+            const query = await models.Event.update({summaryUrl: fileLink},
+                {
+                    where: {id: eventId}
+                }
+            ) !== null;
+
+            return new QuerySuccess(true, 'Se ha actualizado el evento correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }

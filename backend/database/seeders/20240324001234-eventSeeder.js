@@ -17,11 +17,11 @@ module.exports = {
 
     for (const i in eventsInserted) {
       const event = eventsInserted[i]
-      const uploadedFile = await EventUtils.generateSummaryFile(event);
+      // const uploadedFile = await EventUtils.generateSummaryFile(event); Podemos generar tambien un resumen y subirlo a Cloudinary.
 
-      console.log(uploadedFile)
+      const summaryUrl = "https://res.cloudinary.com/diejum3sd/image/upload/v1717967044/event/summary/event-parejas-seed.pdf"
 
-      await models.Event.update({where: {summary_url: uploadedFile.secure_url}})
+      await models.Event.update({summaryUrl}, {where: {id: event.id}})
     }
 
   },

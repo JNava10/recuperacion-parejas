@@ -3,8 +3,6 @@ const {uploadBuffer} = require("../helpers/cloudinary.helper");
 
 class EventUtils {
     static generateSummaryFile = async (event) => {
-        console.log(event)
-
         const summaryHtml = `<div>
                 <span>${event.name}</span>
                 <br>
@@ -13,10 +11,18 @@ class EventUtils {
                 <span>${new Date(event.scheduledDateTime)}</span>
             </div>`
 
-        await convertHTMLToPDF(summaryHtml, async (file) => {
-            const uploadDir = 'event/summary';
+        return new Promise(async (resolve, reject) => {
+            try {
+                await convertHTMLToPDF(summaryHtml, async (file) => {
+                    const uploadDir = 'event/summary';
 
-            return await uploadBuffer(file, {dir: uploadDir})
+                    const pdfFile = await uploadBuffer(file, {dir: uploadDir});
+
+                    resolve(pdfFile)
+                })
+            } catch (e) {
+                reject(e.message)
+            }
         })
     };
 }

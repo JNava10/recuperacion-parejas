@@ -8,10 +8,16 @@ const EventUtils = require("../utils/event.utils");
 class EventController {
 
     static createEvent = async (req, res) => {
-        const event = req.body;
-        event.author = req.payload.userId;
+        const eventBody = req.body;
+        eventBody.author = req.payload.userId;
 
-        const {message, executed, query, error} = await EventQuery.createEvent(event);
+        const {message, executed, query, error} = await EventQuery.createEvent(eventBody);
+
+        const event = query;
+
+        const summaryFile = await EventUtils.generateSummaryFile(event)
+
+        await EventQuery.updateEventSummary(event.id, summaryFile.secure_url);
 
         if (executed) {
             return res.status(200).json(
