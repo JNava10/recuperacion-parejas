@@ -13,7 +13,7 @@ class MessageQuery {
             const emitterUser = await models.User.findOne({where: {id: emitter}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
             const receiverUser = await models.User.findOne({where: {id: receiver}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
 
-            const messages = await models.Message.findAll({
+            const query = await models.Message.findAll({
                 where: {
                     [Op.and]: [
                         // Deben obtenerse los mensajes de ambos, por ello se obtienen los mensajes de uno u otros, independientemente de si son emisores o receptores.
@@ -25,9 +25,17 @@ class MessageQuery {
                         },
                     ]
                 },
+                include: {
+                    model: models.MessageFile,
+                    as: 'files',
+                    attributes: ['file_link']
+                },
+                order: [
+                    ['created_at', 'ASC'],
+                ]
             });
 
-            return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages});
+            return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages: query});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -47,8 +55,33 @@ class MessageQuery {
 
             const query = await models.Message.create(data);
 
-            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', query);
+            const message = query.get({plain: true})
+
+            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', message);
         } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    /**
+     *
+     * @param {number} messageId
+     * @param {string[]} urls
+     * @returns {Promise<QueryError|QuerySuccess>}
+     */
+    static pushMessageFiles = async (messageId, urls) => {
+        try {
+            const messageFiles = []
+
+            urls.forEach(url => {
+                messageFiles.push({message: messageId, file_link: url})
+            })
+
+            const query = await models.MessageFile.bulkCreate(messageFiles);
+
+            return new QuerySuccess(true, 'Se han añadido los archivos correctamente.', query);
+        } catch (e) {
+            console.warn(e)
             return new QueryError(false, e)
         }
     };

@@ -7,14 +7,14 @@ const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
-const {el, fi} = require("@faker-js/faker");
+const {el, fi, tr} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
+const RoomController = require("./room.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
-const jwt = require("jsonwebtoken");
-const models = require("../database/models");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
+const MessageQuery = require("../database/query/message.query");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -57,6 +57,7 @@ class UserController {
         }
     };
 
+    // TODO: Mover a chat.controller.js
     static getMessages = async (req, res) => {
         const receiverId = req.params.receiver;
         const emitterId = req.payload.userId;
@@ -77,6 +78,31 @@ class UserController {
                 )
             )
         }
+    }
+
+    // TODO: Mover a chat.controller.js
+    static uploadMessageImages = async (req, res) => {
+      try {
+          const filesUploaded = await uploadFiles(req.files, {fileExtension: ['jpg', 'png', 'jpeg'], dir: 'chat_images', numberLimit: 4});
+          const filesToSend = []
+
+          filesUploaded.forEach((file) => {
+              filesToSend.push(file.secure_url)
+          });
+
+          return res.status(200).json(
+              new StdResponse("Se han subido los archivos correctamente", {
+                  executed: true,
+                  files: filesToSend
+              })
+          );
+      } catch (e) {
+          console.log(e)
+
+          return res.status(500).json(
+              new StdResponse(e.message,{executed: false})
+          )
+      }
     }
 
     static pushMessage = async (req, res) => {

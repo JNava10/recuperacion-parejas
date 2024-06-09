@@ -1,4 +1,4 @@
-<section class="p-5">
+<section class="p-5 h-full">
   <app-messages class="flex justify-center mt-6 mb-6" [messages]="messages" [partner]="partner" [self]="self"></app-messages>
-  <app-message-input (onSendMessage)="handleNewMessage($event)"></app-message-input>
+  <app-message-input (onSendMessage)="handleNewMessage($event)" class="mt-0"></app-message-input>
 </section>

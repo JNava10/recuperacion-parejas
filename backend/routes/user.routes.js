@@ -30,4 +30,6 @@ router.get('/', [validateToken], UserController.getNotDeletedUsers)
 router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
 router.delete('/:id', [validateToken], UserController.deleteUser)
 
+router.post('/member/messages/files/:receiver', [validateToken], UserController.uploadMessageImages)
+
 module.exports = router;
