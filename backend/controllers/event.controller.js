@@ -3,6 +3,7 @@ const EventQuery = require("../database/query/event.query");
 const StdResponse = require("../classes/stdResponse");
 const convertHTMLToPDF = require("pdf-puppeteer");
 const {uploadFiles, uploadBuffer} = require("../helpers/cloudinary.helper");
+const EventUtils = require("../utils/event.utils");
 
 class EventController {
 
@@ -230,21 +231,9 @@ class EventController {
                 new StdResponse('No se ha encontrado ningun evento con el ID indicado.',{executed: false})
             )
 
-            const summaryHtml = `<div>
-                <span>${event.name}</span>
-                <br>
-                <span>${event.description}</span>
-                <br>
-                <span>${new Date(event.scheduledDateTime)}</span>
-            </div>`
-
-            await convertHTMLToPDF(summaryHtml, async (file) => {
-                const {secure_url} = await uploadBuffer(file, {dir: 'event/summary'})
-
-                return res.status(200).json(
-                    new StdResponse('Se ha creado correctamente el archivo',{file: secure_url})
-                )
-            })
+            return res.status(200).json(
+                new StdResponse('Se ha creado correctamente el archivo',{file: {url: uploadedFile.secure_url}})
+            )
         } catch (e) {
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al crear el archivo.',{executed: false, error: e.toString()})

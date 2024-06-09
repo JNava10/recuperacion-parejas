@@ -67,8 +67,6 @@ const uploadBuffer = async (buffer, settings) => {
     }
 }
 
-
-
 module.exports = {
     uploadFiles,
     uploadBuffer

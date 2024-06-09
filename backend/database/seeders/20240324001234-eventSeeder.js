@@ -3,6 +3,9 @@
 const eventFactory = require("../factories/event.factory");
 const models = require("../models");
 const {getRandomItem} = require("../../helpers/common.helper");
+const EventQuery = require("../query/event.query");
+const EventController = require("../../controllers/event.controller");
+const EventUtils = require("../../utils/event.utils");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -10,19 +13,15 @@ module.exports = {
 
     await queryInterface.bulkInsert(models.Event.tableName, events, {});
 
-    const userFields = await models.User.findAll({attributes: ['id']});
-    const eventFields = await models.Event.findAll({attributes: ['id']});
+    const eventsInserted = await models.Event.findAll({attributes: ['id', 'name', 'description', 'createdAt']});
 
-    for (const i in eventFields) {
-      const userId = getRandomItem(userFields).id
-      const eventId = eventFields[i].id;
+    for (const i in eventsInserted) {
+      const event = eventsInserted[i]
+      const uploadedFile = await EventUtils.generateSummaryFile(event);
 
-      await models.EventAssistant.create({
-        event: eventId,
-        user: userId,
-        created_at: new Date(),
-        updated_at: new Date()
-      });
+      console.log(uploadedFile)
+
+      await models.Event.update({where: {summary_url: uploadedFile.secure_url}})
     }
 
   },
