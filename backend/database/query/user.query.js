@@ -459,6 +459,34 @@ class UserQuery {
             return new QueryError(false, e)
         }
     };
+
+    static getPendingChats = async (userId) => {
+        try {
+            const query = await models.User.findAll({
+                where: {
+                    id: {
+                        [Op.in]: (
+                            await models.Message.findAll({
+                                attributes: ['emitter'],
+                                where: {
+                                    receiver: userId,
+                                    read: false
+                                },
+                                distinct: true
+                            })
+                        ).map(message => message.emitter)
+                    }
+                }
+            });
+
+            if (!query) return new QuerySuccess(false, 'El usuario indicado no existe.');
+
+            return new QuerySuccess(true, 'Se han obtenido los usuario correctamente.', query);
+        } catch (e) {
+            console.log(e)
+            throw e
+        }
+    };
 }
 
 module.exports = UserQuery

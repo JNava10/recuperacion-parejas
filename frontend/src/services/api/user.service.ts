@@ -124,4 +124,8 @@ export class UserService {
   getOwnData = () => {
     return this.http.get<GetProfileResponse>(`${environment.apiUrl}/user/profile`, {params: {...sendTokenParam}});
   }
+
+  getPendingChats = () => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
+  }
 }

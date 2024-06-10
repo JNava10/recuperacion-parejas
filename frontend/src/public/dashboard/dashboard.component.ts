@@ -32,12 +32,18 @@ export class DashboardComponent implements OnInit {
     this.friendshipService.getOwnMatches().subscribe(matches => {
       this.matches = matches;
     })
+
+    this.userService.getPendingChats().subscribe(body => {
+      console.log('a')
+      this.pendingChatsUsers = body.data.query;
+    })
   }
 
   isMatch = false;
   matchedUser?: UserItem;
   likableUsers?: UserItem[];
   matches?: UserItem[];
+  pendingChatsUsers?: UserItem[];
 
   handleMatch(matchedUser: UserItem) {
     this.matchedUser = matchedUser;
