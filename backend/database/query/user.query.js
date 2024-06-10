@@ -9,6 +9,7 @@ const {roleNames, preferenceTypes} = require("../../constants/seed.const");
 const {it, en} = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 const {hashPassword} = require("../../helpers/common.helper");
+const {Logger} = require("sequelize/lib/utils/logger");
 
 class UserQuery {
     /**
@@ -462,6 +463,9 @@ class UserQuery {
 
     static getPendingChats = async (userId) => {
         try {
+
+            // Si bien es cierto que podria hacerse con una consulta normal, es mejor utilizar
+            // Sequelize para evitar resultados duplicados.
             const query = await models.User.findAll({
                 where: {
                     id: {
@@ -470,13 +474,28 @@ class UserQuery {
                                 attributes: ['emitter'],
                                 where: {
                                     receiver: userId,
-                                    read: false
                                 },
                                 distinct: true
                             })
                         ).map(message => message.emitter)
                     }
-                }
+                },
+                include: [
+                    {
+                        model: models.Message,
+                        attributes: ['read'],
+                        distinct: true,
+                        as: 'sendedMessages'
+                    },
+                    {
+                        model: models.Message,
+                        attributes: [
+                            [models.Sequelize.fn('COUNT', models.Sequelize.where(models.Sequelize.col('read'), '=', false)), 'unreadMessages']
+                        ],
+                        as: 'sendedMessages',
+                        group: [`Message.id`]
+                    }
+                ],
             });
 
             if (!query) return new QuerySuccess(false, 'El usuario indicado no existe.');

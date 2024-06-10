@@ -34,7 +34,6 @@ export class DashboardComponent implements OnInit {
     })
 
     this.userService.getPendingChats().subscribe(body => {
-      console.log('a')
       this.pendingChatsUsers = body.data.query;
     })
   }
