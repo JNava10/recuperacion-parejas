@@ -24,7 +24,7 @@ router.put('/recover-account/password', UserController.changePasswordRecovering)
 router.put('/enable-or-disable/:userId', [validateToken], UserController.enableOrDisableUser)
 router.put('/profile/data/:id', [validateToken], UserController.editProfileData)
 
-router.get('/pending-chats', [validateToken], UserController.getPendingChats)
+router.get('/pending-chats', [validateToken], UserController.getChats)
 router.post('/member/messages/files/:receiver', [validateToken], UserController.uploadMessageImages)
 router.get('/profile', [validateToken], UserController.getEditableProfileData)
 router.get('/:id', [validateToken], UserController.findById)

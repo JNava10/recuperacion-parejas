@@ -571,19 +571,17 @@ class UserController {
         }
     };
 
-    static getPendingChats = async (req, res) => {
+    static getChats = async (req, res) => {
         try {
             const {userId} = req.payload;
-            console.log('USERS', 'a')
 
-            const {executed, message, query} = await UserQuery.getPendingChats(userId)
-
-            console.log(query)
+            const pending = await UserQuery.getPendingChats(userId)
+            const readed = await UserQuery.getReadedChats(userId)
 
             return res.status(200).json(
-                new StdResponse(message, {
-                    executed,
-                    query
+                new StdResponse("Se han obtenido la lista de chats correctamente", {
+                    executed: true,
+                    chats: {pending, readed}
                 })
             );
         } catch (e) {

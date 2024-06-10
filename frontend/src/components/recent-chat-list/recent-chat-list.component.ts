@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {UserItem} from "../../interfaces/api/user/user";
+import {PendingChatUserItem, UserItem} from "../../interfaces/api/user/user";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-recent-chat-list',
@@ -9,7 +10,12 @@ import {UserItem} from "../../interfaces/api/user/user";
   styleUrl: './recent-chat-list.component.css'
 })
 export class RecentChatListComponent {
-  @Input() users?: UserItem[];
+  constructor(private router: Router) {
+  }
 
+  @Input() users?: PendingChatUserItem[];
 
+  goToChat = async (user: PendingChatUserItem) => {
+    await this.router.navigate(['chat', {id: user.id}]);
+  };
 }

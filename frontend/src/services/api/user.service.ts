@@ -8,7 +8,7 @@ import {
   GetUserResponse,
   GetUsersResponse,
   User,
-  UserResponse, UserItem, DeleteUserResponse, GetProfileResponse
+  UserResponse, UserItem, DeleteUserResponse, GetProfileResponse, GetPendingChatsResponse
 } from "../../interfaces/api/user/user";
 import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
@@ -126,6 +126,6 @@ export class UserService {
   }
 
   getPendingChats = () => {
-    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
+    return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
   }
 }

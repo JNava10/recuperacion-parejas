@@ -463,44 +463,74 @@ class UserQuery {
 
     static getPendingChats = async (userId) => {
         try {
-
             // Si bien es cierto que podria hacerse con una consulta normal, es mejor utilizar
             // Sequelize para evitar resultados duplicados.
-            const query = await models.User.findAll({
+
+            const usersWithPendingMessages = await models.Message.findAll({
+                    where: {
+                        receiver: userId,
+                        read: false,
+                    },
+                    attributes: [
+                        [models.sequelize.fn('COUNT', models.Sequelize.col('id')), 'count'],
+                        'emitter',
+                    ],
+                    group: ['emitter'],
+                    raw: true
+                }
+            );
+
+            const users = await models.User.findAll({
                 where: {
                     id: {
-                        [Op.in]: (
-                            await models.Message.findAll({
-                                attributes: ['emitter'],
-                                where: {
-                                    receiver: userId,
-                                },
-                                distinct: true
-                            })
-                        ).map(message => message.emitter)
+                        [Op.in]: (usersWithPendingMessages.map(message => message.emitter))
                     }
                 },
-                include: [
-                    {
-                        model: models.Message,
-                        attributes: ['read'],
-                        distinct: true,
-                        as: 'sendedMessages'
-                    },
-                    {
-                        model: models.Message,
-                        attributes: [
-                            [models.Sequelize.fn('COUNT', models.Sequelize.where(models.Sequelize.col('read'), '=', false)), 'unreadMessages']
-                        ],
-                        as: 'sendedMessages',
-                        group: [`Message.id`]
-                    }
-                ],
+                raw: true
             });
 
-            if (!query) return new QuerySuccess(false, 'El usuario indicado no existe.');
+            users.forEach(user => {
+                const userPending = usersWithPendingMessages.find(message => message.emitter === user.id);
+                user.pendingCount = userPending.count;
+            })
 
-            return new QuerySuccess(true, 'Se han obtenido los usuario correctamente.', query);
+            if (!users) return new QuerySuccess(false, 'El usuario indicado no existe.');
+
+            return new QuerySuccess(true, 'Se han obtenido los usuario correctamente.', users);
+        } catch (e) {
+            console.log(e)
+            throw e
+        }
+    };
+
+    static getReadedChats = async (userId) => {
+        try {
+            const usersWithMessages = await models.Message.findAll({
+                    where: {
+                        receiver: userId,
+                        read: true,
+                    },
+                    attributes: [
+                        [models.sequelize.fn('COUNT', models.Sequelize.col('id')), 'count'],
+                        'emitter',
+                    ],
+                    group: ['emitter'],
+                    raw: true
+                }
+            );
+
+            const users = await models.User.findAll({
+                where: {
+                    id: {
+                        [Op.in]: (usersWithMessages.map(message => message.emitter))
+                    }
+                },
+                raw: true
+            });
+
+            if (!users) return new QuerySuccess(false, 'El usuario indicado no existe.');
+
+            return new QuerySuccess(true, 'Se han obtenido los usuario correctamente.', users);
         } catch (e) {
             console.log(e)
             throw e
