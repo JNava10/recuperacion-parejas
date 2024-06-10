@@ -59,8 +59,13 @@ export interface GetUsersResponse extends ApiResponse {
 export interface GetPendingChatsResponse extends ApiResponse {
   data: {
     executed: true
-    query: PendingChatUserItem[]
+    chats: ChatList
   }
+}
+
+export interface ChatList extends ApiResponse {
+  readed: UserItem[],
+  pending: PendingChatUserItem[]
 }
 
 export interface GetUserResponse extends ApiResponse{

@@ -5,7 +5,7 @@ import {RegisteredEventsComponent} from "../../components/events/registered-even
 import {UsersToMatchListComponent} from "../../components/friendship/users-to-match-list/users-to-match-list.component";
 import {FriendshipService} from "../../services/api/friendship.service";
 import {UserService} from "../../services/api/user.service";
-import {PendingChatUserItem, UserItem} from "../../interfaces/api/user/user";
+import {ChatList, PendingChatUserItem, UserItem} from "../../interfaces/api/user/user";
 import {DialogModule} from "primeng/dialog";
 import {ActivatedRoute, Router} from "@angular/router";
 import {MatchesListComponent} from "../../components/friendship/matches-list/matches-list.component";
@@ -35,9 +35,9 @@ export class DashboardComponent implements OnInit {
       this.matches = matches;
     })
 
-    this.userService.getPendingChats().subscribe(body => {
-      console.log(body.data.query)
-      this.pendingChatsUsers = body.data.query;
+    this.userService.getChats().subscribe(body => {
+      console.log(body.data.chats.pending)
+      this.chatList = body.data.chats;
     })
   }
 
@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit {
   matchedUser?: UserItem;
   likableUsers?: UserItem[];
   matches?: UserItem[];
-  pendingChatsUsers?: PendingChatUserItem[];
+  chatList?: ChatList;
 
   handleMatch(matchedUser: UserItem) {
     this.matchedUser = matchedUser;

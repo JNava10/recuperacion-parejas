@@ -575,8 +575,8 @@ class UserController {
         try {
             const {userId} = req.payload;
 
-            const pending = await UserQuery.getPendingChats(userId)
-            const readed = await UserQuery.getReadedChats(userId)
+            const pending = (await UserQuery.getPendingChats(userId)).query
+            const readed = (await UserQuery.getReadedChats(userId)).query
 
             return res.status(200).json(
                 new StdResponse("Se han obtenido la lista de chats correctamente", {
