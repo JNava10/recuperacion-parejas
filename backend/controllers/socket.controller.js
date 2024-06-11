@@ -1,5 +1,7 @@
 const MessageQuery = require("../database/query/message.query");
 const RoomController = require("./room.controller");
+const NotificationQuery = require("../database/query/notification.query");
+const UserQuery = require("../database/query/user.query");
 
 class SocketController {
     static io;
@@ -30,6 +32,7 @@ class SocketController {
         socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
         socket.on('leave-chat', async (params) => await SocketController.onLeaveChat(socket, params))
         socket.on('message-read', async (params) => await SocketController.onMessageRead(socket, params))
+        socket.on('new-match', async (params) => await SocketController.onNewMatch(socket, params))
     }
 
     static onDisconnect = (socket) => {
@@ -117,6 +120,29 @@ class SocketController {
             });
 
             this.io.to(roomUuid).emit('message-read', {messages: readedMessages});
+        }
+    }
+
+    static onNewMatch = async (socket, params) => {
+        const targetId =  params.targetId;
+
+        const userExists = await  UserQuery.checkIfIdExists(targetId)
+
+        if (!userExists) return;
+
+        const targetSocket = SocketController.usersConnected.get(targetId);
+
+        const notificationData = {
+            from: socket.user.userId, to: targetId
+        };
+
+        console.log(notificationData)
+
+
+        await NotificationQuery.pushMatchNotification(notificationData);
+
+        if (targetSocket) {
+            targetSocket.emit('new-match', {from: targetId});
         }
     }
 

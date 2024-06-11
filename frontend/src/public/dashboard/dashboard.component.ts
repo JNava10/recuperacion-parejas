@@ -13,6 +13,10 @@ import {SocketService} from "../../services/socket.service";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {NewMessageArgs} from "../../interfaces/api/chat/message";
 import {matBottomSheetAnimations} from "@angular/material/bottom-sheet";
+import {NewMatchArgs} from "../../interfaces/socket/notification";
+import {MessageService} from "primeng/api";
+import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
+import {ButtonModule} from "primeng/button";
 
 @Component({
   selector: 'app-dashboard',
@@ -23,13 +27,21 @@ import {matBottomSheetAnimations} from "@angular/material/bottom-sheet";
     UsersToMatchListComponent,
     DialogModule,
     MatchesListComponent,
-    RecentChatListComponent
+    RecentChatListComponent,
+    CustomToastComponent,
+    ButtonModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  constructor(private userService: UserService, private router: Router, private friendshipService: FriendshipService, private socketService: SocketService) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private friendshipService: FriendshipService,
+    private socketService: SocketService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.getMatchedUsers();
@@ -62,6 +74,10 @@ export class DashboardComponent implements OnInit {
         this.getNewSender(args);
       }
     })
+
+    this.socketService.listenNewMatch((args: NewMatchArgs) => {
+      this.userService.findUserById(args.from).subscribe(user => this.notifyNewMatch(user))
+    })
   }
 
   private switchToPending(user: UserItem) {
@@ -92,6 +108,7 @@ export class DashboardComponent implements OnInit {
 
   handleMatch(matchedUser: UserItem) {
     this.matchedUser = matchedUser;
+    this.socketService.sendNewMatch(matchedUser)
     this.isMatch = true;
   }
 
@@ -103,5 +120,9 @@ export class DashboardComponent implements OnInit {
     this.friendshipService.getMatchableUsers().subscribe(users => {
       this.likableUsers = users;
     });
+  }
+
+  private notifyNewMatch(user: UserItem) {
+    this.messageService.add({summary: '¡Tienes un nuevo match!', severity: 'success', detail: `Le has gustado a ${user.nickname}`});
   }
 }
