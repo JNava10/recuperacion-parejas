@@ -62,6 +62,10 @@ export class SocketService {
     this.socket?.emit('new-match', {targetId: user.id});
   }
 
+  listenNewMatch = (callback: Function) => {
+    this.socket?.on('new-match', (params) => callback(params));
+  }
+
   removeAllListeners = () => {
     this.socket?.removeAllListeners();
   }

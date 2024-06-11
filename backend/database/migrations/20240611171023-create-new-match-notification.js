@@ -30,14 +30,6 @@ module.exports = {
           key: 'id'
         }
       },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      description: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       seen: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

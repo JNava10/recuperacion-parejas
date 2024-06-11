@@ -22,7 +22,7 @@ class FriendshipController {
             const alreadyLiked = await FriendshipQuery.checkIfIsLiked(req.payload.userId, req.params.id);
 
             if (alreadyLiked.query.isMatch) {
-                await FriendshipQuery.likeUser(req.payload.userId, req.params.id);
+                // await FriendshipQuery.likeUser(req.payload.userId, req.params.id);
                 await FriendshipQuery.setMatch(req.payload.userId, req.params.id)
 
                 return res.status(200).json(

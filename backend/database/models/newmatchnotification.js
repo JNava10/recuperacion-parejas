@@ -29,27 +29,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     seen: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      default: false
+      defaultValue: false
     },
-    created_at: {
+    createdAt: {
       allowNull: false,
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      defaultValue: new Date(Date.now())
     },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: new Date(Date.now())
+    }
   }, {
     sequelize,
     modelName: 'NewMatchNotification',
-    tableName: 'new_match_notifications'
+    tableName: 'new_match_notifications',
+    underscored: true
   });
   return NewMatchNotification;
 };

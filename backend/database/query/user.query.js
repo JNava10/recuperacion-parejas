@@ -77,6 +77,20 @@ class UserQuery {
         }
     };
 
+    static checkIfIdExists = async (id) => {
+        try {
+            const query = await models.User.findOne({where: {id}}) !== null;
+
+            if (!query) return new QuerySuccess(true, 'No existe el ID introducido.', query);
+
+            return new QuerySuccess(true, 'El ID introducido ha sido encontrado.', query);
+        } catch (e) {
+            console.log(e)
+            return new QueryError(false, e)
+        }
+    };
+
+
     static checkIfNicknameExists = async (nickname) => {
         try {
             const query = await models.User.findOne({where: {nickname}});
