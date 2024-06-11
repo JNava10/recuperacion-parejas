@@ -46,14 +46,16 @@ export interface MessageFile {
   file_link: string
 }
 
-
 export interface SendMessageApiParams {
   text?: string,
   files?: File[]
 }
 
-
 export interface SendMessageSocketParams {
   text?: string,
   urls?: string[]
+}
+
+export interface NewMessageArgs {
+  from: number
 }

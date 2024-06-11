@@ -32,6 +32,11 @@ export interface UserItem {
   roleIds?: number[]
 }
 
+export interface PendingChatUserItem extends UserItem {
+  pendingCount: number
+}
+
+
 export interface CreateUserItem extends UserItem {
   password?: string
 }
@@ -51,7 +56,19 @@ export interface GetUsersResponse extends ApiResponse {
   }
 }
 
-export interface GetUserResponse  extends ApiResponse{
+export interface GetPendingChatsResponse extends ApiResponse {
+  data: {
+    executed: true
+    chats: ChatListResponse
+  }
+}
+
+export interface ChatListResponse extends ApiResponse {
+  notPending: UserItem[],
+  pending: PendingChatUserItem[]
+}
+
+export interface GetUserResponse extends ApiResponse{
   data: {
     executed: true
     query: UserItem

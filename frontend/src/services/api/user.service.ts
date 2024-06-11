@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {
   CreateUserItem,
-  ManageUserResponse,
+  DeleteUserResponse,
+  GetPendingChatsResponse,
+  GetProfileResponse,
   GetUserResponse,
   GetUsersResponse,
-  User,
-  UserResponse, UserItem, DeleteUserResponse, GetProfileResponse
+  ManageUserResponse,
+  PendingChatUserItem,
+  UserItem
 } from "../../interfaces/api/user/user";
-import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {catchError, map, tap} from "rxjs";
+import {map} from "rxjs";
 import {
   RecoverPasswordResponse,
   SendRecoverCodeResponse,
@@ -33,7 +35,7 @@ export class UserService {
     return this.http.post<SearchResponse>(`${environment.apiUrl}/user/member/search`, body);
   }
 
-  findUserById = (id: string) => {
+  findUserById = (id: number) => {
     return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/${id}`, {params: {...sendTokenParam, withRoles: true}}).pipe(
       map(body => body.data.query)
     )
@@ -123,5 +125,9 @@ export class UserService {
 
   getOwnData = () => {
     return this.http.get<GetProfileResponse>(`${environment.apiUrl}/user/profile`, {params: {...sendTokenParam}});
+  }
+
+  getChats = () => {
+    return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
   }
 }

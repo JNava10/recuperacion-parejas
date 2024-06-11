@@ -1,14 +1,5 @@
-
-const {sendStandardResponse} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
-const bcrypt = require("bcrypt");
-const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
-const QuerySuccess = require("../classes/QuerySuccess");
-const {findRecentChatMessages} = require("../database/query/message.query");
-const EventQuery = require("../database/query/event.query");
-const {el} = require("@faker-js/faker");
-const UserController = require("./user.controller");
 const FriendshipQuery = require("../database/query/friendship.query");
 
 class FriendshipController {

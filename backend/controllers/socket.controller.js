@@ -4,8 +4,26 @@ const RoomController = require("./room.controller");
 class SocketController {
     static io;
 
+    /** Lista con las conexiones actuales. Como clave está el ID del usuario y como valor la instancia Socket de su conexion.
+     *
+     * @type {Map<number, Socket>}
+     */
+    static usersConnected = new Map();
+
+    /**
+     *
+     * @param {number[]} ids
+     */
+    static findUsersById = (ids) => {
+        const userList = [...SocketController.usersConnected.entries()];
+
+        return userList.filter(entry => ids.includes(entry[0]))
+    }
+
     static onConnect = (socket, io) => {
         SocketController.io = io;
+
+        SocketController.usersConnected.set(socket.user.userId, socket)
 
         socket.on('disconnect', () => SocketController.onDisconnect(socket))
         socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
@@ -68,8 +86,6 @@ class SocketController {
                 message.files.push(file)
             })
 
-            console.log(message)
-
             console.log(`Enviando mensaje con archivos a la room ${roomUuid}`);
 
             // Enviamos el mensaje con sus archivos al front.
@@ -78,8 +94,11 @@ class SocketController {
             })
         }
 
+        const socketToSend = SocketController.usersConnected.get(idToSend);
 
-
+        if (socketToSend) {
+            socketToSend.emit('new-message', {from: socket.user.userId});
+        }
     }
 
     static onMessageRead = async (socket, params) => {
@@ -112,8 +131,6 @@ class SocketController {
             roomController.joinRoom(uuid);
         }
 
-        console.log('rooms socket', SocketController.io.sockets.adapter.rooms);
-
         const unreadedMessages = await MessageQuery.getUnreadedMessages(params.receiverId, socket.user.userId);
         const readedMessages = [];
 
@@ -129,7 +146,15 @@ class SocketController {
         socket.emit('join-chat', {joined: true});
     }
 
-    static onLeaveChat = async (socket, params) => {}
+    static onLeaveChat = async (socket, params) => {
+        const roomController = new RoomController(socket);
+
+        let uuid = roomController.findChatRoom(params.receiverId)
+
+        if (!uuid) uuid = roomController.getUserFreeRoom(socket.user.userId);
+
+        console.log('Saliendo del chat con room', uuid)
+    }
 }
 
 module.exports = SocketController

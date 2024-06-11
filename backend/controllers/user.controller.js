@@ -570,6 +570,28 @@ class UserController {
             )
         }
     };
+
+    static getChats = async (req, res) => {
+        try {
+            const {userId} = req.payload;
+
+            const pending = (await UserQuery.getPendingChats(userId)).query
+            const notPending = (await UserQuery.getNotPendingChats(userId)).query
+
+            return res.status(200).json(
+                new StdResponse("Se han obtenido la lista de chats correctamente", {
+                    executed: true,
+                    chats: {pending, notPending}
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
 }
 
 module.exports = UserController

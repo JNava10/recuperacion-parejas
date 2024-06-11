@@ -10,6 +10,7 @@ import {StorageService} from "../../services/storage.service";
 import {Router, RouterLink} from "@angular/router";
 import {CustomToastComponent} from "../custom-toast/custom-toast.component";
 import {ignoreElements} from "rxjs";
+import {LoginResponseData} from "../../interfaces/api/auth/login";
 
 @Component({
   selector: 'app-login-form',
@@ -51,17 +52,18 @@ export class LoginFormComponent {
 
     this.authService.sendLoginData(email, password).subscribe(async res => {
       if (res.data.logged) {
-        await this.handleLogin(res.data.token, res.data.firstLogin);
+        await this.handleLogin(res.data);
       } else {
         this.messageService.add({summary: 'Error', detail: res.message, severity: 'error'})
       }
     })
   }
 
-  private handleLogin = async (token: string, firstLogin: boolean) => {
-    this.storageService.save('token', token);
+  private handleLogin = async (data: LoginResponseData) => {
+    this.storageService.save('token', data.token);
+    this.storageService.save('socketToken', data.socketToken);
 
-    if (firstLogin) await this.router.navigate(['/start']);
+    if (data.firstLogin) await this.router.navigate(['/start']);
     else await this.router.navigate(['/dashboard']);
   }
 }

@@ -12,6 +12,11 @@
   <app-matches-list [matches]="matches"></app-matches-list>
 </section>
 
+<section>
+  <h3>Chats pendientes</h3>
+  <app-recent-chat-list [notPending]="this.notPending" [pending]="this.pending"></app-recent-chat-list>
+</section>
+
 <p-dialog header="¡Has hecho una nueva amistad!" [modal]="true" [(visible)]="isMatch">
   <div>
     {{matchedUser?.nickname}}
