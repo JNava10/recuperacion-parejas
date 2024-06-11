@@ -9,6 +9,9 @@ import {DialogModule} from "primeng/dialog";
 import {Router} from "@angular/router";
 import {MatchesListComponent} from "../../components/friendship/matches-list/matches-list.component";
 import {RecentChatListComponent} from "../../components/recent-chat-list/recent-chat-list.component";
+import {SocketService} from "../../services/socket.service";
+import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
+import {NewMessageArgs} from "../../interfaces/api/chat/message";
 
 @Component({
   selector: 'app-dashboard',
@@ -25,7 +28,7 @@ import {RecentChatListComponent} from "../../components/recent-chat-list/recent-
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  constructor(private userService: UserService, private router: Router, private friendshipService: FriendshipService) {}
+  constructor(private userService: UserService, private router: Router, private friendshipService: FriendshipService, private socketService: SocketService) {}
 
   ngOnInit(): void {
     this.getMatchedUsers();
@@ -35,27 +38,45 @@ export class DashboardComponent implements OnInit {
     })
 
     this.userService.getChats().subscribe(body => {
-      const pendingMap = new Map<number, PendingChatUserItem>()
-      const readMap = new Map<number, UserItem>()
-
-      console.log(body.data.chats.read)
-
       body.data.chats.read.forEach((user) => {
         console.log(user)
-        readMap.set(user.id!, user!)
+        this.read.set(user.id!, user!)
       })
 
       body.data.chats.pending.forEach((user) => {
-        console.log(user)
-        pendingMap.set(user.id!, user!)
+        this.pending.set(user.id!, user!)
       })
 
       this.chatList = {
-        pending: pendingMap, read: readMap
+        pending: this.pending, read: this.read
       };
+    })
+
+    this.socketService.listenNewMesages((args: NewMessageArgs) => {
+      const pendingUser = this.pending.get(args.from);
+      const readUser = this.read.get(args.from);
+
+      if (!pendingUser && !readUser) {
+        this.userService.findUserById(args.from).subscribe(user => {
+          const pendingUser: PendingChatUserItem = {...user, pendingCount: 1}
+
+          return this.pending.set(user.id!, pendingUser);
+        })
+      } else if (pendingUser) {
+        pendingUser.pendingCount++;
+
+        this.pending.set(pendingUser.id!, pendingUser)
+      } else if (readUser) {
+        console.log('read exists', readUser)
+        this.read.delete(readUser.id!);
+
+        this.pending.set(readUser.id!, {...readUser, pendingCount: 1})
+      }
     })
   }
 
+  pending = new Map<number, PendingChatUserItem>()
+  read = new Map<number, UserItem>()
   isMatch = false;
   matchedUser?: UserItem;
   likableUsers?: UserItem[];

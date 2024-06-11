@@ -1,4 +1,4 @@
-@if (pending) {
+@if (pending && read) {
   <ul class="max-w-sm divide-y divide-gray-200 dark:divide-gray-700">
     @for (user of pending!.values(); track user.id) {
       <li class="pb-3 sm:pb-4 hover:bg-gray-800 cursor-pointer" (click)="goToChat(user)">

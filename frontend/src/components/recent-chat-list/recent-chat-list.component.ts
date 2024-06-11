@@ -10,8 +10,7 @@ import {Router} from "@angular/router";
   styleUrl: './recent-chat-list.component.css'
 })
 export class RecentChatListComponent {
-  constructor(private router: Router) {
-  }
+  constructor(private router: Router) {}
 
   @Input() pending?: Map<number, PendingChatUserItem>;
   @Input() read?: Map<number, UserItem>;

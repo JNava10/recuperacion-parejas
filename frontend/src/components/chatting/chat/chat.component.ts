@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MessageInputComponent} from "../message-input/message-input.component";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {UserService} from "../../../services/api/user.service";
 import {User} from "../../../interfaces/api/user/user";
 import {ChatService} from "../../../services/api/chat.service";
@@ -29,7 +29,7 @@ import {StorageService} from "../../../services/storage.service";
   styleUrl: './chat.component.css'
 })
 export class ChatComponent implements OnInit {
-  constructor(private route: ActivatedRoute, private chatService: ChatService, private socketService: SocketService) { }
+  constructor(private route: ActivatedRoute, private chatService: ChatService, private socketService: SocketService, private router: Router) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -52,6 +52,12 @@ export class ChatComponent implements OnInit {
 
     this.socketService.listenJoinChat((params: ChatJoin) => this.handleJoining(params));
     this.socketService.listenReadMessages((params: MessagesRead) => this.handleMessagesRead(params));
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.socketService.sendLeavingChat(this.receiver?.id!)
+      }
+    });
   }
 
   partnerId?: number

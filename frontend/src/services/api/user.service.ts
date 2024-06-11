@@ -35,7 +35,7 @@ export class UserService {
     return this.http.post<SearchResponse>(`${environment.apiUrl}/user/member/search`, body);
   }
 
-  findUserById = (id: string) => {
+  findUserById = (id: number) => {
     return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/${id}`, {params: {...sendTokenParam, withRoles: true}}).pipe(
       map(body => body.data.query)
     )
