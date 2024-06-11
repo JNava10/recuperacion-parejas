@@ -503,11 +503,32 @@ class UserQuery {
         }
     };
 
-    static getReadedChats = async (userId) => {
+    static getNotPendingChats = async (userId) => {
         try {
-            const usersWithMessages = await models.Message.findAll({
+            const usersWithPendingMessages = await models.Message.findAll({
                     where: {
                         receiver: userId,
+                        read: false,
+                    },
+                    attributes: [
+                        [models.sequelize.fn('COUNT', models.Sequelize.col('id')), 'count'],
+                        'emitter',
+                    ],
+                    group: ['emitter'],
+                    order: [['created_at', 'DESC']],
+                    raw: true
+                }
+            );
+
+            const usersWithReadMessages = await models.Message.findAll({
+                    where: {
+                        receiver: userId,
+                        emitter: {
+                            [Op.and]: [
+                                {[Op.not]: userId},
+                                {[Op.notIn]: usersWithPendingMessages.map(message => message.emitter)}
+                            ]
+                        },
                         read: true,
                     },
                     attributes: [
@@ -515,14 +536,44 @@ class UserQuery {
                         'emitter',
                     ],
                     group: ['emitter'],
+                    order: [['created_at', 'ASC']],
                     raw: true
                 }
             );
 
+            const usersWhoSendMessages = await models.Message.findAll({
+                    where: {
+                        emitter: userId,
+                        receiver: {[Op.and]: [
+                                {[Op.not]: userId},
+                                {[Op.notIn]: usersWithPendingMessages.map(message => message.emitter)}
+                            ]
+                        },
+                    },
+                    attributes: [
+                        [models.sequelize.fn('COUNT', models.Sequelize.col('id')), 'count'],
+                        'receiver',
+                    ],
+                    group: ['receiver'],
+                    order: [['created_at', 'ASC']],
+                    raw: true
+                }
+            );
+
+            console.log(usersWithPendingMessages.map(message => message.emitter))
+            console.log((usersWhoSendMessages.map(message => message.receiver)))
+            console.log((usersWithReadMessages.map(message => message.emitter)))
             const users = await models.User.findAll({
                 where: {
                     id: {
-                        [Op.in]: (usersWithMessages.map(message => message.emitter))
+                        [Op.or]: [
+                            {
+                                [Op.in]: (usersWhoSendMessages.map(message => message.receiver))
+                            },
+                            {
+                                [Op.in]: (usersWithReadMessages.map(message => message.emitter))
+                            },
+                        ]
                     }
                 },
                 raw: true
@@ -535,7 +586,7 @@ class UserQuery {
             console.log(e)
             throw e
         }
-    };
+    }
 }
 
 module.exports = UserQuery

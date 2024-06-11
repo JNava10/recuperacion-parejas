@@ -64,7 +64,7 @@ export interface GetPendingChatsResponse extends ApiResponse {
 }
 
 export interface ChatListResponse extends ApiResponse {
-  read: UserItem[],
+  notPending: UserItem[],
   pending: PendingChatUserItem[]
 }
 
