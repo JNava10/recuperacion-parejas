@@ -1,5 +1,6 @@
 const MessageQuery = require("../database/query/message.query");
 const RoomController = require("./room.controller");
+const NotificationQuery = require("../database/query/notification.query");
 
 class SocketController {
     static io;
@@ -118,6 +119,16 @@ class SocketController {
 
             this.io.to(roomUuid).emit('message-read', {messages: readedMessages});
         }
+    }
+
+    static onNewMatch = async (socket, params) => {
+        const targetId =  params.targetId;
+        const user = SocketController.usersConnected.get(targetId);
+
+        if (user) {
+            NotificationQuery.pushMatchNotification()
+        }
+
     }
 
     static onJoinChat = async (socket, params) => {

@@ -4,6 +4,7 @@ import {environment} from "../environments/environment.development";
 import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 import {StorageService} from "./storage.service";
 import {Message, SendMessageSocketParams} from "../interfaces/api/chat/message";
+import {UserItem} from "../interfaces/api/user/user";
 @Injectable({
   providedIn: 'root'
 })
@@ -55,6 +56,10 @@ export class SocketService {
   }
   listenReadMessages = (callback: Function) => {
     this.socket?.on('message-read', (params) => callback(params));
+  }
+
+  sendNewMatch = (user: UserItem) => {
+    this.socket?.emit('new-match', {targetId: user.id});
   }
 
   removeAllListeners = () => {

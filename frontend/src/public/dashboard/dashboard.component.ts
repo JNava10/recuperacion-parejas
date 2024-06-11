@@ -92,6 +92,7 @@ export class DashboardComponent implements OnInit {
 
   handleMatch(matchedUser: UserItem) {
     this.matchedUser = matchedUser;
+    this.socketService.sendNewMatch(matchedUser)
     this.isMatch = true;
   }
 
