@@ -56,4 +56,8 @@ export class SocketService {
   listenReadMessages = (callback: Function) => {
     this.socket?.on('message-read', (params) => callback(params));
   }
+
+  removeAllListeners = () => {
+    this.socket?.removeAllListeners();
+  }
 }

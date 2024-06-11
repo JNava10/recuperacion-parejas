@@ -38,6 +38,7 @@ export class ChatComponent implements OnInit {
 
     this.socketService.listenMessages((message: Message) => {
       this.pushMessage(message)
+      console.log(message)
       this.socketService.sendMessageRead(this.partnerId!);
     })
 
@@ -56,6 +57,7 @@ export class ChatComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.socketService.sendLeavingChat(this.receiver?.id!)
+        this.socketService.removeAllListeners();
       }
     });
   }

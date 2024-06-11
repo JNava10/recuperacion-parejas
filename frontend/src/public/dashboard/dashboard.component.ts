@@ -56,12 +56,10 @@ export class DashboardComponent implements OnInit {
 
       if (pendingUser) {
         this.setNewMessage(pendingUser);
+      } else if (notPendingUser) {
+        this.switchToPending(notPendingUser);
       } else if (!pendingUser && !notPendingUser) {
-        if (notPendingUser) {
-          this.switchToPending(notPendingUser);
-        } else {
-          this.getNewSender(args);
-        }
+        this.getNewSender(args);
       }
     })
   }
