@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {
   CreateUserItem,
-  ManageUserResponse,
+  DeleteUserResponse,
+  GetPendingChatsResponse,
+  GetProfileResponse,
   GetUserResponse,
   GetUsersResponse,
-  User,
-  UserResponse, UserItem, DeleteUserResponse, GetProfileResponse, GetPendingChatsResponse
+  ManageUserResponse,
+  PendingChatUserItem,
+  UserItem
 } from "../../interfaces/api/user/user";
-import {GetEventsResponse} from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {catchError, map, tap} from "rxjs";
+import {map} from "rxjs";
 import {
   RecoverPasswordResponse,
   SendRecoverCodeResponse,

@@ -13,8 +13,8 @@ export class RecentChatListComponent {
   constructor(private router: Router) {
   }
 
-  @Input() pending?: PendingChatUserItem[];
-  @Input() readed?: UserItem[];
+  @Input() pending?: Map<number, PendingChatUserItem>;
+  @Input() read?: Map<number, UserItem>;
 
   goToChat = async (user: PendingChatUserItem | UserItem) => {
     await this.router.navigate(['chat', {id: user.id}]);

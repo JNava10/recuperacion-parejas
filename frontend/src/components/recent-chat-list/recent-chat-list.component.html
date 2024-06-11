@@ -1,6 +1,6 @@
 @if (pending) {
-  <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700 max-w-sm">
-    @for (user of pending; track user.id) {
+  <ul class="max-w-sm divide-y divide-gray-200 dark:divide-gray-700">
+    @for (user of pending!.values(); track user.id) {
       <li class="pb-3 sm:pb-4 hover:bg-gray-800 cursor-pointer" (click)="goToChat(user)">
         <div class="flex items-center space-x-4 rtl:space-x-reverse">
           <div class="flex flex-row gap-3 items-center">
@@ -18,7 +18,7 @@
       </li>
     }
 
-    @for (user of readed!; track user.id) {
+    @for (user of read!.values(); track user.id) {
       <li class="pb-3 sm:pb-4 hover:bg-gray-800 cursor-pointer" (click)="goToChat(user)">
         <div class="flex items-center space-x-4 rtl:space-x-reverse">
           <div class="flex flex-row gap-3 items-center">
