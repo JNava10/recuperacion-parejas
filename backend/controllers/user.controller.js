@@ -16,6 +16,7 @@ const {getRecoverCodeMail} = require("../constants/mail.constants");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
 const MessageQuery = require("../database/query/message.query");
 const {roleNames} = require("../constants/seed.const");
+const CustomError = require("../classes/customError");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -281,7 +282,19 @@ class UserController {
 
     static registerUser = async (req, res) => {
         try {
-            if (!req.body.picUrl) req.body.picUrl = process.env.DEFAULT_PROFILE_PIC_URL;
+            const emailExists = (await UserQuery.checkIfEmailExists(req.body.email)).query;
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(req.body.nickname)).query;
+
+            if (emailExists && nicknameExists) return res.status(200).json(
+                new StdResponse("El email y nombre de usuario introducidos ya existen",{executed: false})
+            )
+            else if (emailExists) return res.status(200).json(
+                new StdResponse("El email ya existe",{executed: false})
+            )
+            else if (nicknameExists) return res.status(200).json(
+                new StdResponse("El nombre de usuario ya existe",{executed: false})
+            )
+
 
             const {message, query, executed} = await UserQuery.registerUser(req.body);
 
@@ -546,7 +559,7 @@ class UserController {
 
     static updateUserAvatar = async (req, res) => {
         try {
-            const key = 'file'
+            const key = 'avatar'
 
             if (!req.files || !req.files[key]) return res.status(400).json(
                 new StdResponse(
@@ -556,7 +569,7 @@ class UserController {
                     })
             );
 
-            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg']});
+            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg', 'png', 'jpeg']});
 
             const avatarUrl = uploadedNames.get(key).secure_url;
 
@@ -572,6 +585,12 @@ class UserController {
             );
         } catch (e) {
             console.log(e)
+
+            if (e instanceof CustomError) {
+                return res.status(400).json(
+                    new StdResponse(e.message,{executed: false})
+                )
+            }
 
             return res.status(500).json(
                 new StdResponse(e.message,{executed: false})

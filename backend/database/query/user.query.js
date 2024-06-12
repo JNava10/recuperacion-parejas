@@ -63,7 +63,9 @@ class UserQuery {
 
     static checkIfEmailExists = async (email) => {
         try {
-            const query = await models.User.findOne({where: {email}});
+            const query = await models.User.findOne({where: {email}}) !== null;
+
+            console.log(query)
 
             if (!query) return new QuerySuccess(true, 'No existe el correo introducido.', query);
 
@@ -90,7 +92,7 @@ class UserQuery {
 
     static checkIfNicknameExists = async (nickname) => {
         try {
-            const query = await models.User.findOne({where: {nickname}});
+            const query = await models.User.findOne({where: {nickname}}) !== null;
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
@@ -282,7 +284,7 @@ class UserQuery {
                 await models.AssignedRole.create({user: created.id, role: memberRole.query.id})
             }
 
-            return new QuerySuccess(true, 'Se ha registrado el usuario correctamente.', true);
+            return new QuerySuccess(true, 'Se ha registrado el usuario correctamente.', {id:  created.id});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)

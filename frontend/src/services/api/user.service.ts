@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {
   CreateUserItem,
@@ -10,11 +10,11 @@ import {
   GetUserResponse,
   GetUsersResponse,
   ManageUserResponse,
-  PendingChatUserItem,
+  RegisterUserResponse,
   UserItem
 } from "../../interfaces/api/user/user";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {map} from "rxjs";
+import {catchError, map, of} from "rxjs";
 import {
   RecoverPasswordResponse,
   SendRecoverCodeResponse,
@@ -58,9 +58,7 @@ export class UserService {
   }
 
   registerUser = (user: CreateUserItem) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/register`, user).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<RegisterUserResponse>(`${environment.apiUrl}/user/register`, user)
   }
 
   sendRecoverEmail = (email: string) => {
@@ -127,5 +125,20 @@ export class UserService {
 
   getChats = () => {
     return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
+  }
+
+  updateUserAvatar = (id: number, file: File) => {
+    const fileKey = 'avatar';
+
+    const formData = new FormData();
+    formData.append(fileKey, file)
+
+    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/avatar/${id}`, formData, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageUserResponse;
+
+        return of(error);
+      })
+    );
   }
 }

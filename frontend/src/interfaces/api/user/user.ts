@@ -82,6 +82,15 @@ export interface ManageUserResponse extends ApiResponse {
   }
 }
 
+export interface RegisterUserResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: {
+      id: number
+    }
+  }
+}
+
 export interface RoleItem {
   id?: number,
   name?: string,
