@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {UserItem} from "../../../interfaces/api/user/user";
+import {User, UserItem} from "../../../interfaces/api/user/user";
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
 import {Router} from "@angular/router";
 import {UserService} from "../../../services/api/user.service";
@@ -49,6 +49,10 @@ export class UserTableComponent {
 
       this.cancelDeleteUser();
     });
+  }
+
+  goToEditUser = (user: UserItem) => {
+    this.router.navigate(['edit-user'], {queryParams: {id: user.id}})
   }
 
   cancelDeleteUser = () => {

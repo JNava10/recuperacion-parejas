@@ -29,6 +29,7 @@ let latLng = {
   styleUrl: './create-event.component.css'
 })
 export class CreateEventComponent {
+
   constructor(private eventService: EventService, private messageService: MessageService) {}
 
   static modalId = "create-event-modal";
@@ -82,8 +83,8 @@ export class CreateEventComponent {
       name: formData.name!,
       description: formData.description!,
       scheduledDateTime: scheduledDateTime!,
-      latitude: 10.1,
-      longitude: 10.2
+      latitude: formData.latLng?.lat,
+      longitude: formData.latLng?.lng
     }
     
     this.eventService.createEvent(event).subscribe(body => {
@@ -115,5 +116,15 @@ export class CreateEventComponent {
     this.messageService.add(message);
 
     this.creatingEvent = false;
+  }
+
+  changeEventPos($event: google.maps.LatLngLiteral) {
+    
+    this.createEventForm.patchValue({
+      latLng: $event
+    })
+
+    console.log(this.createEventForm.value.latLng);
+
   }
 }

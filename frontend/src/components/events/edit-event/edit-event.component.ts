@@ -9,26 +9,30 @@ import {EventItem} from "../../../interfaces/api/event/event";
 import {EventService} from "../../../services/api/event.service";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 import LatLngLiteral = google.maps.LatLngLiteral;
+import { MessageService } from 'primeng/api';
+import { getQueryToast } from '../../../utils/common.utils';
+import { CustomToastComponent } from "../../custom-toast/custom-toast.component";
 
 @Component({
-  selector: 'app-edit-event',
-  standalone: true,
-  imports: [
-    NgIf,
-    PaginatorModule,
-    ReactiveFormsModule,
-    DatePipe,
-    GoogleMap,
-    MapEventMarkerComponent
-  ],
-  templateUrl: './edit-event.component.html',
-  styleUrl: './edit-event.component.css'
+    selector: 'app-edit-event',
+    standalone: true,
+    templateUrl: './edit-event.component.html',
+    styleUrl: './edit-event.component.css',
+    imports: [
+        NgIf,
+        PaginatorModule,
+        ReactiveFormsModule,
+        DatePipe,
+        GoogleMap,
+        MapEventMarkerComponent,
+        CustomToastComponent
+    ]
 })
 export class EditEventComponent implements OnInit {
   @Input() event?: EventItem;
   @Output() edited = new EventEmitter<boolean>();
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService, private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.patchValues(this.event!);
@@ -79,6 +83,9 @@ export class EditEventComponent implements OnInit {
     }
 
     this.eventService.editEventDetails(eventDetails).subscribe(body => {
+      const message = getQueryToast(body.data.executed, body.message);
+
+      this.messageService.add(message)
       this.edited.emit(body.data.executed)
     });
   }
@@ -97,7 +104,7 @@ export class EditEventComponent implements OnInit {
   }
 
   setPlaceValue = (latLng: google.maps.LatLngLiteral) => {
-    this.editEventPlaceForm.setValue({latLng});
+    this.editEventPlaceForm.patchValue({latLng});
   };
 
   handleEditPlaceForm = () => {

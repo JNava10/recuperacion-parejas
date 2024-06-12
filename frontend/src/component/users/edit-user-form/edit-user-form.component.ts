@@ -55,11 +55,6 @@ export class EditUserFormComponent implements OnInit {
     this.userService.editUserData(user!, this.user?.id!).subscribe();
   };
 
-  private getRolesData = () => {
-    const roles = this.userDataForm.value.roles;
-    return roles?.map(role => role.id!);
-  }
-
   private getUserData = () => {
     const formData = this.userDataForm.value;
 
