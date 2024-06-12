@@ -113,9 +113,7 @@ export class UserService {
   }
 
   deleteUser = (user: UserItem) => {
-    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}} )
   }
 
 

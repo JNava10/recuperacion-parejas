@@ -58,7 +58,8 @@ export class EditProfileDataFormComponent implements OnInit {
 
     const user = this.getUserData();
 
-    this.userService.editProfileData(user).subscribe(res => {  const message: Message = {summary: res.message}
+    this.userService.editProfileData(user).subscribe(res => {
+      const message: Message = {summary: res.message}
       message.severity = res.data.executed ? "success" : "error"
 
       this.messageService.add(message);

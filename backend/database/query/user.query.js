@@ -3,13 +3,10 @@ const {findUserByNameOrNick, findUserByFullname} = require("../../constants/sql.
 const {QueryTypes, Op} = require("sequelize");
 const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
-const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
 const RoleQuery = require("./role.query");
 const {roleNames, preferenceTypes} = require("../../constants/seed.const");
-const {it, en} = require("@faker-js/faker");
-const bcrypt = require("bcrypt");
 const {hashPassword} = require("../../helpers/common.helper");
-const {Logger} = require("sequelize/lib/utils/logger");
+const {tr, fa} = require("@faker-js/faker");
 
 class UserQuery {
     /**
@@ -601,6 +598,42 @@ class UserQuery {
             throw e
         }
     }
+
+    static userHasRole = async (id, roleName) => {
+        try {
+            const hasRole = await models.User.findOne(
+                {
+                    where: {id},
+                    include: {model: models.Role, where: {name: roleName}, as: 'roles'}
+                }
+            ) !== null;
+
+            return new QuerySuccess(true, 'Se ha obtenido el rol correctamente.', hasRole);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getRoleUsersRemaining = async (roleName) => {
+        try {
+            const remainingCount = (await models.User.findOne(
+                {
+                    include: {model: models.Role, attributes: [], where: {name: roleName}, as: 'roles'},
+                    where: {enabled: true},
+                    attributes: [
+                       [models.sequelize.fn('COUNT', models.Sequelize.col('user.id')), 'remaining']
+                    ],
+                    raw: true
+                },
+            ));
+
+            return new QuerySuccess(true, 'Se ha obtenido la cantidad de usuarios correctamente.', remainingCount.remaining);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = UserQuery

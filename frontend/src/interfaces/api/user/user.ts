@@ -95,7 +95,7 @@ export interface GetRolesResponse extends ApiResponse {
   }
 }
 
-export interface DeleteUserResponse {
+export interface DeleteUserResponse extends ApiResponse {
   data: {
     executed: true
     query: boolean

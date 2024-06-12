@@ -15,6 +15,7 @@ const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
 const MessageQuery = require("../database/query/message.query");
+const {roleNames} = require("../constants/seed.const");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -464,6 +465,13 @@ class UserController {
     };
 
     static deleteUser = async (req, res) => {
+        const isAdmin = await UserQuery.userHasRole(req.params.id, roleNames.admin.name);
+        const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
+
+        if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
+            new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
+        )
+
         const {message, executed, query, error} = await UserQuery.deleteUser(req.params.id);
 
         if (executed) {
