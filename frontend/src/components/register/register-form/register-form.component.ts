@@ -101,7 +101,6 @@ export class RegisterFormComponent {
       this.showPicModal = false;
       await this.finishRegister()
     } else {
-      console.log(this.registeredId)
       this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
         const message = getQueryToast(body.data.executed, body.message)
         this.messageService.add(message)

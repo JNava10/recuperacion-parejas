@@ -7,7 +7,7 @@ const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
 const EventQuery = require("../database/query/event.query");
-const {el, fi, tr} = require("@faker-js/faker");
+const {el, fi, tr, fa} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const RoomController = require("./room.controller");
@@ -167,35 +167,36 @@ class UserController {
     };
 
     static createUser = async (req, res) => {
-        const user = req.body;
+        try {
+            const user = req.body;
 
-        const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
+            const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
 
-        if (emailExists) return res.status(200).json(
-            new StdResponse("El correo indicado ya existe",{executed: false})
-        )
-
-        const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
-
-        if (nicknameExists) return res.status(200).json(
-            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
-        )
-
-        const {message, executed, query, error} = await UserQuery.createUser(user);
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+            if (emailExists) return res.status(200).json(
+                new StdResponse("El correo indicado ya existe",{executed: false})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
+
+            if (nicknameExists) return res.status(200).json(
+                new StdResponse(nicknameExists.message,{executed: false})
             )
-        } else if (!query) {
+
+            const {message, executed, query} = await UserQuery.createUser(user);
+
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        } catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse(e.message,{executed: false})
             )
         }
+
     };
 
     static updateUserData = async (req, res) => {

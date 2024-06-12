@@ -6,6 +6,7 @@ class UserSeed {
         this.nickname = nickname;
         this.password = password;
         this.pic_url = picUrl;
+        this.enabled = true
         this.email = email.toLowerCase();
         this.created_at = new Date();
         this.updated_at = new Date();

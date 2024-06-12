@@ -82,7 +82,7 @@ export interface ManageUserResponse extends ApiResponse {
   }
 }
 
-export interface RegisterUserResponse extends ApiResponse {
+export interface CreateUserResponse extends ApiResponse {
   data: {
     executed: true
     query: {

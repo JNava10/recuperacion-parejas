@@ -92,9 +92,11 @@ class UserQuery {
 
     static checkIfNicknameExists = async (nickname) => {
         try {
-            const query = await models.User.findOne({where: {nickname}}) !== null;
+            const exists = await models.User.findOne({where: {nickname}}) !== null;
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+            const message = exists ? 'El nombre de usuario indicado ya existe' : 'El nombre de usuario indicado no se ha encontrado.'
+
+            return new QuerySuccess(true, message, exists);
         } catch (e) {
             return new QueryError(false, e)
         }
@@ -134,7 +136,7 @@ class UserQuery {
                 }
             }
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', true);
+            return new QuerySuccess(true, 'Se ha creado el usuario correctamente.', {id: created.id});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e.message)

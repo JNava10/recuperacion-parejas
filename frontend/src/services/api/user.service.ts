@@ -10,7 +10,7 @@ import {
   GetUserResponse,
   GetUsersResponse,
   ManageUserResponse,
-  RegisterUserResponse,
+  CreateUserResponse,
   UserItem
 } from "../../interfaces/api/user/user";
 import {sendTokenParam} from "../../utils/const/url.constants";
@@ -54,11 +54,11 @@ export class UserService {
   }
 
   createUser = (user: CreateUserItem) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}})
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}})
   }
 
   registerUser = (user: CreateUserItem) => {
-    return this.http.post<RegisterUserResponse>(`${environment.apiUrl}/user/register`, user)
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/register`, user)
   }
 
   sendRecoverEmail = (email: string) => {

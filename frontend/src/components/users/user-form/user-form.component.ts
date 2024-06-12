@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {CreateUserItem, RoleItem, UserItem} from "../../../interfaces/api/user/user";
+import {CreateUserItem, CreateUserResponse, RoleItem, UserItem} from "../../../interfaces/api/user/user";
 import {UserService} from "../../../services/api/user.service";
 import * as regex from "../../../utils/const/regex.constants";
 import * as customValidators from "../../../utils/validators/customValidators";
@@ -9,6 +9,8 @@ import {SelectRolesEditComponent} from "../../roles/select-roles/select-roles.co
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
 import {Message, MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
+import {getQueryToast} from "../../../utils/common.utils";
+import {ProgressSpinnerModule} from "primeng/progressspinner";
 
 @Component({
   selector: 'app-user-form',
@@ -18,7 +20,8 @@ import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
     NgIf,
     SelectRolesEditComponent,
     RoleBadgeComponent,
-    CustomToastComponent
+    CustomToastComponent,
+    ProgressSpinnerModule
   ],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
@@ -27,6 +30,9 @@ export class UserFormComponent {
   constructor(private userService: UserService, private messageService: MessageService) {}
 
   @Input() roles: RoleItem[] = [];
+
+  protected picFile?: File;
+  creatingUser = false;
 
   userForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -51,11 +57,22 @@ export class UserFormComponent {
 
     const user = this.getUserData();
 
-    this.userService.createUser(user).subscribe(res => {  const message: Message = {summary: res.message}
-      message.severity = res.data.executed ? "success" : "error"
+    this.userService.createUser(user).subscribe(res => {
+      this.creatingUser = true
 
-      this.messageService.add(message);
+      if (!res.data.executed) {
+        const message: Message = {summary: res.message}
+        message.severity = res.data.executed ? "success" : "error"
+        this.messageService.add(message);
+      }
 
+      if (this.picFile) {
+        this.changeCreatedUserAvatar(res.data.query.id, res)
+      } else {
+        const message: Message = {summary: res.message}
+        message.severity = res.data.executed ? "success" : "error"
+        this.messageService.add(message);
+      }
     });
   };
 
@@ -74,5 +91,38 @@ export class UserFormComponent {
     }
 
     return user;
+  }
+
+  protected handleFile = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+
+    const file = input.files?.item(0);
+
+    if (file) {
+      this.picFile = file
+    }
+  };
+
+  private sendPic = () => {
+    // this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
+    //   const message = getQueryToast(body.data.executed, body.message)
+    //   this.messageService.add(message)
+    //
+    //   if (body.data.executed) {
+    //     this.finishRegister()
+    //   }
+    // })
+  }
+
+  private changeCreatedUserAvatar = (id: number, createdRes: CreateUserResponse) => {
+    this.userService.updateUserAvatar(id, this.picFile!).subscribe(() => {
+      const message: Message = {summary: createdRes.message}
+
+      message.severity = createdRes.data.executed ? "success" : "error";
+
+      this.messageService.add(message);
+
+      this.creatingUser = false
+    });
   }
 }
