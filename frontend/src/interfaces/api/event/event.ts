@@ -14,7 +14,6 @@ export interface SubscribeEventResponse extends ApiResponse {
   }
 }
 
-
 export interface EventItem {
   id?: number
   name?: string
@@ -52,5 +51,14 @@ export interface EventSummaryResponse {
   data: {
     executed: true
     file: SummaryFile
+  }
+}
+
+export interface ManageEventResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: {
+      id: number
+    }
   }
 }

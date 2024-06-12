@@ -86,7 +86,6 @@ export class UserFormComponent {
       nickname: formData.nickname!,
       email: formData.email!,
       password: formData.passwords!.password!,
-      picUrl: "https://www.mundodeportivo.com/files/image_449_220/files/fp/uploads/2024/05/24/6650bdf5b973a.r_d.2397-2343-902.jpeg",
       roleIds: [Number(formData.role)]
     }
 
@@ -102,17 +101,6 @@ export class UserFormComponent {
       this.picFile = file
     }
   };
-
-  private sendPic = () => {
-    // this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
-    //   const message = getQueryToast(body.data.executed, body.message)
-    //   this.messageService.add(message)
-    //
-    //   if (body.data.executed) {
-    //     this.finishRegister()
-    //   }
-    // })
-  }
 
   private changeCreatedUserAvatar = (id: number, createdRes: CreateUserResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(() => {

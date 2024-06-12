@@ -15,6 +15,7 @@ router.get('/subscribed/:id', [validateToken], EventController.getIfRegisteredTo
 router.get('/:id', [validateToken], EventController.getEvent);
 router.delete('/:id', [validateToken], EventController.deleteEventById);
 router.get('/summary/:id', [validateToken], EventController.getSummaryFile);
+router.put('/pic/:id', [validateToken], EventController.updateEventPic);
 
 module.exports = router;
 

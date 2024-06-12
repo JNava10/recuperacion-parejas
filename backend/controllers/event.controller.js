@@ -1,4 +1,3 @@
-
 const EventQuery = require("../database/query/event.query");
 const StdResponse = require("../classes/stdResponse");
 const convertHTMLToPDF = require("pdf-puppeteer");
@@ -234,15 +233,57 @@ class EventController {
             const event = (await EventQuery.getEvent(req.params.id)).query;
 
             if (!event) return res.status(200).json(
-                new StdResponse('No se ha encontrado ningun evento con el ID indicado.',{executed: false})
+                new StdResponse('No se ha encontrado ningun evento con el ID indicado.', {executed: false})
             )
 
             return res.status(200).json(
-                new StdResponse('Se ha creado correctamente el archivo',{file: {url: uploadedFile.secure_url}})
+                new StdResponse('Se ha creado correctamente el archivo', {file: {url: uploadedFile.secure_url}})
             )
         } catch (e) {
             return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al crear el archivo.',{executed: false, error: e.toString()})
+                new StdResponse('Ha ocurrido un problema al crear el archivo.', {executed: false, error: e.toString()})
+            )
+        }
+    };
+
+    static updateEventPic = async (req, res) => {
+        try {
+            const key = 'pic';
+
+            if (!req.files || !req.files[key]) return res.status(400).json(
+                new StdResponse(
+                    "No se ha subido ningun archivo.",
+                    {
+                        executed: false,
+                    }
+                )
+            );
+
+            const uploadedNames = await uploadFiles(req.files, {dir: '/event/pics', fileExtension: ['jpg', 'png', 'jpeg']});
+
+            const picUrl = uploadedNames.get(key).secure_url;
+
+            const {id} = req.params;
+
+            const {message, query, executed} = await EventQuery.updateEventPic(id, picUrl)
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            if (e instanceof CustomError) {
+                return res.status(400).json(
+                    new StdResponse(e.message,{executed: false})
+                )
+            }
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
             )
         }
     };

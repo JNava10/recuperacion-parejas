@@ -168,6 +168,20 @@ class CreateEvent {
             return new QueryError(false, e)
         }
     };
+
+    static updateEventPic = async (eventId, fileLink) => {
+        try {
+            const query = await models.Event.update({picUrl: fileLink},
+                {
+                    where: {id: eventId}
+                }
+            ) !== null;
+
+            return new QuerySuccess(true, 'Se ha actualizado el evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
 }
 
 module.exports = CreateEvent;

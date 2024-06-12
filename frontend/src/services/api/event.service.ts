@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {environment} from "../../environments/environment";
 import {
+  ManageEventResponse,
   EventItem,
   EventResponse, EventSummaryResponse,
   GetEventsResponse,
@@ -10,7 +11,8 @@ import {
   SubscribeEventResponse
 } from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {map, tap} from "rxjs";
+import {catchError, map, of, tap} from "rxjs";
+import {ManageUserResponse} from "../../interfaces/api/user/user";
 
 @Injectable({
   providedIn: 'root'
@@ -79,5 +81,20 @@ export class EventService {
 
   getSummaryFile(event: EventItem) {
     return this.http.get<EventSummaryResponse>(`${environment.apiUrl}/event/summary/${event.id}`, {params: {...sendTokenParam}})
+  }
+
+  updateEventPic = (id: number, file: File) => {
+    const fileKey = 'pic';
+
+    const formData = new FormData();
+    formData.append(fileKey, file)
+
+    return this.http.put<ManageEventResponse>(`${environment.apiUrl}/event/pic/${id}`, formData, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageEventResponse;
+
+        return of(error);
+      })
+    );
   }
 }
