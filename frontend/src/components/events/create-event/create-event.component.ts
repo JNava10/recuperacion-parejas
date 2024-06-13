@@ -5,7 +5,7 @@ import {EventService} from "../../../services/api/event.service";
 import {} from "googlemaps";
 import * as regex from '../../../utils/const/regex.constants';
 import {NgIf} from "@angular/common";
-import {EventItem, ManageEventResponse} from "../../../interfaces/api/event/event";
+import {CreateEventItem, EventItem, ManageEventResponse} from "../../../interfaces/api/event/event";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {Message, MessageService} from "primeng/api";
@@ -79,14 +79,14 @@ export class CreateEventComponent {
     const formData = this.createEventForm.value;
     const scheduledDateTime = `${formData.scheduledDate} ${formData.scheduledTime}`;
 
-    const event: EventItem = {
+    const event: CreateEventItem = {
       name: formData.name!,
       description: formData.description!,
       scheduledDateTime: scheduledDateTime!,
       latitude: formData.latLng?.lat,
       longitude: formData.latLng?.lng
     }
-    
+
     this.eventService.createEvent(event).subscribe(body => {
       if (this.picFile) {
         this.eventService.updateEventPic(body.data.query.id!, this.picFile!).subscribe(body => this.handleUpdatingPic(body));
@@ -104,7 +104,7 @@ export class CreateEventComponent {
       this.picFile = file
     }
   };
-  
+
   creatingEvent = false;
   picFile?: File;
 
@@ -119,7 +119,7 @@ export class CreateEventComponent {
   }
 
   changeEventPos($event: google.maps.LatLngLiteral) {
-    
+
     this.createEventForm.patchValue({
       latLng: $event
     })

@@ -3,6 +3,8 @@ const StdResponse = require("../classes/stdResponse");
 const convertHTMLToPDF = require("pdf-puppeteer");
 const {uploadFiles, uploadBuffer} = require("../helpers/cloudinary.helper");
 const EventUtils = require("../utils/event.utils");
+const CustomError = require("../classes/customError");
+const {fa} = require("@faker-js/faker");
 
 class EventController {
 
@@ -190,8 +192,32 @@ class EventController {
         }
     };
 
-    static registerToEvent = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.subscribeEvent(req.params.id, req.payload.userId);
+    static subscribeToEvent = async (req, res) => {
+      try {
+          const isClosed = (await EventQuery.eventIsClosed(req.params.id));
+
+          if (isClosed.query) return res.status(200).json(
+              new StdResponse(isClosed.message, {
+                  executed: true,
+                  closed: true
+              })
+          );
+
+          const {message, executed} = await EventQuery.subscribeEvent(req.params.id, req.payload.userId);
+
+          return res.status(200).json(
+              new StdResponse(message, {
+                  executed,
+                  closed: false
+              })
+          );
+      } catch (e) {
+          console.log(e)
+
+          return res.status(500).json(
+              new StdResponse(e.message,{executed: false})
+          )
+      }
 
         if (executed) {
             return res.status(200).json(

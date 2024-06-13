@@ -149,7 +149,7 @@ class CreateEvent {
                 }
             ) !== null;
 
-            return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
+            return new QuerySuccess(true, 'Se ha retirado del evento correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }
@@ -180,6 +180,21 @@ class CreateEvent {
             return new QuerySuccess(true, 'Se ha actualizado el evento correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
+        }
+    };
+
+    static eventIsClosed = async (eventId) => {
+        try {
+            const query = await models.sequelize.query(
+                `SELECT * FROM ${models.Event.tableName} WHERE close_date_time < NOW() AND id = :id`,
+                {replacements: {id: eventId}}
+            ) !== null;
+
+            const message = query ? 'El evento está cerrado.' : 'El evento aun está abierto a inscripciones.'
+
+            return new QuerySuccess(true, message, query);
+        } catch (e) {
+            throw e
         }
     };
 }

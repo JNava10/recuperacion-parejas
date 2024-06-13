@@ -8,18 +8,20 @@ import {
   EventResponse, EventSummaryResponse,
   GetEventsResponse,
   SubscribedToEventResponse,
-  SubscribeEventResponse
+  SubscribeEventResponse, CreateEventItem
 } from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of, tap} from "rxjs";
 import {ManageUserResponse} from "../../interfaces/api/user/user";
+import {MessageService} from "primeng/api";
+import {getQueryToast} from "../../utils/common.utils";
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private messageService: MessageService) { }
 
   createEvent = (event: EventItem) => {
     return this.http.post<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
@@ -43,7 +45,7 @@ export class EventService {
     )
   }
 
-  editEventDetails = (event: EventItem) => {
+  editEventDetails = (event: CreateEventItem) => {
     return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
   }
 
@@ -68,14 +70,27 @@ export class EventService {
   }
 
   registerToEvent(event: EventItem) {
-    return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/subscribe/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+    return this.http.post<SubscribeEventResponse>(
+      `${environment.apiUrl}/event/subscribe/${event.id}`,
+      {},
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SubscribeEventResponse;
+        return of(error);
+      })
     )
   }
 
   withdrawFromEvent(event: EventItem) {
-    return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/withdraw/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+    return this.http.post<SubscribeEventResponse>(
+      `${environment.apiUrl}/event/withdraw/${event.id}`,
+      {},
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SubscribeEventResponse;
+
+        return of(error);
+      })
     )
   }
 
