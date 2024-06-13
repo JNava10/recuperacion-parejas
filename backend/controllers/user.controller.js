@@ -1,5 +1,5 @@
 
-const {sendStandardResponse} = require("../helpers/common.helper");
+const {sendStandardResponse, hashPassword} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
 const bcrypt = require("bcrypt");
 const {generateToken} = require("../helpers/jwt.helper");
@@ -262,7 +262,7 @@ class UserController {
     };
 
     static updateUserPassword = async (req, res) => {
-        const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
+        const password = hashPassword(req.body.password);
 
         const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
 
