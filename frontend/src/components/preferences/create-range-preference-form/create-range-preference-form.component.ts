@@ -11,21 +11,26 @@ import {
 import {NgIf} from "@angular/common";
 import {PreferenceService} from "../../../services/api/preference.service";
 import * as regex from "../../../utils/const/regex.constants";
-import {CreateChoicePreferenceItem, CreateRangePreferenceItem} from "../../../interfaces/api/preference/preferenceItem";
+import {CreateRangePreferenceItem} from "../../../interfaces/api/preference/preferenceItem";
+import {rangeValidation} from "../../../utils/validators/customValidators";
+import {getQueryToast} from "../../../utils/common.utils";
+import {MessageService} from "primeng/api";
+import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-create-range-preference-form',
   standalone: true,
-    imports: [
-        FormsModule,
-        NgIf,
-        ReactiveFormsModule
-    ],
+  imports: [
+    FormsModule,
+    NgIf,
+    ReactiveFormsModule,
+    CustomToastComponent
+  ],
   templateUrl: './create-range-preference-form.component.html',
   styleUrl: './create-range-preference-form.component.css'
 })
 export class CreateRangePreferenceFormComponent {
-  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService) {}
+  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService, private messageService: MessageService) {}
 
   rangePreferenceForm = this.formBuilder.group({
     name: ['', {
@@ -40,15 +45,13 @@ export class CreateRangePreferenceFormComponent {
       ]
     }],
 
-    range: this.formBuilder.group({
-      min: new FormControl(0, {
-        validators: [Validators.required, Validators.min(1), Validators.max(99)],
-      }),
-      max: new FormControl(0, {
-        validators: [Validators.required, Validators.min(2), Validators.max(100)],
-      }),
-    })
-  }, {updateOn: "submit"});
+    min: new FormControl(0, {
+      validators: [Validators.required, Validators.min(1), Validators.max(99)],
+    }),
+    max: new FormControl(0, {
+      validators: [Validators.required, Validators.min(2), Validators.max(100)],
+    }),
+  }, {updateOn: "submit", validators: rangeValidation('min', 'max')});
 
   handleForm($event: SubmitEvent) {
     if (this.rangePreferenceForm.invalid) return;
@@ -59,11 +62,15 @@ export class CreateRangePreferenceFormComponent {
       name: formValues.name!,
       description: formValues.description!,
       range: {
-        min: formValues.range!.min!,
-        max: formValues.range!.max!
+        min: formValues.min!,
+        max: formValues.max!
       }
     }
 
-    this.preferenceService.saveRangePreference(rangePreference).subscribe()
+    this.preferenceService.saveRangePreference(rangePreference).subscribe(body => {
+      const message = getQueryToast(body.data.executed, body.message);
+
+      this.messageService.add(message);
+    })
   }
 }
