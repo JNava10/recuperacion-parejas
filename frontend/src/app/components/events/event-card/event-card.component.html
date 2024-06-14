@@ -16,6 +16,9 @@
     <button type="button" *ngIf="(Date.parse(event?.closeDateTime!) > Date.now())" (click)="showDeleteEvent()" class="focus:outline-none text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
       <i class="fa-solid fa-trash"></i>
     </button>
+    <button type="button" (click)="showMembersSidebar()" class="focus:outline-none text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-purple-900">
+      <i class="fa-solid fa-person"></i>
+    </button>
   </div>
 </div>
 
@@ -31,3 +34,9 @@
 <p-dialog [modal]="true" header="¿Estás seguro de borrar este evento?" closeOnEscape="true" [(visible)]="deletingEvent" class="max-w-l">
   <app-confirm-delete-event (deleteEvent)="handleDeleteEvent($event)"></app-confirm-delete-event>
 </p-dialog>
+
+@if (showMembers) {
+  <p-sidebar [(visible)]="showMembers" position="left">
+    <app-manage-event-members-form [event]="event"></app-manage-event-members-form>
+  </p-sidebar>
+}

@@ -65,10 +65,22 @@ class CreateEvent {
 
     static getAllEvents = async () => {
         try {
-            const query = await models.Event.findAll();
+            const query = await models.Event.findAll({
+                // include: {
+                //     model: models.User,
+                //     attributes: [
+                //         [models.sequelize.fn('COUNT', models.Sequelize.col(`user`)), 'count'],
+                //     ],
+                //     group: 'event',
+                //     as: 'assistants'
+                // },
+            });
+
+            console.log(query)
 
             return new QuerySuccess(true, 'Se han obtenido los eventos correctamente.', query);
         } catch (e) {
+            console.log(e)
             return new QueryError(false, e)
         }
     };
@@ -194,6 +206,22 @@ class CreateEvent {
         } catch (e) {
             throw e
         }
+    };
+
+    static getEventMembers = async (eventId) => {
+        const query = (await models.Event.findOne({
+            include: {
+                model: models.User,
+                as: 'assistants'
+            },
+            where: {
+                id: eventId
+            }
+        })).assistants;
+
+        console.log(query)
+
+        return new QuerySuccess(true, "Se han obtenido los miembros del evento correctamente", query);
     };
 }
 

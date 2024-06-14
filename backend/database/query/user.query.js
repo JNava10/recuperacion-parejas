@@ -639,6 +639,23 @@ class UserQuery {
         }
     };
 
+    static getRoleUsers = async (roleName) => {
+        try {
+            const users = await models.User.findAll(
+                {
+                    include: {model: models.Role, attributes: [], where: {name: roleName}, as: 'roles'},
+                    where: {enabled: true},
+                    raw: true
+                },
+            );
+
+            return new QuerySuccess(true, 'Se ha obtenido la cantidad de usuarios correctamente.', users);
+        } catch (e) {
+            console.warn(e);
+            return new QueryError(false, e);
+        }
+    };
+
     // TODO: Mover a RoleQuery
     static findRoleByName = async (name) => {
         try {

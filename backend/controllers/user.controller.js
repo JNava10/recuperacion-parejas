@@ -124,8 +124,23 @@ class UserController {
         }
     }
 
+    static getRoleUsers = async (req, res) => {
+        try {
+            const {message, executed, query} = await UserQuery.getRoleUsers(req.params.role);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            );
+        } catch (e) {
+            console.log(e);
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            );
+        }
+    };
+
     static getNotDeletedUsers = async (req, res) => {
-        console.log(req.payload.userId)
         const {message, executed, query, error} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
         if (executed) {
@@ -142,6 +157,7 @@ class UserController {
             )
         }
     };
+
 
     static getNotDeletedUsersWithRoles = async (req, res) => {
         const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);

@@ -120,6 +120,10 @@ export class UserService {
     return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
   }
 
+  getRoleUsers = (role: string) => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/role/${role}`, {params: {...sendTokenParam}});
+  }
+
   updateUserAvatar = (id: number, file: File) => {
     const fileKey = 'avatar';
 

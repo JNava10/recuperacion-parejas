@@ -27,6 +27,9 @@ export interface EventItem {
   author?: number
   createdAt?: string
   updatedAt?: string
+  assistants? : {
+    count: number
+  }
 }
 
 export interface CreateEventItem {

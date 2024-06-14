@@ -12,7 +12,7 @@ import {
 } from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of, tap} from "rxjs";
-import {ManageUserResponse} from "../../interfaces/api/user/user";
+import {GetUsersResponse, ManageUserResponse} from "../../interfaces/api/user/user";
 import {MessageService} from "primeng/api";
 import {getQueryToast} from "../../utils/common.utils";
 
@@ -116,6 +116,15 @@ export class EventService {
       catchError((res: HttpErrorResponse) => {
         const error = res.error as ManageEventResponse;
 
+        return of(error);
+      })
+    );
+  }
+
+  getEventMembers = (id: number) => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/event/members/${id}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
         return of(error);
       })
     );

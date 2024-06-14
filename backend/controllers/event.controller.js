@@ -321,6 +321,33 @@ class EventController {
             )
         }
     };
+
+    static getEventMembers = async (req, res) => {
+        try {
+            const eventExists = await EventQuery.getEvent(req.params.id);
+
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+            
+            const {message, query, executed} = await EventQuery.getEventMembers(req.params.id);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            console.log(e);
+
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al crear el archivo.', {executed: false, error: e.toString()})
+            );
+        }
+    };
 }
 
-module.exports = EventController
+module.exports = EventController;

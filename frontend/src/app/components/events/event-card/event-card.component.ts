@@ -11,6 +11,10 @@ import {
   ConfirmDeleteEventComponent
 } from "../../../../components/events/confirm-delete-event/confirm-delete-event.component";
 import {EventService} from "../../../../services/api/event.service";
+import {SidebarModule} from "primeng/sidebar";
+import {
+  ManageEventMembersFormComponent
+} from "../../../../components/events/manage-event-members-form/manage-event-members-form.component";
 
 @Component({
   selector: 'app-event-card',
@@ -22,7 +26,9 @@ import {EventService} from "../../../../services/api/event.service";
     ReactiveFormsModule,
     NgIf,
     EditEventComponent,
-    ConfirmDeleteEventComponent
+    ConfirmDeleteEventComponent,
+    SidebarModule,
+    ManageEventMembersFormComponent
   ],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.css'
@@ -31,12 +37,14 @@ export class EventCardComponent {
 
   constructor(private eventService: EventService) {}
 
-  @Input() event?: EventItem;
+  protected readonly Date = Date;
 
+  @Input() event?: EventItem;
   @Output() refresh = new EventEmitter<null>();
 
   protected editingEvent = false;
   protected deletingEvent = false;
+  protected showMembers = false;
 
   summaryFile?: SummaryFile
 
@@ -55,11 +63,13 @@ export class EventCardComponent {
       this.refresh.emit()
     })
   };
-
   getSummaryFile = (event: EventItem) => {
     this.eventService.getSummaryFile(event).subscribe((body) => {
       this.summaryFile = body.data.file;
     })
   };
-  protected readonly Date = Date;
+
+  showMembersSidebar = () => {
+    this.showMembers = true
+  };
 }

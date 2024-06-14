@@ -17,6 +17,7 @@ router.post('/roles/:id', [validateToken], UserController.addUserRoles)
 router.post('/roles/delete/:id', [validateToken], UserController.deleteUserRoles)
 router.post('/register', [], UserController.registerUser)
 router.get('/possible-matches', [validateToken], UserController.getPossibleMatches)
+router.get('/role/:role', [validateToken], UserController.getRoleUsers)
 router.post('/send-recover-email', UserController.sendRecoverEmail)
 
 router.post('/send-recover-code', UserController.checkRecoverCode)
