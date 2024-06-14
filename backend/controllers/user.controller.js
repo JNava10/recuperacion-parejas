@@ -244,19 +244,19 @@ class UserController {
     };
 
     static deleteUserRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+        try {
+            const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query;
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+            if (adminsRemaining >= 1)  return res.status(200).json(
+                new StdResponse('No se pueden borrar mas administradores.',{executed: false})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
+
+            const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+        }  catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
@@ -610,6 +610,35 @@ class UserController {
                 new StdResponse("Se han obtenido la lista de chats correctamente", {
                     executed: true,
                     chats: {pending, notPending}
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static getRoleUsersRemaining = async (req, res) => {
+        try {
+            const roleName = req.params.role;
+
+            const roleExists = (await UserQuery.findRoleByName(roleName)).query;
+
+            if (!roleExists) return res.status(404).json(
+                new StdResponse("El rol buscado no existe", {
+                    executed: false,
+                })
+            );
+
+            const remaining = (await UserQuery.getRoleUsersRemaining(roleName)).query
+
+            return res.status(200).json(
+                new StdResponse("Se ha obtenido la cantidad de usuarios correctamente.", {
+                    executed: true,
+                    count: remaining
                 })
             );
         } catch (e) {

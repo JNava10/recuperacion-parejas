@@ -209,7 +209,7 @@ class UserQuery {
 
             const userRoles = await models.AssignedRole.findAll({where: {user}, attributes: ['role']});
 
-            return new QuerySuccess(created !== null, 'Se han insertado los usuarios correctamente.', {rolesAssigned: userRoles.map(assignedRole => assignedRole.role)});
+            return new QuerySuccess(created !== null, 'Se ha asignado el rol correctamente.', {rolesAssigned: userRoles.map(assignedRole => assignedRole.role)});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -225,7 +225,7 @@ class UserQuery {
                 ]}
             });
 
-            return new QuerySuccess(true, 'Se han insertado los usuarios correctamente.', deleted);
+            return new QuerySuccess(true, 'Se ha quitado el rol correctamente.', deleted);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -575,9 +575,6 @@ class UserQuery {
                 }
             );
 
-            console.log(usersWithPendingMessages.map(message => message.emitter))
-            console.log((usersWhoSendMessages.map(message => message.receiver)))
-            console.log((usersWithReadMessages.map(message => message.emitter)))
             const users = await models.User.findAll({
                 where: {
                     id: {
@@ -603,6 +600,7 @@ class UserQuery {
         }
     }
 
+    // TODO: Mover a RoleQuery
     static userHasRole = async (id, roleName) => {
         try {
             const hasRole = await models.User.findOne(
@@ -619,6 +617,7 @@ class UserQuery {
         }
     };
 
+    // TODO: Mover a RoleQuery
     static getRoleUsersRemaining = async (roleName) => {
         try {
             const remainingCount = (await models.User.findOne(
@@ -633,6 +632,23 @@ class UserQuery {
             ));
 
             return new QuerySuccess(true, 'Se ha obtenido la cantidad de usuarios correctamente.', remainingCount.remaining);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    // TODO: Mover a RoleQuery
+    static findRoleByName = async (name) => {
+        try {
+            const role = (await models.Role.findOne(
+                {
+                    where: {name},
+                    raw: true
+                }
+            )) !== null;
+
+            return new QuerySuccess(true, 'Se ha realizado la consulta correctamente.', role);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)

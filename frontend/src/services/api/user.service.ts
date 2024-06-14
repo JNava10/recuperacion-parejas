@@ -11,7 +11,7 @@ import {
   GetUsersResponse,
   ManageUserResponse,
   CreateUserResponse,
-  UserItem
+  UserItem, GetCountResponse, CrudEditResponse
 } from "../../interfaces/api/user/user";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of} from "rxjs";
@@ -80,17 +80,12 @@ export class UserService {
   }
 
   addRoles = (id: number, roles: number[]) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}})
   }
 
   deleteRoles = (id: number, roles: number[]) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}})
   }
-
 
   editUserData = (data: CreateUserItem, id: number) => {
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}}).pipe(
@@ -140,5 +135,9 @@ export class UserService {
         return of(error);
       })
     );
+  }
+
+  getRoleUsersCount = (roleName: string) => {
+    return this.http.get<GetCountResponse>(`${environment.apiUrl}/user/role-users/${roleName}`, {params: {...sendTokenParam}});
   }
 }

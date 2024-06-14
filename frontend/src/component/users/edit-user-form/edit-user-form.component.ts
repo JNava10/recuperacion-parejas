@@ -6,6 +6,7 @@ import {UserService} from "../../../services/api/user.service";
 import {CreateUserItem, RoleItem, UserItem} from "../../../interfaces/api/user/user";
 import * as regex from "../../../utils/const/regex.constants";
 import * as customValidators from "../../../utils/validators/customValidators";
+import {CustomToastComponent} from "../../../components/custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-edit-user-form',
@@ -14,7 +15,8 @@ import * as customValidators from "../../../utils/validators/customValidators";
     FormsModule,
     NgIf,
     ReactiveFormsModule,
-    SelectRolesEditComponent
+    SelectRolesEditComponent,
+    CustomToastComponent
   ],
   templateUrl: './edit-user-form.component.html',
   styleUrl: './edit-user-form.component.css'
@@ -69,7 +71,7 @@ export class EditUserFormComponent implements OnInit {
     return user;
   }
 
-  setUserData() {
+  setUserData = () => {
     this.userDataForm.patchValue({
       name: this.user!.name!,
       firstLastname: this.user!.firstSurname!,
@@ -77,7 +79,7 @@ export class EditUserFormComponent implements OnInit {
       nickname: this.user!.nickname!,
       email: this.user!.email!,
     })
-  }
+  };
 
   handleSubmitPassword = () => {
     if (this.passwordsForm.invalid) return;
