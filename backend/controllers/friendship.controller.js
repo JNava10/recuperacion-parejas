@@ -7,7 +7,7 @@ class FriendshipController {
         // TODO: Seleccionar usuarios más afínes
 
         // let results = await FriendshipController.getAffineUsers();
-        let {message, executed, query, error} = await UserQuery.getNotDeletedUsers();
+        let {message, executed, query, error} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
         return res.status(200).json(
             new StdResponse(

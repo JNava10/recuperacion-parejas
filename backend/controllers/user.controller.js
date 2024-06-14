@@ -125,7 +125,8 @@ class UserController {
     }
 
     static getNotDeletedUsers = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers();
+        console.log(req.payload.userId)
+        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
         if (executed) {
             return res.status(200).json(
@@ -143,7 +144,7 @@ class UserController {
     };
 
     static getNotDeletedUsersWithRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles();
+        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);
 
         if (executed) {
             return res.status(200).json(
@@ -478,6 +479,10 @@ class UserController {
 
         if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
             new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
+        )
+
+        if (req.params.id === req.payload.userId) return res.status(200).json(
+            new StdResponse("No puedes borrarte a tí mismo.",{executed: false})
         )
 
         const {message, executed, query, error} = await UserQuery.deleteUser(req.params.id);

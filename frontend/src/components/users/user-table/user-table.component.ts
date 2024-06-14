@@ -7,6 +7,8 @@ import {DialogModule} from "primeng/dialog";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {MessageService} from "primeng/api";
 import {getQueryToast} from "../../../utils/common.utils";
+import {TableModule} from "primeng/table";
+import {StyleClassModule} from "primeng/styleclass";
 
 @Component({
   selector: 'app-user-table',
@@ -14,7 +16,9 @@ import {getQueryToast} from "../../../utils/common.utils";
   imports: [
     RoleBadgeComponent,
     DialogModule,
-    CustomToastComponent
+    CustomToastComponent,
+    TableModule,
+    StyleClassModule
   ],
   templateUrl: './user-table.component.html',
   styleUrl: './user-table.component.css'

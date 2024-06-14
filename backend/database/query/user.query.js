@@ -51,9 +51,10 @@ class UserQuery {
         return await models.sequelize.query(findUserByFullname, {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
     };
 
-    static getNotDeletedUsers = async () => {
+    static getNotDeletedUsers = async (selfId) => {
         try {
-            const query = await models.User.findAll();
+            console.log(selfId)
+            const query = await models.User.findAll({where: {[Op.not]: {id: selfId}}});
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
@@ -102,7 +103,7 @@ class UserQuery {
         }
     };
 
-    static getNotDeletedWithRoles = async () => {
+    static getNotDeletedWithRoles = async (selfId) => {
         try {
             const query = await models.User.findAll({
                 include: {
@@ -110,7 +111,7 @@ class UserQuery {
                     through: models.AssignedRole,
                     attributes: ['id', 'name', 'display_name'],
                     as: 'roles'
-                }
+                },  where: {[Op.not]: {id: selfId}}
             });
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
