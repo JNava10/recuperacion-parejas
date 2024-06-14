@@ -31,8 +31,6 @@ export class EventCardComponent {
 
   constructor(private eventService: EventService) {}
 
-
-
   @Input() event?: EventItem;
 
   @Output() refresh = new EventEmitter<null>();
@@ -63,4 +61,5 @@ export class EventCardComponent {
       this.summaryFile = body.data.file;
     })
   };
+  protected readonly Date = Date;
 }

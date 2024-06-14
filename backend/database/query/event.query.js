@@ -32,8 +32,6 @@ class CreateEvent {
 
             const date = new Date(scheduledDateTime);
 
-            console.log(date)
-
             const query = await models.Event.update({name, description, scheduledDateTime: date}, {where: {id: eventDetails.id}});
 
             return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);

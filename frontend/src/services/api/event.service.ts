@@ -46,7 +46,15 @@ export class EventService {
   }
 
   editEventDetails = (event: CreateEventItem) => {
-    return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
+    return this.http.put<EventResponse>(
+      `${environment.apiUrl}/event/details`,
+      event,
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as EventResponse;
+        return of(error);
+      })
+    )
   }
 
   editEventPlace = (event: EventItem) => {

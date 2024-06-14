@@ -8,11 +8,10 @@ import {GoogleMap, GoogleMapsModule} from '@angular/google-maps'
 import {CreateEventItem, EventItem} from "../../../interfaces/api/event/event";
 import {EventService} from "../../../services/api/event.service";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
-import LatLngLiteral = google.maps.LatLngLiteral;
+
 import {Message, MessageService} from 'primeng/api';
 import { getQueryToast } from '../../../utils/common.utils';
 import { CustomToastComponent } from "../../custom-toast/custom-toast.component";
-import {CreateEventComponent} from "../create-event/create-event.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({

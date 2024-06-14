@@ -36,23 +36,26 @@ class EventController {
     };
 
     static editEventDetails = async (req, res) => {
-        const event = req.body;
-        event.author = req.payload.userId;
+        try {
+            const event = req.body;
+            event.author = req.payload.userId;
 
-        const {message, executed, query, error} = await EventQuery.editEventDetails(event);
+            const isClosed = await EventQuery.eventIsClosed(req.body.id);
 
-        if (executed) {
+            if (isClosed.query) return res.status(200).json(
+                new StdResponse(isClosed.message,{executed: false})
+            )
+
+            const {message, executed, query} = await EventQuery.editEventDetails(event);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error)
+        } catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
@@ -80,22 +83,27 @@ class EventController {
     };
 
     static deleteEventById = async (req, res) => {
-        const {id} = req.params;
+        try {
+            const {id} = req.params;
 
-        const {message, executed, query, error} = await EventQuery.deleteEvent(id);
+            const isClosed = await EventQuery.eventIsClosed(req.body.id);
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+            if (isClosed.query) return res.status(200).json(
+                new StdResponse(isClosed.message,{executed: false})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error)
+
+            const {message, executed, query, error} = await EventQuery.deleteEvent(id);
+
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        }  catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
