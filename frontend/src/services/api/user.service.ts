@@ -88,9 +88,7 @@ export class UserService {
   }
 
   editUserData = (data: CreateUserItem, id: number) => {
-    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}})
   }
 
   sendNewPassword = (password: string, recoverToken: string) => {
@@ -127,6 +125,8 @@ export class UserService {
 
     const formData = new FormData();
     formData.append(fileKey, file)
+
+    console.log(id)
 
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/avatar/${id}`, formData, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {

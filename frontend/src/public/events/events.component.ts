@@ -5,6 +5,7 @@ import {EventService} from "../../services/api/event.service";
 import {EventItem} from "../../interfaces/api/event/event";
 import {EventCardComponent} from "../../app/components/events/event-card/event-card.component";
 import {DialogModule} from "primeng/dialog";
+import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 
 
 @Component({
@@ -14,7 +15,8 @@ import {DialogModule} from "primeng/dialog";
     CreateEventComponent,
     FormsModule,
     EventCardComponent,
-    DialogModule
+    DialogModule,
+    CustomToastComponent,
   ],
   templateUrl: './events.component.html',
   styleUrl: './events.component.css'

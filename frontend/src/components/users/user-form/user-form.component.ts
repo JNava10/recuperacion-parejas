@@ -11,6 +11,7 @@ import {Message, MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {getQueryToast} from "../../../utils/common.utils";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-user-form',
@@ -21,7 +22,8 @@ import {ProgressSpinnerModule} from "primeng/progressspinner";
     SelectRolesEditComponent,
     RoleBadgeComponent,
     CustomToastComponent,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    MatProgressSpinner
   ],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
@@ -32,7 +34,7 @@ export class UserFormComponent {
   @Input() roles: RoleItem[] = [];
 
   protected picFile?: File;
-  creatingUser = false;
+  loading = false;
 
   userForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -58,7 +60,7 @@ export class UserFormComponent {
     const user = this.getUserData();
 
     this.userService.createUser(user).subscribe(res => {
-      this.creatingUser = true
+      this.loading = true
 
       if (!res.data.executed) {
         const message: Message = {summary: res.message}
@@ -67,7 +69,7 @@ export class UserFormComponent {
       }
 
       if (this.picFile) {
-        this.changeCreatedUserAvatar(res.data.query.id, res)
+        this.changeUserAvatar(res.data.query.id, res)
       } else {
         const message: Message = {summary: res.message}
         message.severity = res.data.executed ? "success" : "error"
@@ -102,7 +104,7 @@ export class UserFormComponent {
     }
   };
 
-  private changeCreatedUserAvatar = (id: number, createdRes: CreateUserResponse) => {
+  private changeUserAvatar = (id: number, createdRes: CreateUserResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(() => {
       const message: Message = {summary: createdRes.message}
 
@@ -110,7 +112,7 @@ export class UserFormComponent {
 
       this.messageService.add(message);
 
-      this.creatingUser = false
+      this.loading = false
     });
   }
 }

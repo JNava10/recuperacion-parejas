@@ -1,20 +1,14 @@
 
-const {sendStandardResponse, hashPassword} = require("../helpers/common.helper");
+const {hashPassword} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
-const bcrypt = require("bcrypt");
-const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
-const EventQuery = require("../database/query/event.query");
-const {el, fi, tr, fa} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
-const RoomController = require("./room.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
-const MessageQuery = require("../database/query/message.query");
 const {roleNames} = require("../constants/seed.const");
 const CustomError = require("../classes/customError");
 
