@@ -212,7 +212,9 @@ class EventController {
               })
           );
 
-          const {message, executed} = await EventQuery.subscribeToEvent(req.params.id, req.payload.userId);
+          const userId = req.params.userId ?? req.payload.userId;
+
+          const {message, executed} = await EventQuery.subscribeToEvent(req.params.id, userId);
 
           return res.status(200).json(
               new StdResponse(message, {
@@ -227,40 +229,30 @@ class EventController {
               new StdResponse(e.message,{executed: false})
           )
       }
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error)
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
     };
 
     static withdrawEvent = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.withdrawEvent(req.params.id, req.payload.userId);
+         try {
+             const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error)
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
+             if (isClosed.query) return res.status(200).json(
+                 new StdResponse(isClosed.message, {
+                     executed: true,
+                     closed: true
+                 })
+             );
+
+             const userId = req.params.userId ?? req.payload.userId;
+             const {message, executed, query} = await EventQuery.withdrawEvent(req.params.eventId, userId);
+
+             return res.status(200).json(
+                 new StdResponse(message,{executed, query})
+             )
+         } catch (e) {
+             return res.status(500).json(
+                 new StdResponse('Ha ocurrido un problema al desapuntar al usuario.', {executed: false, error: e.toString()})
+             )
+         }
     };
 
     static getSummaryFile = async (req, res) => {
@@ -325,6 +317,7 @@ class EventController {
 
     static getEventMembers = async (req, res) => {
         try {
+            // TODO: Cambiar a getIfEventExists
             const eventExists = await EventQuery.getEvent(req.params.id);
 
             if (!eventExists.query) return res.status(200).json(
@@ -345,7 +338,36 @@ class EventController {
             console.log(e);
 
             return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al crear el archivo.', {executed: false, error: e.toString()})
+                new StdResponse('Ha ocurrido un problema al buscar los usuarios', {executed: false, error: e.toString()})
+            );
+        }
+    };
+
+    static getEventNotMembers = async (req, res) => {
+        try {
+
+            // TODO: Cambiar a getIfEventExists
+            const eventExists = await EventQuery.getEvent(req.params.id);
+
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+
+            const {message, query, executed} = await EventQuery.getEventNonAssistants(req.params.id);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            console.log(e);
+
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al buscar los usuarios.', {executed: false, error: e.toString()})
             );
         }
     };

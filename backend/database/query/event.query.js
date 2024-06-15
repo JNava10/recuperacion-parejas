@@ -233,6 +233,24 @@ class CreateEvent {
 
         return new QuerySuccess(true, "Se han obtenido los miembros del evento correctamente", query);
     };
+
+    static getEventNonAssistants = async (eventId) => {
+        const assistants = ((await models.Event.findOne({
+            include: {
+                model: models.User,
+                as: 'assistants'
+            },
+            where: {
+                id: eventId
+            }
+        })).assistants).map(user => user.id);
+
+        const nonAssistants = await models.User.findAll({
+            where: {id: {[Op.notIn]: assistants}}
+        })
+
+        return new QuerySuccess(true, "Se han obtenido los usuarios no miembros del evento correctamente", nonAssistants);
+    };
 }
 
 module.exports = CreateEvent;

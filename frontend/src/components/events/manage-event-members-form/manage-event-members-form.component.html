@@ -12,7 +12,7 @@
               size="normal"
               shape="circle" />
             <td>{{ user.nickname }}</td>
-            <button type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+            <button (click)="withdrawFromEvent(user)" type="button" class="focus:outline-none text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-red-900">
               <i class="fa-solid fa-trash"></i>
             </button>
           </tr>
@@ -22,7 +22,7 @@
 
     <div>
       <h1>Añadir miembros al evento</h1>
-      <p-table scrollable scrollHeight="300px"  [value]="allUsers!">
+      <p-table scrollable scrollHeight="300px"  [value]="nonAssistants!">
         <ng-template pTemplate="body" let-user>
           <tr>
             <p-avatar

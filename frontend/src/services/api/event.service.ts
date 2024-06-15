@@ -12,7 +12,7 @@ import {
 } from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of, tap} from "rxjs";
-import {CrudEditResponse, GetUsersResponse, ManageUserResponse} from "../../interfaces/api/user/user";
+import {CrudEditResponse, GetUsersResponse, ManageUserResponse, UserItem} from "../../interfaces/api/user/user";
 import {MessageService} from "primeng/api";
 import {getQueryToast} from "../../utils/common.utils";
 import {user} from "../../utils/const/regex.constants";
@@ -78,7 +78,7 @@ export class EventService {
     )
   }
 
-  registerToEvent(event: EventItem) {
+  registerSelfToEvent(event: EventItem) {
     return this.http.post<SubscribeEventResponse>(
       `${environment.apiUrl}/event/subscribe/${event.id}`,
       {},
@@ -90,7 +90,7 @@ export class EventService {
     )
   }
 
-  withdrawFromEvent(event: EventItem) {
+  withdrawSelfFromEvent(event: EventItem) {
     return this.http.post<SubscribeEventResponse>(
       `${environment.apiUrl}/event/withdraw/${event.id}`,
       {},
@@ -131,6 +131,15 @@ export class EventService {
     );
   }
 
+  getNonEventAssistants = (id: number) => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/event/not-members/${id}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+        return of(error);
+      })
+    );
+  }
+
   addMemberToEvent = (eventId: number, userId: number) => {
     return this.http.post<CrudEditResponse>(`${environment.apiUrl}/event/members/add/${eventId}/${userId}`, {},{params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
@@ -140,4 +149,18 @@ export class EventService {
       })
     );
   }
+
+  withdrawMemberFromEvent(event: EventItem, user: UserItem) {
+    return this.http.post<SubscribeEventResponse>(
+      `${environment.apiUrl}/event/withdraw/${event.id}/${user.id}`,
+      {},
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SubscribeEventResponse;
+
+        return of(error);
+      })
+    )
+  }
+
 }

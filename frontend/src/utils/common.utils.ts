@@ -9,7 +9,7 @@ export const getQueryToast = (executed: boolean, description: string) => {
   return message
 }
 
-export const addQueryMessage = (executed: boolean, description: string, messageService: MessageService) => {
+export const showQueryToast = (executed: boolean, description: string, messageService: MessageService) => {
   const message: Message = {detail: description}
 
   message.summary = executed ? "Exito" : "Error"
