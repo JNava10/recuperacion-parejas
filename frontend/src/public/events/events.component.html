@@ -1,15 +1,19 @@
-<section>
+<button (click)="this.creatingEvent = true" class="fixed text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+  Crear evento
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<section class="h-screen overflow-y-scroll py-3">
   @if (eventsFetched) {
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      @for (event of events; track event.id) {
-        <app-event-card [event]="event!" (refresh)="getAllEvents()"/>
-      }
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-3 gap-4">
+        @for (event of events; track event.id) {
+          <app-event-card [event]="event!" (refresh)="getAllEvents()"/>
+        }
+      </div>
     </div>
+
   }
-  <button (click)="this.creatingEvent = true" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-    Crear evento
-    <i class="fa-solid fa-plus"></i>
-  </button>
 </section>
 
 <!-- Main modal -->

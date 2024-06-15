@@ -32,6 +32,8 @@ router.get('/profile', [validateToken], UserController.getEditableProfileData)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
 router.get('/notifications', [validateToken], UserController.getSelfNotifications)
 
+router.get('/roles', [validateToken], UserController.getSelfRoles)
+
 router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
 router.delete('/:id', [validateToken], UserController.deleteUser)
 router.get('/:id', [validateToken], UserController.findById)

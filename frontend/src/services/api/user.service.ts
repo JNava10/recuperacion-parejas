@@ -11,7 +11,7 @@ import {
   GetUsersResponse,
   ManageUserResponse,
   CreateUserResponse,
-  UserItem, GetCountResponse, CrudEditResponse
+  UserItem, GetCountResponse, CrudEditResponse, GetSelfRoles
 } from "../../interfaces/api/user/user";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of} from "rxjs";
@@ -123,6 +123,10 @@ export class UserService {
 
   getRoleUsers = (role: string) => {
     return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/role/${role}`, {params: {...sendTokenParam}});
+  }
+
+  getSelfRoles = () => {
+    return this.http.get<GetSelfRoles>(`${environment.apiUrl}/user/roles`, {params: {...sendTokenParam}});
   }
 
   updateUserAvatar = (id: number, file: File) => {

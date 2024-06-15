@@ -1,6 +1,9 @@
 import {Message, MessageService} from "primeng/api";
 import TimeAgo from 'javascript-time-ago'
 import es from 'javascript-time-ago/locale/es'
+import {inject} from "@angular/core";
+import {UserService} from "../services/api/user.service";
+import {userMenuItems} from "./const/menu.constants";
 
 export const getQueryToast = (executed: boolean, description: string) => {
   const message: Message = {detail: description}
@@ -28,4 +31,8 @@ export const getTimeAgo = (timestamp: number) => {
   const date = new Date(timestamp);
 
   return timeAgo.format(date)
+}
+
+export const getUserMenuItems = () => {
+
 }

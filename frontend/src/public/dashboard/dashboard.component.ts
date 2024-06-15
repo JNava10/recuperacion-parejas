@@ -6,7 +6,7 @@ import {FriendshipService} from "../../services/api/friendship.service";
 import {UserService} from "../../services/api/user.service";
 import {PendingChatUserItem, UserItem} from "../../interfaces/api/user/user";
 import {DialogModule} from "primeng/dialog";
-import {Router} from "@angular/router";
+import {Router, RouterOutlet} from "@angular/router";
 import {MatchesListComponent} from "../../components/friendship/matches-list/matches-list.component";
 import {RecentChatListComponent} from "../../components/recent-chat-list/recent-chat-list.component";
 import {SocketService} from "../../services/socket.service";
@@ -30,7 +30,8 @@ import { user } from '../../utils/const/regex.constants';
     MatchesListComponent,
     RecentChatListComponent,
     CustomToastComponent,
-    ButtonModule
+    ButtonModule,
+    RouterOutlet
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
