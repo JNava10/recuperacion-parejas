@@ -1,4 +1,6 @@
 import {Message, MessageService} from "primeng/api";
+import TimeAgo from 'javascript-time-ago'
+import es from 'javascript-time-ago/locale/es'
 
 export const getQueryToast = (executed: boolean, description: string) => {
   const message: Message = {detail: description}
@@ -16,4 +18,14 @@ export const showQueryToast = (executed: boolean, description: string, messageSe
   message.severity = executed ? "success" : "error"
 
   messageService.add(message)
+}
+
+
+TimeAgo.addDefaultLocale(es)
+const timeAgo = new TimeAgo('es-ES')
+
+export const getTimeAgo = (timestamp: number) => {
+  const date = new Date(timestamp);
+
+  return timeAgo.format(date)
 }

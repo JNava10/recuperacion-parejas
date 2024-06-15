@@ -26,6 +26,7 @@ import {
 import {StartComponent} from "../public/start/start.component";
 import {AdminComponent} from "../public/admin/admin.component";
 import {EditProfileComponent} from "../public/edit-profile/edit-profile.component";
+import {NotificationListComponent} from "../components/notifications/notification-list/notification-list.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -34,6 +35,7 @@ export const routes: Routes = [
   { path: 'available-events', component: FindAvailableEventsComponent },
   { path: 'event-info', component: EventInfoComponent },
   { path: 'add-user', component: AddUserComponent },
+  { path: 'notifications', component: NotificationListComponent },
   { path: 'edit-user', component: EditUserComponent },
   { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
   { path: 'create-range-preference', component: CreateRangePreferenceComponent },

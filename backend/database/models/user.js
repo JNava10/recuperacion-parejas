@@ -29,6 +29,16 @@ module.exports = (sequelize) => {
         as: 'sendedMessages'
       })
 
+      this.hasMany(models.NewMatchNotification, {
+        foreignKey: 'from',
+        as: 'userFrom'
+      })
+
+      this.hasMany(models.NewMatchNotification, {
+        foreignKey: 'to',
+        as: 'userTo'
+      })
+
       // this.hasMany(models.Message, {
       //   foreignKey: 'receiver',
       //   as: 'receivedMessages'

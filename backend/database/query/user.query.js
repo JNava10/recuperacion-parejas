@@ -672,6 +672,26 @@ class UserQuery {
             return new QueryError(false, e)
         }
     };
+
+    static getUserNotifications = async (userId) => {
+        const notifications = await models.NewMatchNotification.findAll(
+            {
+                where: {to: userId},
+                include: [
+                    {
+                        model: models.User,
+                        as: 'userFrom'
+                    },
+                    {
+                        model: models.User,
+                        as: 'userTo'
+                    }
+                ]
+            }
+        );
+
+        return new QuerySuccess(true, 'Se han obtenido las notificaciones correctamente.', notifications);
+    };
 }
 
 module.exports = UserQuery

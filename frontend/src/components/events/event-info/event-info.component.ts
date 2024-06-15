@@ -39,7 +39,7 @@ export class EventInfoComponent implements OnInit {
   isSubscribed?: boolean;
 
   joinEvent = () => {
-    this.eventService.registerToEvent(this.event!).subscribe(body => {
+    this.eventService.registerSelfToEvent(this.event!).subscribe(body => {
       const message: Message = getQueryToast(body.data.executed, body.message);
 
       if (body.data.executed) {
@@ -56,7 +56,7 @@ export class EventInfoComponent implements OnInit {
   };
 
   withdrawFromEvent() {
-    this.eventService.withdrawFromEvent(this.event!).subscribe(body => {
+    this.eventService.withdrawSelfFromEvent(this.event!).subscribe(body => {
       const message = getQueryToast(body.data.executed, body.message)
 
       if (body.data.executed) message.severity = 'info';

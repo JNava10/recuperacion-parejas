@@ -21,6 +21,7 @@ import {
   SendRecoverEmailResponse
 } from "../../interfaces/recover-password";
 import {MessageService} from "primeng/api";
+import {GetNotificationsResponse} from "../../interfaces/api/others/notification";
 
 @Injectable({
   providedIn: 'root'
@@ -143,5 +144,9 @@ export class UserService {
 
   getRoleUsersCount = (roleName: string) => {
     return this.http.get<GetCountResponse>(`${environment.apiUrl}/user/role-users/${roleName}`, {params: {...sendTokenParam}});
+  }
+
+  getNotifications = () => {
+    return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}});
   }
 }

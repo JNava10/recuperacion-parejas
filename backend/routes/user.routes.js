@@ -30,8 +30,9 @@ router.post('/member/messages/files/:receiver', [validateToken], UserController.
 router.get('/role-users/:role', [validateToken], UserController.getRoleUsersRemaining)
 router.get('/profile', [validateToken], UserController.getEditableProfileData)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
-router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
+router.get('/notifications', [validateToken], UserController.getSelfNotifications)
 
+router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
 router.delete('/:id', [validateToken], UserController.deleteUser)
 router.get('/:id', [validateToken], UserController.findById)
 
