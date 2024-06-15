@@ -5,30 +5,36 @@ import MapMouseEvent = google.maps.MapMouseEvent;
 import {DatePipe, NgIf} from "@angular/common";
 import {PaginatorModule} from "primeng/paginator";
 import {GoogleMap, GoogleMapsModule} from '@angular/google-maps'
-import {EventItem} from "../../../interfaces/api/event/event";
+import {CreateEventItem, EventItem} from "../../../interfaces/api/event/event";
 import {EventService} from "../../../services/api/event.service";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
-import LatLngLiteral = google.maps.LatLngLiteral;
+
+import {Message, MessageService} from 'primeng/api';
+import { getQueryToast } from '../../../utils/common.utils';
+import { CustomToastComponent } from "../../custom-toast/custom-toast.component";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
-  selector: 'app-edit-event',
-  standalone: true,
+    selector: 'app-edit-event',
+    standalone: true,
+    templateUrl: './edit-event.component.html',
+    styleUrl: './edit-event.component.css',
   imports: [
     NgIf,
     PaginatorModule,
     ReactiveFormsModule,
     DatePipe,
     GoogleMap,
-    MapEventMarkerComponent
-  ],
-  templateUrl: './edit-event.component.html',
-  styleUrl: './edit-event.component.css'
+    MapEventMarkerComponent,
+    CustomToastComponent,
+    MatProgressSpinner
+  ]
 })
 export class EditEventComponent implements OnInit {
   @Input() event?: EventItem;
   @Output() edited = new EventEmitter<boolean>();
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService, private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.patchValues(this.event!);
@@ -42,6 +48,9 @@ export class EditEventComponent implements OnInit {
   private mapMarker?: google.maps.Marker;
   map?: google.maps.Map;
   center: google.maps.LatLngLiteral = this.latLng;
+
+  protected picFile?: File;
+  loading = false;
 
   editEventForm = new FormGroup({
     name: new FormControl(this.event?.name, {validators: [
@@ -79,6 +88,15 @@ export class EditEventComponent implements OnInit {
     }
 
     this.eventService.editEventDetails(eventDetails).subscribe(body => {
+      this.loading = true;
+      const message: Message = getQueryToast(body.data.executed, body.message)
+
+      if (this.picFile) {
+        this.updatePic(message);
+      } else {
+        this.edited.emit(body.data.executed);
+        this.messageService.add(message);
+      }
       this.edited.emit(body.data.executed)
     });
   }
@@ -97,7 +115,7 @@ export class EditEventComponent implements OnInit {
   }
 
   setPlaceValue = (latLng: google.maps.LatLngLiteral) => {
-    this.editEventPlaceForm.setValue({latLng});
+    this.editEventPlaceForm.patchValue({latLng});
   };
 
   handleEditPlaceForm = () => {
@@ -108,9 +126,16 @@ export class EditEventComponent implements OnInit {
     const eventDetails: EventItem = {id: this.event?.id, latitude: latLng?.lat, longitude: latLng?.lng};
 
     this.eventService.editEventPlace(eventDetails).subscribe(body => {
-      this.edited.emit(body.data.executed);
+
     });
   };
+
+  private updatePic(message: Message) {
+    this.eventService.updateEventPic(this.event?.id!, this.picFile!).subscribe(body => {
+      this.messageService.add(message);
+      this.edited.emit(body.data.executed);
+    })
+  }
 
   getEventPos(): google.maps.LatLngLiteral | undefined {
     if (this.event?.latitude && this.event?.longitude) {
@@ -119,4 +144,14 @@ export class EditEventComponent implements OnInit {
 
     else return undefined;
   }
+
+  protected handleFile = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+
+    const file = input.files?.item(0);
+
+    if (file) {
+      this.picFile = file
+    }
+  };
 }

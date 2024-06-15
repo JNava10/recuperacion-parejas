@@ -9,11 +9,10 @@ export interface EventResponse extends ApiResponse {
 
 export interface SubscribeEventResponse extends ApiResponse {
   data: {
-    executed: true
-    query: boolean
+    executed: boolean
+    closed: boolean
   }
 }
-
 
 export interface EventItem {
   id?: number
@@ -21,12 +20,28 @@ export interface EventItem {
   description?: string
   picUrl?: string
   scheduledDateTime?: string
+  closeDateTime?: string
   summaryUrl?: string
   latitude?: number
   longitude?: number
   author?: number
   createdAt?: string
   updatedAt?: string
+  assistants? : {
+    count: number
+  }
+}
+
+export interface CreateEventItem {
+  id?: number
+  name?: string
+  description?: string
+  picUrl?: string
+  scheduledDateTime?: string
+  closeDateTime?: string
+  summaryUrl?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface GetEventsResponse {
@@ -52,5 +67,14 @@ export interface EventSummaryResponse {
   data: {
     executed: true
     file: SummaryFile
+  }
+}
+
+export interface ManageEventResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: {
+      id: number
+    }
   }
 }

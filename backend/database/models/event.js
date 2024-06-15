@@ -40,12 +40,18 @@ module.exports = (sequelize) => {
     picUrl: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: process.env.DEFAULT_EVENT_PIC_URL,
     },
     summaryUrl: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: process.env.DEFAULT_EVENT_SUMMARY
     },
     scheduledDateTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    closeDateTime: {
       type: DataTypes.DATE,
       allowNull: false,
     },

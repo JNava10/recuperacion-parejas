@@ -32,8 +32,6 @@ class CreateEvent {
 
             const date = new Date(scheduledDateTime);
 
-            console.log(date)
-
             const query = await models.Event.update({name, description, scheduledDateTime: date}, {where: {id: eventDetails.id}});
 
             return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
@@ -67,10 +65,22 @@ class CreateEvent {
 
     static getAllEvents = async () => {
         try {
-            const query = await models.Event.findAll();
+            const query = await models.Event.findAll({
+                // include: {
+                //     model: models.User,
+                //     attributes: [
+                //         [models.sequelize.fn('COUNT', models.Sequelize.col(`user`)), 'count'],
+                //     ],
+                //     group: 'event',
+                //     as: 'assistants'
+                // },
+            });
+
+            console.log(query)
 
             return new QuerySuccess(true, 'Se han obtenido los eventos correctamente.', query);
         } catch (e) {
+            console.log(e)
             return new QueryError(false, e)
         }
     };
@@ -124,7 +134,7 @@ class CreateEvent {
         }
     };
 
-    static subscribeEvent = async (event, user) => {
+    static subscribeToEvent = async (event, user) => {
         try {
             const eventAssistant = {
                 event,
@@ -149,7 +159,7 @@ class CreateEvent {
                 }
             ) !== null;
 
-            return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
+            return new QuerySuccess(true, 'Se ha retirado del evento correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }
@@ -167,6 +177,79 @@ class CreateEvent {
         } catch (e) {
             return new QueryError(false, e)
         }
+    };
+
+    static updateEventPic = async (eventId, fileLink) => {
+        try {
+            const query = await models.Event.update({picUrl: fileLink},
+                {
+                    where: {id: eventId}
+                }
+            ) !== null;
+
+            return new QuerySuccess(true, 'Se ha actualizado el evento correctamente.', query);
+        } catch (e) {
+            return new QueryError(false, e)
+        }
+    };
+
+    static eventIsClosed = async (eventId) => {
+        try {
+            // const query = await models.sequelize.query(
+            //     `SELECT * FROM ${models.Event.tableName} WHERE close_date_time < NOW() AND id = :id`,
+            //     {replacements: {id: eventId}}
+            // ) !== null;
+
+            const query = await models.Event.findOne({
+                where: {
+                    [Op.and]: [
+                        {id: eventId},
+                        {closeDateTime: {[Op.lt]: new Date(Date.now())}}
+                    ]
+                }
+            }) !== null
+
+
+            const message = query ? 'El evento está cerrado.' : 'El evento aun está abierto a inscripciones.'
+
+            return new QuerySuccess(true, message, query);
+        } catch (e) {
+            throw e
+        }
+    };
+
+    static getEventMembers = async (eventId) => {
+        const query = (await models.Event.findOne({
+            include: {
+                model: models.User,
+                as: 'assistants'
+            },
+            where: {
+                id: eventId
+            }
+        })).assistants;
+
+        console.log(query)
+
+        return new QuerySuccess(true, "Se han obtenido los miembros del evento correctamente", query);
+    };
+
+    static getEventNonAssistants = async (eventId) => {
+        const assistants = ((await models.Event.findOne({
+            include: {
+                model: models.User,
+                as: 'assistants'
+            },
+            where: {
+                id: eventId
+            }
+        })).assistants).map(user => user.id);
+
+        const nonAssistants = await models.User.findAll({
+            where: {id: {[Op.notIn]: assistants}}
+        })
+
+        return new QuerySuccess(true, "Se han obtenido los usuarios no miembros del evento correctamente", nonAssistants);
     };
 }
 

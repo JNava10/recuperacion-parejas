@@ -3,11 +3,12 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {CalendarModule} from "primeng/calendar";
 import {EventService} from "../../../services/api/event.service";
 import {} from "googlemaps";
-import MapMouseEvent = google.maps.MapMouseEvent;
 import * as regex from '../../../utils/const/regex.constants';
 import {NgIf} from "@angular/common";
-import {EventItem} from "../../../interfaces/api/event/event";
+import {CreateEventItem, EventItem, ManageEventResponse} from "../../../interfaces/api/event/event";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
+import {ProgressSpinnerModule} from "primeng/progressspinner";
+import {Message, MessageService} from "primeng/api";
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -21,13 +22,15 @@ let latLng = {
     ReactiveFormsModule,
     CalendarModule,
     NgIf,
-    MapEventMarkerComponent
+    MapEventMarkerComponent,
+    ProgressSpinnerModule
   ],
   templateUrl: './create-event.component.html',
   styleUrl: './create-event.component.css'
 })
 export class CreateEventComponent {
-  constructor(private eventService: EventService) {}
+
+  constructor(private eventService: EventService, private messageService: MessageService) {}
 
   static modalId = "create-event-modal";
 
@@ -76,18 +79,52 @@ export class CreateEventComponent {
     const formData = this.createEventForm.value;
     const scheduledDateTime = `${formData.scheduledDate} ${formData.scheduledTime}`;
 
-    const event: EventItem = {
+    const event: CreateEventItem = {
       name: formData.name!,
       description: formData.description!,
       scheduledDateTime: scheduledDateTime!,
-      picUrl: "https://cdn-9.motorsport.com/images/amp/YpNpMWJ0/s1000/ferrari-f1-75-con-paraspruzzi.jpg",
-      summaryUrl: "https://www.fia.com/sites/default/files/fia_2024_formula_1_technical_regulations_-_issue_1_-_2023-04-25.pdf" ,
-      latitude: 10.1,
-      longitude: 10.2
+      latitude: formData.latLng?.lat,
+      longitude: formData.latLng?.lng
     }
 
     this.eventService.createEvent(event).subscribe(body => {
+      if (this.picFile) {
+        this.eventService.updateEventPic(body.data.query.id!, this.picFile!).subscribe(body => this.handleUpdatingPic(body));
+      }
+
       this.created.emit(body.data.executed)
     })
   };
+
+  protected handleFile = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+    const file = input.files?.item(0);
+
+    if (file) {
+      this.picFile = file
+    }
+  };
+
+  creatingEvent = false;
+  picFile?: File;
+
+  private handleUpdatingPic(res: ManageEventResponse) {
+    const message: Message = { summary: res.message };
+
+    message.severity = res.data.executed ? "success" : "error";
+
+    this.messageService.add(message);
+
+    this.creatingEvent = false;
+  }
+
+  changeEventPos($event: google.maps.LatLngLiteral) {
+
+    this.createEventForm.patchValue({
+      latLng: $event
+    })
+
+    console.log(this.createEventForm.value.latLng);
+
+  }
 }

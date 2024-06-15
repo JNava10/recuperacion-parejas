@@ -16,6 +16,7 @@ import {MessagesComponent} from "../messages/messages.component";
 import {SocketService} from "../../../services/socket.service";
 import {ChatJoin, MessagesRead} from "../../../interfaces/socket/chat";
 import {StorageService} from "../../../services/storage.service";
+import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-chat',
@@ -23,7 +24,8 @@ import {StorageService} from "../../../services/storage.service";
   imports: [
     ReactiveFormsModule,
     MessageInputComponent,
-    MessagesComponent
+    MessagesComponent,
+    CustomToastComponent
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'

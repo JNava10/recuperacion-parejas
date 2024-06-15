@@ -17,6 +17,7 @@ import {NewMatchArgs} from "../../interfaces/socket/notification";
 import {MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 import {ButtonModule} from "primeng/button";
+import { user } from '../../utils/const/regex.constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -110,6 +111,10 @@ export class DashboardComponent implements OnInit {
     this.matchedUser = matchedUser;
     this.socketService.sendNewMatch(matchedUser)
     this.isMatch = true;
+
+    this.friendshipService.getOwnMatches().subscribe(users => {
+      this.matches = users
+    })
   }
 
   goToChat = async (user: UserItem) => {

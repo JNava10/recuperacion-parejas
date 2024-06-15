@@ -3,13 +3,10 @@ const {findUserByNameOrNick, findUserByFullname} = require("../../constants/sql.
 const {QueryTypes, Op} = require("sequelize");
 const QuerySuccess = require("../../classes/QuerySuccess");
 const QueryError = require("../../classes/QueryError");
-const {jpegminiMedium} = require("@cloudinary/url-gen/qualifiers/quality");
 const RoleQuery = require("./role.query");
 const {roleNames, preferenceTypes} = require("../../constants/seed.const");
-const {it, en} = require("@faker-js/faker");
-const bcrypt = require("bcrypt");
 const {hashPassword} = require("../../helpers/common.helper");
-const {Logger} = require("sequelize/lib/utils/logger");
+const {tr, fa} = require("@faker-js/faker");
 
 class UserQuery {
     /**
@@ -54,9 +51,10 @@ class UserQuery {
         return await models.sequelize.query(findUserByFullname, {type: QueryTypes.SELECT, model: models.User, replacements: { input: input }});
     };
 
-    static getNotDeletedUsers = async () => {
+    static getNotDeletedUsers = async (selfId) => {
         try {
-            const query = await models.User.findAll();
+            console.log(selfId)
+            const query = await models.User.findAll({where: {[Op.not]: {id: selfId}}});
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
         } catch (e) {
@@ -66,7 +64,9 @@ class UserQuery {
 
     static checkIfEmailExists = async (email) => {
         try {
-            const query = await models.User.findOne({where: {email}});
+            const query = await models.User.findOne({where: {email}}) !== null;
+
+            console.log(query)
 
             if (!query) return new QuerySuccess(true, 'No existe el correo introducido.', query);
 
@@ -93,15 +93,17 @@ class UserQuery {
 
     static checkIfNicknameExists = async (nickname) => {
         try {
-            const query = await models.User.findOne({where: {nickname}});
+            const exists = await models.User.findOne({where: {nickname}}) !== null;
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+            const message = exists ? 'El nombre de usuario indicado ya existe' : 'El nombre de usuario indicado no se ha encontrado.'
+
+            return new QuerySuccess(true, message, exists);
         } catch (e) {
             return new QueryError(false, e)
         }
     };
 
-    static getNotDeletedWithRoles = async () => {
+    static getNotDeletedWithRoles = async (selfId) => {
         try {
             const query = await models.User.findAll({
                 include: {
@@ -109,7 +111,7 @@ class UserQuery {
                     through: models.AssignedRole,
                     attributes: ['id', 'name', 'display_name'],
                     as: 'roles'
-                }
+                },  where: {[Op.not]: {id: selfId}}
             });
 
             return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
@@ -135,7 +137,7 @@ class UserQuery {
                 }
             }
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', true);
+            return new QuerySuccess(true, 'Se ha creado el usuario correctamente.', {id: created.id});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e.message)
@@ -208,7 +210,7 @@ class UserQuery {
 
             const userRoles = await models.AssignedRole.findAll({where: {user}, attributes: ['role']});
 
-            return new QuerySuccess(created !== null, 'Se han insertado los usuarios correctamente.', {rolesAssigned: userRoles.map(assignedRole => assignedRole.role)});
+            return new QuerySuccess(created !== null, 'Se ha asignado el rol correctamente.', {rolesAssigned: userRoles.map(assignedRole => assignedRole.role)});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -224,7 +226,7 @@ class UserQuery {
                 ]}
             });
 
-            return new QuerySuccess(true, 'Se han insertado los usuarios correctamente.', deleted);
+            return new QuerySuccess(true, 'Se ha quitado el rol correctamente.', deleted);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -285,7 +287,7 @@ class UserQuery {
                 await models.AssignedRole.create({user: created.id, role: memberRole.query.id})
             }
 
-            return new QuerySuccess(true, 'Se ha registrado el usuario correctamente.', true);
+            return new QuerySuccess(true, 'Se ha registrado el usuario correctamente.', {id:  created.id});
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -574,9 +576,6 @@ class UserQuery {
                 }
             );
 
-            console.log(usersWithPendingMessages.map(message => message.emitter))
-            console.log((usersWhoSendMessages.map(message => message.receiver)))
-            console.log((usersWithReadMessages.map(message => message.emitter)))
             const users = await models.User.findAll({
                 where: {
                     id: {
@@ -601,6 +600,98 @@ class UserQuery {
             throw e
         }
     }
+
+    // TODO: Mover a RoleQuery
+    static userHasRole = async (id, roleName) => {
+        try {
+            const hasRole = await models.User.findOne(
+                {
+                    where: {id},
+                    include: {model: models.Role, where: {name: roleName}, as: 'roles'}
+                }
+            ) !== null;
+
+            return new QuerySuccess(true, 'Se ha obtenido el rol correctamente.', hasRole);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    // TODO: Mover a RoleQuery
+    static getRoleUsersRemaining = async (roleName) => {
+        try {
+            const remainingCount = (await models.User.findOne(
+                {
+                    include: {model: models.Role, attributes: [], where: {name: roleName}, as: 'roles'},
+                    where: {enabled: true},
+                    attributes: [
+                       [models.sequelize.fn('COUNT', models.Sequelize.col('user.id')), 'remaining']
+                    ],
+                    raw: true
+                },
+            ));
+
+            return new QuerySuccess(true, 'Se ha obtenido la cantidad de usuarios correctamente.', remainingCount.remaining);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getRoleUsers = async (roleName) => {
+        try {
+            const users = await models.User.findAll(
+                {
+                    include: {model: models.Role, attributes: [], where: {name: roleName}, as: 'roles'},
+                    where: {enabled: true},
+                    raw: true
+                },
+            );
+
+            return new QuerySuccess(true, 'Se ha obtenido la cantidad de usuarios correctamente.', users);
+        } catch (e) {
+            console.warn(e);
+            return new QueryError(false, e);
+        }
+    };
+
+    // TODO: Mover a RoleQuery
+    static findRoleByName = async (name) => {
+        try {
+            const role = (await models.Role.findOne(
+                {
+                    where: {name},
+                    raw: true
+                }
+            )) !== null;
+
+            return new QuerySuccess(true, 'Se ha realizado la consulta correctamente.', role);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getUserNotifications = async (userId) => {
+        const notifications = await models.NewMatchNotification.findAll(
+            {
+                where: {to: userId},
+                include: [
+                    {
+                        model: models.User,
+                        as: 'userFrom'
+                    },
+                    {
+                        model: models.User,
+                        as: 'userTo'
+                    }
+                ]
+            }
+        );
+
+        return new QuerySuccess(true, 'Se han obtenido las notificaciones correctamente.', notifications);
+    };
 }
 
 module.exports = UserQuery

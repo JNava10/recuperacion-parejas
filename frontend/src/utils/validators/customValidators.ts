@@ -1,4 +1,5 @@
 import {AbstractControl, ValidationErrors, ValidatorFn} from "@angular/forms";
+
 export function passwordsMatch(passwordControlName: string, confirmPasswordName: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
     const passwordsGroup = group.get('passwords')!;
@@ -25,5 +26,30 @@ export function passwordsMatch(passwordControlName: string, confirmPasswordName:
 
       return error
     }
+  };
+}
+
+export function rangeValidation(minControlName: string, maxControlName: string): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const minControl = group.get(minControlName);
+    const maxControl = group.get(maxControlName);
+    const minExceededError = {minExceeded: 'El minimo no puede ser mayor que el maximo.'};
+
+    let error: any;
+
+    console.log(minControl?.value, maxControl?.value)
+
+    if (minControl?.value >= maxControl?.value) {
+      error = minExceededError;
+      console.log('a')
+    } else {
+      error = null;
+    }
+
+    group.setErrors(error);
+
+    console.log(error)
+
+    return error !== null ? error : null;
   };
 }

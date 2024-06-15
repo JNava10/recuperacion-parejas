@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {
   CreateUserItem,
@@ -10,17 +10,18 @@ import {
   GetUserResponse,
   GetUsersResponse,
   ManageUserResponse,
-  PendingChatUserItem,
-  UserItem
+  CreateUserResponse,
+  UserItem, GetCountResponse, CrudEditResponse
 } from "../../interfaces/api/user/user";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {map} from "rxjs";
+import {catchError, map, of} from "rxjs";
 import {
   RecoverPasswordResponse,
   SendRecoverCodeResponse,
   SendRecoverEmailResponse
 } from "../../interfaces/recover-password";
 import {MessageService} from "primeng/api";
+import {GetNotificationsResponse} from "../../interfaces/api/others/notification";
 
 @Injectable({
   providedIn: 'root'
@@ -54,13 +55,11 @@ export class UserService {
   }
 
   createUser = (user: CreateUserItem) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}})
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}})
   }
 
   registerUser = (user: CreateUserItem) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/register`, user).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/register`, user)
   }
 
   sendRecoverEmail = (email: string) => {
@@ -82,22 +81,15 @@ export class UserService {
   }
 
   addRoles = (id: number, roles: number[]) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}})
   }
 
   deleteRoles = (id: number, roles: number[]) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}})
   }
 
-
   editUserData = (data: CreateUserItem, id: number) => {
-    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}})
   }
 
   sendNewPassword = (password: string, recoverToken: string) => {
@@ -113,9 +105,7 @@ export class UserService {
   }
 
   deleteUser = (user: UserItem) => {
-    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
-    )
+    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}} )
   }
 
 
@@ -129,5 +119,34 @@ export class UserService {
 
   getChats = () => {
     return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
+  }
+
+  getRoleUsers = (role: string) => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/role/${role}`, {params: {...sendTokenParam}});
+  }
+
+  updateUserAvatar = (id: number, file: File) => {
+    const fileKey = 'avatar';
+
+    const formData = new FormData();
+    formData.append(fileKey, file)
+
+    console.log(id)
+
+    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/avatar/${id}`, formData, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageUserResponse;
+
+        return of(error);
+      })
+    );
+  }
+
+  getRoleUsersCount = (roleName: string) => {
+    return this.http.get<GetCountResponse>(`${environment.apiUrl}/user/role-users/${roleName}`, {params: {...sendTokenParam}});
+  }
+
+  getNotifications = () => {
+    return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}});
   }
 }

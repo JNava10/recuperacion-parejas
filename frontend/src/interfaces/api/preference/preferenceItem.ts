@@ -7,6 +7,12 @@ export interface GetPreferenceResponse extends ApiResponse {
   }
 }
 
+export interface SavePreferenceResponse extends ApiResponse {
+  data: {
+    executed: true
+  }
+}
+
 export interface GetPreferencesResponse extends ApiResponse {
   data: {
     executed: true

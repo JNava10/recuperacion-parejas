@@ -17,6 +17,7 @@ router.post('/roles/:id', [validateToken], UserController.addUserRoles)
 router.post('/roles/delete/:id', [validateToken], UserController.deleteUserRoles)
 router.post('/register', [], UserController.registerUser)
 router.get('/possible-matches', [validateToken], UserController.getPossibleMatches)
+router.get('/role/:role', [validateToken], UserController.getRoleUsers)
 router.post('/send-recover-email', UserController.sendRecoverEmail)
 
 router.post('/send-recover-code', UserController.checkRecoverCode)
@@ -26,11 +27,13 @@ router.put('/profile/data/:id', [validateToken], UserController.editProfileData)
 
 router.get('/pending-chats', [validateToken], UserController.getChats)
 router.post('/member/messages/files/:receiver', [validateToken], UserController.uploadMessageImages)
+router.get('/role-users/:role', [validateToken], UserController.getRoleUsersRemaining)
 router.get('/profile', [validateToken], UserController.getEditableProfileData)
-router.get('/:id', [validateToken], UserController.findById)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
+router.get('/notifications', [validateToken], UserController.getSelfNotifications)
 
 router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
 router.delete('/:id', [validateToken], UserController.deleteUser)
+router.get('/:id', [validateToken], UserController.findById)
 
 module.exports = router;

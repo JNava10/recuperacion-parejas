@@ -1,20 +1,16 @@
 
-const {sendStandardResponse} = require("../helpers/common.helper");
+const {hashPassword} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
-const bcrypt = require("bcrypt");
-const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
 const QuerySuccess = require("../classes/QuerySuccess");
 const {findRecentChatMessages} = require("../database/query/message.query");
-const EventQuery = require("../database/query/event.query");
-const {el, fi, tr} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
-const RoomController = require("./room.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
-const MessageQuery = require("../database/query/message.query");
+const {roleNames} = require("../constants/seed.const");
+const CustomError = require("../classes/customError");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -128,8 +124,24 @@ class UserController {
         }
     }
 
+    static getRoleUsers = async (req, res) => {
+        try {
+            const {message, executed, query} = await UserQuery.getRoleUsers(req.params.role);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            );
+        } catch (e) {
+            console.log(e);
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            );
+        }
+    };
+
     static getNotDeletedUsers = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers();
+        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
         if (executed) {
             return res.status(200).json(
@@ -146,8 +158,9 @@ class UserController {
         }
     };
 
+
     static getNotDeletedUsersWithRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles();
+        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);
 
         if (executed) {
             return res.status(200).json(
@@ -165,35 +178,36 @@ class UserController {
     };
 
     static createUser = async (req, res) => {
-        const user = req.body;
+        try {
+            const user = req.body;
 
-        const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
+            const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
 
-        if (emailExists) return res.status(200).json(
-            new StdResponse("El correo indicado ya existe",{executed: false})
-        )
-
-        const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
-
-        if (nicknameExists) return res.status(200).json(
-            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
-        )
-
-        const {message, executed, query, error} = await UserQuery.createUser(user);
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+            if (emailExists) return res.status(200).json(
+                new StdResponse("El correo indicado ya existe",{executed: false})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
+
+            if (nicknameExists) return res.status(200).json(
+                new StdResponse(nicknameExists.message,{executed: false})
             )
-        } else if (!query) {
+
+            const {message, executed, query} = await UserQuery.createUser(user);
+
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        } catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse(e.message,{executed: false})
             )
         }
+
     };
 
     static updateUserData = async (req, res) => {
@@ -241,25 +255,25 @@ class UserController {
     };
 
     static deleteUserRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+        try {
+            const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query;
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
+            if (adminsRemaining >= 1)  return res.status(200).json(
+                new StdResponse('No se pueden borrar mas administradores.',{executed: false})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
+
+            const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+        }  catch (e) {
+            console.log(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
 
     static updateUserPassword = async (req, res) => {
-        const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
+        const password = hashPassword(req.body.password);
 
         const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
 
@@ -280,7 +294,19 @@ class UserController {
 
     static registerUser = async (req, res) => {
         try {
-            if (!req.body.picUrl) req.body.picUrl = process.env.DEFAULT_PROFILE_PIC_URL;
+            const emailExists = (await UserQuery.checkIfEmailExists(req.body.email)).query;
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(req.body.nickname)).query;
+
+            if (emailExists && nicknameExists) return res.status(200).json(
+                new StdResponse("El email y nombre de usuario introducidos ya existen",{executed: false})
+            )
+            else if (emailExists) return res.status(200).json(
+                new StdResponse("El email ya existe",{executed: false})
+            )
+            else if (nicknameExists) return res.status(200).json(
+                new StdResponse("El nombre de usuario ya existe",{executed: false})
+            )
+
 
             const {message, query, executed} = await UserQuery.registerUser(req.body);
 
@@ -464,6 +490,17 @@ class UserController {
     };
 
     static deleteUser = async (req, res) => {
+        const isAdmin = await UserQuery.userHasRole(req.params.id, roleNames.admin.name);
+        const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
+
+        if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
+            new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
+        )
+
+        if (req.params.id === req.payload.userId) return res.status(200).json(
+            new StdResponse("No puedes borrarte a tí mismo.",{executed: false})
+        )
+
         const {message, executed, query, error} = await UserQuery.deleteUser(req.params.id);
 
         if (executed) {
@@ -538,7 +575,7 @@ class UserController {
 
     static updateUserAvatar = async (req, res) => {
         try {
-            const key = 'file'
+            const key = 'avatar'
 
             if (!req.files || !req.files[key]) return res.status(400).json(
                 new StdResponse(
@@ -548,7 +585,7 @@ class UserController {
                     })
             );
 
-            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg']});
+            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg', 'png', 'jpeg']});
 
             const avatarUrl = uploadedNames.get(key).secure_url;
 
@@ -564,6 +601,12 @@ class UserController {
             );
         } catch (e) {
             console.log(e)
+
+            if (e instanceof CustomError) {
+                return res.status(400).json(
+                    new StdResponse(e.message,{executed: false})
+                )
+            }
 
             return res.status(500).json(
                 new StdResponse(e.message,{executed: false})
@@ -582,6 +625,56 @@ class UserController {
                 new StdResponse("Se han obtenido la lista de chats correctamente", {
                     executed: true,
                     chats: {pending, notPending}
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static getRoleUsersRemaining = async (req, res) => {
+        try {
+            const roleName = req.params.role;
+
+            const roleExists = (await UserQuery.findRoleByName(roleName)).query;
+
+            if (!roleExists) return res.status(404).json(
+                new StdResponse("El rol buscado no existe", {
+                    executed: false,
+                })
+            );
+
+            const remaining = (await UserQuery.getRoleUsersRemaining(roleName)).query
+
+            return res.status(200).json(
+                new StdResponse("Se ha obtenido la cantidad de usuarios correctamente.", {
+                    executed: true,
+                    count: remaining
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static getSelfNotifications = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            const notifications = await UserQuery.getUserNotifications(userId);
+
+            return res.status(200).json(
+                new StdResponse(notifications.message, {
+                    executed: notifications.executed,
+                    query: notifications.query
                 })
             );
         } catch (e) {

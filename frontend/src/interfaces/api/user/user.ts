@@ -51,14 +51,14 @@ export interface UserMessagesResponse extends ApiResponse {
 
 export interface GetUsersResponse extends ApiResponse {
   data: {
-    executed: true
-    query: UserItem[]
+    executed: boolean
+    query?: UserItem[]
   }
 }
 
 export interface GetPendingChatsResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
     chats: ChatListResponse
   }
 }
@@ -70,15 +70,30 @@ export interface ChatListResponse extends ApiResponse {
 
 export interface GetUserResponse extends ApiResponse{
   data: {
-    executed: true
+    executed: boolean
     query: UserItem
   }
 }
 
 export interface ManageUserResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
     query: boolean
+  }
+}
+
+export interface CrudEditResponse extends ApiResponse {
+  data: {
+    executed: boolean
+  }
+}
+
+export interface CreateUserResponse extends ApiResponse {
+  data: {
+    executed: true
+    query: {
+      id: number
+    }
   }
 }
 
@@ -90,24 +105,31 @@ export interface RoleItem {
 
 export interface GetRolesResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
     query: RoleItem[]
   }
 }
 
-export interface DeleteUserResponse {
+export interface DeleteUserResponse extends ApiResponse {
   data: {
     executed: true
     query: boolean
   }
 }
 
-export interface GetProfileResponse extends ApiResponse{
+export interface GetProfileResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
     query: {
       user: UserItem,
       preferences: PreferenceList
     }
+  }
+}
+
+export interface GetCountResponse extends ApiResponse {
+  data: {
+    executed: boolean
+    count: number
   }
 }
