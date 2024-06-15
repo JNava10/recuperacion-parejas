@@ -1,4 +1,8 @@
-<section class="flex justify-between items-center">
-  <p-menu [model]="menuItems" />
-  <router-outlet></router-outlet>
+<section class="h-screen flex p-3 gap-3 items-center justify-between">
+  <div class="h-screen w-1/6 flex items-center">
+    <p-menu styleClass="mx-auto" [model]="menuItems" />
+  </div>
+  <div>
+    <router-outlet></router-outlet>
+  </div>
 </section>

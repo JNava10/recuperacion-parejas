@@ -133,3 +133,10 @@ export interface GetCountResponse extends ApiResponse {
     count: number
   }
 }
+
+export interface GetSelfRoles extends ApiResponse {
+  data: {
+    executed: boolean
+    roles: string[]
+  }
+}

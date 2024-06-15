@@ -3,6 +3,7 @@ const {uploadBuffer} = require("../helpers/cloudinary.helper");
 
 class EventUtils {
     static generateSummaryFile = async (event) => {
+        console.log(event)
         const summaryHtml = `<div>
                 <span>${event.name}</span>
                 <br>

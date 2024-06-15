@@ -265,10 +265,29 @@ class UserQuery {
 
     static getUserRoles = async (user) => {
         try {
-            let items = await models.AssignedRole.findAll({where: {user}, attributes: ['role']});
+            const items = await models.AssignedRole.findAll({where: {user}, attributes: ['role']});
             const roles = items.map(item => item.role);
 
-            return new QuerySuccess(true, 'Se ha obtenido el usuario correctamente.', roles);
+            return new QuerySuccess(true, 'Se han obtenido los roles del usuario correctamente.', roles);
+        } catch (e) {
+            console.log(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getUserRolesWithItems = async (user) => {
+        try {
+            const items = await models.AssignedRole.findAll({
+                where: {user}, attributes: ['role'],
+                include: {
+                    model: models.Role,
+                    attributes: ['name'],
+                    as: 'roleData'
+                }
+            });
+            const roles = items.map(item => item.role);
+
+            return new QuerySuccess(true, 'Se han obtenido los roles del usuario correctamente.', roles);
         } catch (e) {
             console.log(e)
             return new QueryError(false, e)

@@ -45,11 +45,19 @@ function generateSecureInt(min, max) {
     return crypto.randomInt(min, max);
 }
 
+const getEventCloseDate = (scheduledDate) => {
+    const multiplier = (24 * 60 * 60 * 1000);
+    const closeOffset = 1; // Numero de dias antes de la fecha del evento hasta que caduque el evento.
+
+    return new Date(scheduledDate - (closeOffset * multiplier));
+};
+
 module.exports = {
     hashPassword,
     getRandomItem,
     getRandomFromRange,
     sendStandardResponse,
     generateSecureHex,
-    generateSecureInt
-}
+    generateSecureInt,
+    getEventCloseDate
+};
