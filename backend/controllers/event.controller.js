@@ -15,6 +15,7 @@ class EventController {
 
         const {message, executed, query, error} = await EventQuery.createEvent(eventBody);
 
+
         const event = query;
 
         const summaryFile = await EventUtils.generateSummaryFile(event)

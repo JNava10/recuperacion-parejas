@@ -1,54 +1,54 @@
-<div>
-  <p-table [value]="preferences!" scrollable="true" scrollHeight="400px" styleClass="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-    <ng-template pTemplate="header">
-    <tr pStyleClass="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-      <th scope="col" class="px-6 py-3">
-        Nombre
-      </th>
-      <th scope="col" class="px-6 py-3">
-        Tipo
-      </th>
-      <th scope="col" class="px-6 py-3">
-        Descripción
-      </th>
-    </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-preference>
-      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-          {{preference.name | titlecase}}
-        </th>
-        <td class="px-6 py-4">
-          {{preference.type.text}}
-        </td>
-        <td class="px-6 py-4">
-          {{preference.description}}
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-</div>
-<div>
+<section class="min-w-xl">
+  <div>
+    <p-table [value]="preferences!" scrollable="true" scrollHeight="400px" styleClass="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <ng-template pTemplate="header">
+        <tr pStyleClass="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <th scope="col" class="px-6 py-3">
+            Nombre
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Tipo
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Descripción
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-preference>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {{preference.name | titlecase}}
+          </th>
+          <td class="px-6 py-4">
+            {{preference.type.text}}
+          </td>
+          <td class="px-6 py-4">
+            {{preference.description}}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div>
+    <p-button type="button" (click)="createPreferenceDropdown.toggle($event)" styleClass="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+      <i class="fa-solid fa-plus"></i>
+    </p-button>
+  </div>
 
-
-  <p-button type="button" (click)="createPreferenceDropdown.toggle($event)" styleClass="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-    <i class="fa-solid fa-plus"></i>
-  </p-button>
-</div>
-
-<p-overlayPanel #createPreferenceDropdown styleClass="p-0 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-  <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-    <li>
+  <p-overlayPanel #createPreferenceDropdown styleClass="p-0 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+      <li>
         <a routerLink="/create-range-preference" class="flex flex-row gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
           <i class="fa-solid fa-sliders"></i>
           Crear pref. de rango
         </a>
-    </li>
-    <li>
-      <a routerLink="/create-choice-preference" class="flex flex-row gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-        <i class="fa-solid fa-hand-pointer"></i>
-        Crear pref. de elección
-      </a>
-    </li>
-  </ul>
-</p-overlayPanel>
+      </li>
+      <li>
+        <a routerLink="/create-choice-preference" class="flex flex-row gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+          <i class="fa-solid fa-hand-pointer"></i>
+          Crear pref. de elección
+        </a>
+      </li>
+    </ul>
+  </p-overlayPanel>
+</section>

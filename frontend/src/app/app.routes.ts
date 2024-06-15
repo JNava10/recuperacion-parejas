@@ -34,9 +34,7 @@ export const routes: Routes = [
   { path: 'chat', component: ChatComponent },
   { path: 'available-events', component: FindAvailableEventsComponent },
   { path: 'event-info', component: EventInfoComponent },
-  { path: 'add-user', component: AddUserComponent },
   { path: 'notifications', component: NotificationListComponent },
-  { path: 'edit-user', component: EditUserComponent },
   { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
   { path: 'create-range-preference', component: CreateRangePreferenceComponent },
   { path: 'register', component: RegisterComponent },
@@ -44,10 +42,15 @@ export const routes: Routes = [
   { path: 'recover-password/code', component: SendCodeFormComponent },
   { path: 'recover-password/password', component: SendPasswordFormComponent },
   { path: 'start', component: StartComponent },
-  { path: 'admin', component: AdminComponent },
-  { path: 'admin/users', component: UsersComponent },
-  { path: 'admin/events', component: EventsComponent },
-  { path: 'admin/preferences', component: PreferencesComponent },
+  { path: 'admin', component: AdminComponent, children: [
+      { path: 'users', component: UsersComponent, children: [
+          { path: 'edit', component: EditUserComponent },
+          { path: 'add', component: AddUserComponent }
+        ] },
+      { path: 'events', component: EventsComponent },
+      { path: 'preferences', component: PreferencesComponent },
+    ]
+  },
   { path: 'edit-profile', component: EditProfileComponent },
   { path: 'recover-password',   redirectTo: '/recover-password/email', pathMatch: 'full' },
   { path: '',   redirectTo: '/login', pathMatch: 'full' },
