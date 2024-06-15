@@ -6,6 +6,10 @@ import {AvatarModule} from "primeng/avatar";
 import {EventItem} from "../../../interfaces/api/event/event";
 import {OverlayPanelModule} from "primeng/overlaypanel";
 import {UserService} from "../../../services/api/user.service";
+import {ListboxModule} from "primeng/listbox";
+import {addQueryMessage} from "../../../utils/common.utils";
+import {MessageService} from "primeng/api";
+import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-manage-event-members-form',
@@ -13,13 +17,15 @@ import {UserService} from "../../../services/api/user.service";
   imports: [
     TableModule,
     AvatarModule,
-    OverlayPanelModule
+    OverlayPanelModule,
+    ListboxModule,
+    CustomToastComponent
   ],
   templateUrl: './manage-event-members-form.component.html',
   styleUrl: './manage-event-members-form.component.css'
 })
 export class ManageEventMembersFormComponent implements OnInit {
-  constructor(private eventService: EventService, private userService: UserService) {}
+  constructor(private eventService: EventService, private userService: UserService, private messageService: MessageService) {}
 
   ngOnInit() {
     this.eventService.getEventMembers(this.event?.id!).subscribe(body => {
@@ -28,7 +34,6 @@ export class ManageEventMembersFormComponent implements OnInit {
 
     this.userService.getRoleUsers('member').subscribe(body => {
       this.allUsers = body.data.query;
-      console.log(this.allUsers)
     })
   }
 
@@ -36,4 +41,10 @@ export class ManageEventMembersFormComponent implements OnInit {
 
   assistants?: UserItem[];
   allUsers?: UserItem[];
+
+  addToEvent = (user: UserItem) => {
+    this.eventService.addMemberToEvent(this.event!.id!, user.id!).subscribe(body => {
+      addQueryMessage(body.data.executed, body.message, this.messageService)
+    })
+  };
 }

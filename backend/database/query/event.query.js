@@ -134,7 +134,7 @@ class CreateEvent {
         }
     };
 
-    static subscribeEvent = async (event, user) => {
+    static subscribeToEvent = async (event, user) => {
         try {
             const eventAssistant = {
                 event,
@@ -195,10 +195,20 @@ class CreateEvent {
 
     static eventIsClosed = async (eventId) => {
         try {
-            const query = await models.sequelize.query(
-                `SELECT * FROM ${models.Event.tableName} WHERE close_date_time < NOW() AND id = :id`,
-                {replacements: {id: eventId}}
-            ) !== null;
+            // const query = await models.sequelize.query(
+            //     `SELECT * FROM ${models.Event.tableName} WHERE close_date_time < NOW() AND id = :id`,
+            //     {replacements: {id: eventId}}
+            // ) !== null;
+
+            const query = await models.Event.findOne({
+                where: {
+                    [Op.and]: [
+                        {id: eventId},
+                        {closeDateTime: {[Op.lt]: new Date(Date.now())}}
+                    ]
+                }
+            }) !== null
+
 
             const message = query ? 'El evento está cerrado.' : 'El evento aun está abierto a inscripciones.'
 

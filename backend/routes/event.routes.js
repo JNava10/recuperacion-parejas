@@ -12,6 +12,7 @@ router.post('/subscribe/:id', [validateToken], EventController.subscribeToEvent)
 router.post('/withdraw/:id', [validateToken], EventController.withdrawEvent);
 router.get('/registered', [validateToken], EventController.getEventsRegistered);
 router.get('/subscribed/:id', [validateToken], EventController.getIfRegisteredToEvent);
+router.post('/members/add/:eventId/:userId', [validateToken], EventController.addMemberToEvent);
 router.get('/members/:id', [validateToken], EventController.getEventMembers);
 router.get('/:id', [validateToken], EventController.getEvent);
 router.delete('/:id', [validateToken], EventController.deleteEventById);

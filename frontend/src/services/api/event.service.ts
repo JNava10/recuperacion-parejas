@@ -12,9 +12,10 @@ import {
 } from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of, tap} from "rxjs";
-import {GetUsersResponse, ManageUserResponse} from "../../interfaces/api/user/user";
+import {CrudEditResponse, GetUsersResponse, ManageUserResponse} from "../../interfaces/api/user/user";
 import {MessageService} from "primeng/api";
 import {getQueryToast} from "../../utils/common.utils";
+import {user} from "../../utils/const/regex.constants";
 
 @Injectable({
   providedIn: 'root'
@@ -125,6 +126,16 @@ export class EventService {
     return this.http.get<GetUsersResponse>(`${environment.apiUrl}/event/members/${id}`, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
         const error = res.error as GetUsersResponse;
+        return of(error);
+      })
+    );
+  }
+
+  addMemberToEvent = (eventId: number, userId: number) => {
+    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/event/members/add/${eventId}/${userId}`, {},{params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+
         return of(error);
       })
     );

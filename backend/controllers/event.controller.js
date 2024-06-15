@@ -5,6 +5,7 @@ const {uploadFiles, uploadBuffer} = require("../helpers/cloudinary.helper");
 const EventUtils = require("../utils/event.utils");
 const CustomError = require("../classes/customError");
 const {fa} = require("@faker-js/faker");
+const UserQuery = require("../database/query/user.query");
 
 class EventController {
 
@@ -211,7 +212,7 @@ class EventController {
               })
           );
 
-          const {message, executed} = await EventQuery.subscribeEvent(req.params.id, req.payload.userId);
+          const {message, executed} = await EventQuery.subscribeToEvent(req.params.id, req.payload.userId);
 
           return res.status(200).json(
               new StdResponse(message, {
@@ -345,6 +346,99 @@ class EventController {
 
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al crear el archivo.', {executed: false, error: e.toString()})
+            );
+        }
+    };
+
+    // TODO: Fusionar con la ruta de apuntarse a si mismo
+    static addMemberToEvent = async (req, res) => {
+        try {
+            const event = req.params.eventId;
+            const user = req.params.userId;
+
+            const eventExists = await EventQuery.getEvent(event);
+            const userExists = await UserQuery.checkIfIdExists(user);
+
+            if (!eventExists.query && !userExists.query) return res.status(200).json(
+                new StdResponse("No existen ni el usuario ni el evento indicados.", {
+                    executed: false
+                })
+            );
+            else if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+            else if (!userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
+
+            const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));
+
+            if (isClosed.query) return res.status(200).json(
+                new StdResponse(isClosed.message, {
+                    executed: false,
+                    closed: true
+                })
+            );
+
+            const {message, query, executed} = await EventQuery.subscribeToEvent(event, user);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            console.log(e);
+
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al suscribir el usuario del evento.', {executed: false, error: e.toString()})
+            );
+        }
+    };
+
+    // TODO: Fusionar con la ruta de desapuntarse a si mismo
+    static removeFromEvent = async (req, res) => {
+        try {
+            const event = req.params.eventId;
+            const user = req.params.userId;
+
+            const eventExists = await EventQuery.getEvent(event);
+            const userExists = await EventQuery.getEvent(user);
+
+            if (!eventExists.query && !userExists.query) return res.status(200).json(
+                new StdResponse("No existen ni el usuario ni el evento indicados.", {
+                    executed: false
+                })
+            );
+            else if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+            else if (!userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
+
+            const {message, query, executed} = await EventQuery.withdrawEvent(event, user);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            console.log(e);
+
+            return res.status(500).json(
+                new StdResponse('Ha ocurrido un problema al borrar el usuario del evento.', {executed: false, error: e.toString()})
             );
         }
     };

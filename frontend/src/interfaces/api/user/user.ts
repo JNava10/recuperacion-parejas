@@ -52,7 +52,7 @@ export interface UserMessagesResponse extends ApiResponse {
 export interface GetUsersResponse extends ApiResponse {
   data: {
     executed: boolean
-    query: UserItem[]
+    query?: UserItem[]
   }
 }
 
