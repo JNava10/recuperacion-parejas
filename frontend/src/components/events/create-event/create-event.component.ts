@@ -9,6 +9,7 @@ import {CreateEventItem, EventItem, ManageEventResponse} from "../../../interfac
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {Message, MessageService} from "primeng/api";
+import {validateFiles} from "../../../utils/common.utils";
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -101,6 +102,10 @@ export class CreateEventComponent {
     const file = input.files?.item(0);
 
     if (file) {
+      const valid = validateFiles([file], {maxCount: 4, maxSizeMb: 1}, this.messageService)
+
+      if (!valid) return;
+
       this.picFile = file
     }
   };

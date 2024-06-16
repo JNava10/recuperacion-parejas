@@ -10,7 +10,7 @@ import {EventService} from "../../../services/api/event.service";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 
 import {Message, MessageService} from 'primeng/api';
-import { getQueryToast } from '../../../utils/common.utils';
+import {getQueryToast, validateFiles} from '../../../utils/common.utils';
 import { CustomToastComponent } from "../../custom-toast/custom-toast.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
@@ -151,6 +151,9 @@ export class EditEventComponent implements OnInit {
     const file = input.files?.item(0);
 
     if (file) {
+      const valid = validateFiles([file], {maxCount: 4, maxSizeMb: 1}, this.messageService)
+
+      if (!valid) return;
       this.picFile = file
     }
   };

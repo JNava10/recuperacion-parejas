@@ -47,6 +47,8 @@ export class EditProfileDataFormComponent implements OnInit {
   protected picFile?: File;
   loading = false;
 
+  maxFileSize = 1024; // 1 MB
+
   profileDataForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
     firstLastname: new FormControl('', Validators.pattern(regex.user.firstLastname)),
@@ -65,10 +67,10 @@ export class EditProfileDataFormComponent implements OnInit {
     const user = this.getUserData();
 
     this.userService.editProfileData(user).subscribe(res => {
+      showQueryToast(res.data.executed, res.message, this.messageService)
+
       if (this.picFile) {
         this.changeUserAvatar(this.user?.id!, res)
-      } else {
-        showQueryToast(res.data.executed, res.message, this.messageService)
       }
 
       this.loading = false;
@@ -79,6 +81,10 @@ export class EditProfileDataFormComponent implements OnInit {
     const input = $event.target as HTMLInputElement;
 
     const file = input.files?.item(0);
+
+    const valid = this.validateFiles([file!])
+
+    if (!valid) return;
 
     if (file) {
       this.picFile = file
@@ -100,9 +106,23 @@ export class EditProfileDataFormComponent implements OnInit {
     return user;
   }
 
+  private validateFiles = (files: File[]) => {
+    const fileSizeValid = files.every(file => file.size <= this.maxFileSize);
+
+    const message: Message = {severity: 'warn', summary: '¡Ojo!'};
+
+    if (!fileSizeValid) {
+      message.detail = 'Has intentado subir un archivo demaisado grande.';
+    }
+
+    if (message.detail) this.messageService.add(message);
+
+    return message.detail === undefined;
+  }
+
   private changeUserAvatar = (id: number, res: CrudEditResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
-      showQueryToast(res.data.executed, res.message, this.messageService)
+      showQueryToast(body.data.executed, body.message, this.messageService)
 
       this.loading = false
     });

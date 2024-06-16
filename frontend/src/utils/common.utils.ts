@@ -6,6 +6,7 @@ import {UserService} from "../services/api/user.service";
 import {userMenuItems} from "./const/menu.constants";
 import {Preference} from "../interfaces/api/preference/preferenceItem";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FileValidationOptions} from "../interfaces/fileValidation";
 
 export const getQueryToast = (executed: boolean, description: string) => {
   const message: Message = {detail: description}
@@ -57,4 +58,26 @@ export const preferencesToFormGroup = (preferences: Preference[]) => {
   });
 
   return new FormGroup(group);
+}
+
+export const validateFiles = (files: File[], options: FileValidationOptions, messageService: MessageService) => {
+  const fileSizeValid = files.every(file => file.size <= options.maxSizeMb * (1024 * 1024));
+  const fileCountValid = files.length <= options.maxCount;
+  const hasFiles = files.length > 0;
+
+  const message: Message = {severity: 'warn', summary: '¡Ojo!'};
+
+  console.log(fileSizeValid, files[0].size, options.maxSizeMb * 1048576)
+
+  if (!fileSizeValid) {
+    message.detail = 'Has intentado subir un archivo demaisado grande.';
+  } else if (!fileCountValid) {
+    message.detail = 'Has intentado subir demasiados archivos.';
+  } else if (!hasFiles) {
+    message.detail = 'No se ha intentado subir ningun archivo.';
+  }
+
+  if (message.detail) messageService.add(message);
+
+  return message.detail === undefined;
 }

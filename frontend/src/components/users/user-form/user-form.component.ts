@@ -9,7 +9,7 @@ import {SelectRolesEditComponent} from "../../roles/select-roles/select-roles.co
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
 import {Message, MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
-import {getQueryToast} from "../../../utils/common.utils";
+import {getQueryToast, validateFiles} from "../../../utils/common.utils";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
@@ -98,8 +98,11 @@ export class UserFormComponent {
     const input = $event.target as HTMLInputElement;
 
     const file = input.files?.item(0);
-
     if (file) {
+      const valid = validateFiles([file], {maxCount: 1, maxSizeMb: 1}, this.messageService)
+
+      if (!valid) return;
+
       this.picFile = file
     }
   };

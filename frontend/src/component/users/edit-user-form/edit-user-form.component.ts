@@ -15,6 +15,8 @@ import * as customValidators from "../../../utils/validators/customValidators";
 import {CustomToastComponent} from "../../../components/custom-toast/custom-toast.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {Message, MessageService} from "primeng/api";
+import {FileValidationOptions} from "../../../interfaces/fileValidation";
+import {validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-edit-user-form',
@@ -92,8 +94,11 @@ export class EditUserFormComponent implements OnInit {
     const file = input.files?.item(0);
 
     if (file) {
+      const valid = validateFiles([file], {maxSizeMb: 1, maxCount: 1}, this.messageService);
+
+      if (!valid) return;
+
       this.picFile = file
-      console.log(this.picFile)
     }
   };
 

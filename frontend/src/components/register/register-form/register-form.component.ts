@@ -12,7 +12,7 @@ import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {MessageService} from "primeng/api";
 import {MessageModule} from "primeng/message";
 import {tap} from "rxjs";
-import {getQueryToast} from "../../../utils/common.utils";
+import {getQueryToast, validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-register-form',
@@ -101,6 +101,10 @@ export class RegisterFormComponent {
       this.showPicModal = false;
       await this.finishRegister()
     } else {
+      const valid = validateFiles([file], {maxCount: 4, maxSizeMb: 1}, this.messageService)
+
+      if (!valid) return;
+
       this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
         const message = getQueryToast(body.data.executed, body.message)
         this.messageService.add(message)
