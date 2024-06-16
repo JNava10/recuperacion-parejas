@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import * as regex from "../../../utils/const/regex.constants";
-import MapMouseEvent = google.maps.MapMouseEvent;
+
 import {DatePipe, NgIf} from "@angular/common";
 import {PaginatorModule} from "primeng/paginator";
 import {GoogleMap, GoogleMapsModule} from '@angular/google-maps'
@@ -10,9 +10,10 @@ import {EventService} from "../../../services/api/event.service";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 
 import {Message, MessageService} from 'primeng/api';
-import {getQueryToast, validateFiles} from '../../../utils/common.utils';
+import {getQueryToast, showQueryToast, validateFiles} from '../../../utils/common.utils';
 import { CustomToastComponent } from "../../custom-toast/custom-toast.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {closeDateIsValid} from "../../../utils/validators/customValidators";
 
 @Component({
     selector: 'app-edit-event',
@@ -68,22 +69,32 @@ export class EditEventComponent implements OnInit {
     scheduledTime: new FormControl('', [
       Validators.required, Validators.pattern(regex.event.scheduledTime)
     ]),
-  }, {updateOn: "change"});
+
+    closeDate: new FormControl('', [
+      Validators.required, Validators.pattern(regex.event.scheduledDate)
+    ]),
+
+    closeTime: new FormControl('', [
+      Validators.required, Validators.pattern(regex.event.scheduledTime)
+    ]),
+  }, {updateOn: "change", validators: [closeDateIsValid('scheduledDate', 'closeDate')]});
 
   editEventPlaceForm = new FormGroup({
     latLng: new FormControl(this.latLng, [Validators.required])
   }, {updateOn: "change"});
 
   handleEditDetailsForm() {
-    const {name, description, scheduledDate, scheduledTime} = this.editEventForm.value;
+    const {name, description, scheduledDate, scheduledTime, closeTime, closeDate} = this.editEventForm.value;
     if (!this.editEventForm.valid) return;
 
     const scheduledDateTime = new Date(`${scheduledDate} ${scheduledTime}`).toString();
+    const closeDateTime = new Date(`${closeDate} ${closeTime}`).toString();
 
     const eventDetails: EventItem = {
       name: name!,
       description: description!,
       scheduledDateTime: scheduledDateTime,
+      closeDateTime: closeDateTime,
       id: this.event?.id
     }
 
@@ -103,14 +114,19 @@ export class EditEventComponent implements OnInit {
 
   private patchValues = (event: EventItem) => {
     const scheduledDateTime = new Date(event.scheduledDateTime!);
+    const closeDateTime = new Date(event.closeDateTime!);
     const scheduledDate = new DatePipe('en-US').transform(scheduledDateTime, 'YYYY-MM-dd')?.toString();
     const scheduledTime = new DatePipe('en-US').transform(scheduledDateTime, 'hh:ss')?.toString();
+    const closeDate = new DatePipe('en-US').transform(closeDateTime, 'YYYY-MM-dd')?.toString();
+    const closeTime = new DatePipe('en-US').transform(closeDateTime, 'hh:ss')?.toString();
 
     this.editEventForm.patchValue({
       name: event.name,
       description: event.description,
       scheduledTime: scheduledTime,
       scheduledDate: scheduledDate,
+      closeTime: closeTime,
+      closeDate: closeDate,
     });
   }
 
@@ -126,7 +142,7 @@ export class EditEventComponent implements OnInit {
     const eventDetails: EventItem = {id: this.event?.id, latitude: latLng?.lat, longitude: latLng?.lng};
 
     this.eventService.editEventPlace(eventDetails).subscribe(body => {
-
+      showQueryToast(body.data.executed, body.message, this.messageService);
     });
   };
 

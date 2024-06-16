@@ -9,7 +9,8 @@ import {CreateEventItem, EventItem, ManageEventResponse} from "../../../interfac
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {Message, MessageService} from "primeng/api";
-import {validateFiles} from "../../../utils/common.utils";
+import {showQueryToast, validateFiles} from "../../../utils/common.utils";
+import {closeDateIsValid, dateIsNotPast} from "../../../utils/validators/customValidators";
 
 let latLng = {
   "lat": 38.69293623181963,
@@ -58,19 +59,20 @@ export class CreateEventComponent {
       Validators.required, Validators.pattern(regex.event.scheduledTime)
     ]),
 
+    closeDate: new FormControl('', [
+      Validators.required, Validators.pattern(regex.event.scheduledDate)
+    ]),
+
+    closeTime: new FormControl('', [
+      Validators.required, Validators.pattern(regex.event.scheduledTime)
+    ]),
+
     latLng: new FormControl({lat: 0, lng: 0}, [Validators.required])
-  }, {updateOn: "submit"});
+  }, {updateOn: "submit", validators: [closeDateIsValid('scheduledDate', 'closeDate'), dateIsNotPast('scheduledDate', 'closeDate')]}, );
 
   @Output() created = new EventEmitter<boolean>();
 
   handleCreateForm = (mouseEvent: SubmitEvent) => {
-    const validations = {
-      name: regex.event.name.test(this.createEventForm.value.name!),
-      description: regex.event.description.test(this.createEventForm.value.description!),
-      scheduledDate: regex.event.scheduledDate.test(this.createEventForm.value.scheduledDate!),
-    }
-
-    console.table(validations)
     if (!this.createEventForm.valid) return
 
     const createBtn = mouseEvent.target as Element;
@@ -79,11 +81,13 @@ export class CreateEventComponent {
 
     const formData = this.createEventForm.value;
     const scheduledDateTime = `${formData.scheduledDate} ${formData.scheduledTime}`;
+    const closeDateTime = `${formData.closeDate} ${formData.closeTime}`;
 
     const event: CreateEventItem = {
       name: formData.name!,
       description: formData.description!,
       scheduledDateTime: scheduledDateTime!,
+      closeDateTime: closeDateTime!,
       latitude: formData.latLng?.lat,
       longitude: formData.latLng?.lng
     }
@@ -92,6 +96,8 @@ export class CreateEventComponent {
       if (this.picFile) {
         this.eventService.updateEventPic(body.data.query.id!, this.picFile!).subscribe(body => this.handleUpdatingPic(body));
       }
+
+      showQueryToast(body.data.executed, body.message, this.messageService)
 
       this.created.emit(body.data.executed)
     })
@@ -128,8 +134,5 @@ export class CreateEventComponent {
     this.createEventForm.patchValue({
       latLng: $event
     })
-
-    console.log(this.createEventForm.value.latLng);
-
   }
 }

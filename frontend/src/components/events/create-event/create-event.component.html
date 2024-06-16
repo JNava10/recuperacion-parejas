@@ -15,8 +15,22 @@
       <input type="date" formControlName="scheduledDate" class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       <input type="time" formControlName="scheduledTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
     </div>
-    <span class="text-red-400" *ngIf="!this.createEventForm.get('scheduledDate')?.valid && form.submitted">Campo no valido</span>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('scheduledDate')?.valid && form.submitted">Fecha no valida</p>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('scheduledTime')?.valid && form.submitted">Hora no valida</p>
+    <p class="text-red-400" *ngIf="this.createEventForm.errors && this.createEventForm.errors['schedulePast'] && form.submitted">Fecha pasada</p>
   </div>
+  <div class="mb-5">
+    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de cierre de inscripciones</label>
+    <div class="flex">
+      <input type="date" formControlName="closeDate" class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <input type="time" formControlName="closeTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+    </div>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('closeDate')?.valid && form.submitted">Fecha no valida</p>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('closeTime')?.valid && form.submitted">Hora no valida</p>
+  </div>
+  <p class="text-red-400" *ngIf="this.createEventForm.errors && this.createEventForm.errors['invalidCloseTime'] && form.submitted">Fecha de cierre invalida</p>
+  <p class="text-red-400" *ngIf="this.createEventForm.errors && this.createEventForm.errors['closePast'] && form.submitted">Fecha pasada</p>
+
   <div class="flex">
     <app-map-event-marker (positionChange)="changeEventPos($event)"></app-map-event-marker>
   </div>
