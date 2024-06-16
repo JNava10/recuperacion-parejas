@@ -553,6 +553,8 @@ class UserController {
             const userData = (await UserQuery.getUsersById([userId])).query[0];
             const userPreferences = (await PreferenceQuery.getUserPreferences(userId)).query;
 
+            console.log(userPreferences)
+
             return res.status(200).json(
                 new StdResponse(
                     "Se han obtenido los datos editables correctamente",
@@ -696,6 +698,26 @@ class UserController {
                 new StdResponse(message, {
                     executed,
                     query
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static updateUserPreferences = async (req, res) => {
+        try {
+            const userId = req.params.userId ?? req.payload.userId;
+
+            const {message, executed} = await UserQuery.setUserPreferences(userId, req.body.preferences);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
                 })
             );
         } catch (e) {

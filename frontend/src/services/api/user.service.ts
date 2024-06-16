@@ -22,6 +22,7 @@ import {
 } from "../../interfaces/recover-password";
 import {MessageService} from "primeng/api";
 import {GetNotificationsResponse} from "../../interfaces/api/others/notification";
+import {PreferenceValueFormItem} from "../../interfaces/api/preference/preferenceItem";
 
 @Injectable({
   providedIn: 'root'
@@ -152,5 +153,15 @@ export class UserService {
 
   getNotifications = () => {
     return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}});
+  }
+
+  updateOwnPreferences = (preferences: PreferenceValueFormItem[]) => {
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/preferences/`,{preferences}, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
+    );;
   }
 }

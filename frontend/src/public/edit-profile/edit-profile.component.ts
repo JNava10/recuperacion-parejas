@@ -7,6 +7,10 @@ import {PreferenceList} from "../../interfaces/api/preference/preferenceItem";
 import {
   EditProfilePreferencesFormComponent
 } from "../../components/edit-preferences-form/edit-profile-preferences-form.component";
+import {
+  EditUserPreferencesFormComponent
+} from "../../components/edit-user-preferences-form/edit-user-preferences-form.component";
+import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-edit-profile',
@@ -14,7 +18,9 @@ import {
   imports: [
     EditUserFormComponent,
     EditProfileDataFormComponent,
-    EditProfilePreferencesFormComponent
+    EditProfilePreferencesFormComponent,
+    EditUserPreferencesFormComponent,
+    CustomToastComponent
   ],
   templateUrl: './edit-profile.component.html',
   styleUrl: './edit-profile.component.css'

@@ -1,4 +1,5 @@
 import {ApiResponse} from "../apiResponse";
+import {FormControl} from "@angular/forms";
 
 export interface GetPreferenceResponse extends ApiResponse {
   data: {
@@ -43,6 +44,12 @@ export interface PreferenceList {
   range: RangePreference[],
 }
 
+export interface PreferenceValueFormItem {
+  preference: number,
+  value: number
+}
+
+
 export interface CreatePreferenceItem {
   name?: string,
   description?: string
@@ -64,15 +71,13 @@ export interface PreferenceItemWithType extends PreferenceItem {
 }
 
 
-export interface ChoicePreference {
-  id: number
-  name?: string
-  description?: string
-  type?: {
-    text?: string
-  }
-  userValues?: UserValue
+export interface ChoicePreference extends Preference {
   options?: Option[]
+}
+
+export interface PreferenceControl extends Preference {
+  label?: string,
+  required?: string,
 }
 
 export interface Option {
@@ -81,25 +86,28 @@ export interface Option {
   option_value: number
 }
 
-export interface RangePreference {
-  id: number
+export interface Preference {
+  id?: number
   name?: string
   description?: string
   type?: {
     text?: string
   }
-  values?: PreferenceValue
-  userValues?: UserValue
+  userValues?: UserValue[]
 }
 
-export interface UserValue {
-  value?: number
+export interface RangePreference extends Preference {
+  values?: PreferenceValue
 }
 
 export interface PreferenceValue {
   preference?: number
   min_value?: number
   max_value?: number
+}
+
+export interface UserValue {
+  value?: number
 }
 
 export interface UserPreferenceItem {

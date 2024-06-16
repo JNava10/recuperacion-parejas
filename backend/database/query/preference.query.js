@@ -41,7 +41,7 @@ class PreferenceQuery {
                 console.log(options)
 
                 options.forEach((option, index) => {
-                    const item = new PreferenceOption(createdPreference.id, option.text, index);
+                    const item = new PreferenceOption(createdPreference.id, option.text, index + 1);
 
                     preferenceOptions.push(item);
                 });
