@@ -73,6 +73,7 @@ export interface PreferenceItemWithType extends PreferenceItem {
 
 export interface ChoicePreference extends Preference {
   options?: Option[]
+  optionSelected?: string
 }
 
 export interface PreferenceControl extends Preference {

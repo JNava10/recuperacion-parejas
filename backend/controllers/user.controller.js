@@ -605,6 +605,7 @@ class UserController {
             console.log(e)
 
             if (e instanceof CustomError) {
+                console.log('a')
                 return res.status(400).json(
                     new StdResponse(e.message,{executed: false})
                 )

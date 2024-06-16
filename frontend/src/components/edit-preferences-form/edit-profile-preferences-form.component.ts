@@ -6,7 +6,7 @@ import {
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {SliderModule} from "primeng/slider";
 import {InputTextModule} from "primeng/inputtext";
-import {preferencesToFormGroup, showQueryToast} from "../../utils/common.utils";
+import {userPreferencesToFormGroup, showQueryToast} from "../../utils/common.utils";
 import {UserService} from "../../services/api/user.service";
 import {MessageService} from "primeng/api";
 
@@ -27,19 +27,13 @@ export class EditProfilePreferencesFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.choicePreferencesForm = preferencesToFormGroup(this.preferences!.choice)
-    this.rangePreferencesForm = preferencesToFormGroup(this.preferences!.range)
+    this.choicePreferencesForm = userPreferencesToFormGroup(this.preferences!.choice)
+    this.rangePreferencesForm = userPreferencesToFormGroup(this.preferences!.range)
   }
 
   @Input() preferences?: PreferenceList
   choicePreferencesForm?: FormGroup
   rangePreferencesForm?: FormGroup
-
-  isSelectedOption(preference: ChoicePreference, $index: number) {
-    const userValue = preference.userValues![0].value;
-
-    return preference.options![$index].option_value === userValue;
-  }
 
   getPreferencesFormData = () => {
     const choiceValues =  Object.entries(this.choicePreferencesForm?.value);

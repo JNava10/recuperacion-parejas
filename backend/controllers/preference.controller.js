@@ -66,12 +66,19 @@ class PreferenceController {
 
     static createUserPreferences = async (req, res) => {
         try {
+            const userHasPreferences = await PreferenceQuery.userHasPreferences(req.payload.userId)
+
+            if (userHasPreferences.query) return res.status(400).json(
+                new StdResponse(userHasPreferences.message,{executed: false})
+            )
+
             const {message, query, executed} = await PreferenceQuery.createUserPreferences(req.body, req.payload.userId);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
+            console.log(e)
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
             )

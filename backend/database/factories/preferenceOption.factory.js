@@ -21,7 +21,7 @@ const make = async (preferences) => {
             const preferenceOptions = [];
 
             for (const j in preference.options) {
-                const option = new PreferenceOption(result[0].id, preference.options[j], j + 1);
+                const option = new PreferenceOption(result[0].id, preference.options[j], `${Number(j) + 1}`);
                 preferenceOptions.push(option);
             }
 
