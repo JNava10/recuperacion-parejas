@@ -2,6 +2,7 @@ const {Router } = require('express');
 const UserController = require('../controllers/user.controller');
 const {isAdmin, isMember} = require("../middlewares/role.middleware");
 const {validateToken} = require("../helpers/jwt.helper");
+const BlacklistController = require("../controllers/blacklist.controller");
 const router = Router();
 
 router.post('/member/search', UserController.findUser); // TODO: Cambiar a GET
@@ -32,8 +33,9 @@ router.get('/profile', [validateToken], UserController.getEditableProfileData)
 router.get('/', [validateToken], UserController.getNotDeletedUsers)
 router.put('/preferences/:id?', [validateToken], UserController.updateUserPreferences)
 
-router.get('/notifications', [validateToken], UserController.getSelfNotifications)
+router.post('/logout', BlacklistController.logout)
 
+router.get('/notifications', [validateToken], UserController.getSelfNotifications)
 router.put('/notifications/read', [validateToken], UserController.readUserNotifications)
 router.get('/roles', [validateToken], UserController.getSelfRoles)
 router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
