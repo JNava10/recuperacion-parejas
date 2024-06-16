@@ -4,6 +4,8 @@ import es from 'javascript-time-ago/locale/es'
 import {inject} from "@angular/core";
 import {UserService} from "../services/api/user.service";
 import {userMenuItems} from "./const/menu.constants";
+import {Preference} from "../interfaces/api/preference/preferenceItem";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 export const getQueryToast = (executed: boolean, description: string) => {
   const message: Message = {detail: description}
@@ -35,4 +37,14 @@ export const getTimeAgo = (timestamp: number) => {
 
 export const getUserMenuItems = () => {
 
+}
+
+export const preferencesToFormGroup = (preferences: Preference[]) => {
+  const group: any = {};
+
+  preferences.forEach((preference) => {
+    group[preference.id!] = new FormControl(preference.userValues![0].value || '', Validators.required)
+  });
+
+  return new FormGroup(group);
 }

@@ -711,6 +711,25 @@ class UserQuery {
 
         return new QuerySuccess(true, 'Se han obtenido las notificaciones correctamente.', notifications);
     };
+
+    static setUserPreferences = async (userId, preferences) => {
+        console.log(preferences)
+
+        for (const {value, preference} of preferences) {
+            await models.UserPreference.update(
+                {value},
+                {
+                    where: {
+                        [Op.and]: [
+                            {user: userId},
+                            {preference}
+                        ]
+                    }
+                });
+        }
+
+        return new QuerySuccess(true, 'Se han modificado las preferencias correctamente.');
+    };
 }
 
 module.exports = UserQuery

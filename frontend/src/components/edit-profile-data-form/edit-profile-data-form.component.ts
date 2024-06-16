@@ -3,21 +3,25 @@ import {CustomToastComponent} from "../custom-toast/custom-toast.component";
 import {NgIf} from "@angular/common";
 import {PaginatorModule} from "primeng/paginator";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {CreateUserItem, RoleItem, UserItem} from "../../interfaces/api/user/user";
+import {CreateUserItem, CrudEditResponse, RoleItem, UserItem} from "../../interfaces/api/user/user";
 import * as regex from "../../utils/const/regex.constants";
 import * as customValidators from "../../utils/validators/customValidators";
 import {Message, MessageService} from "primeng/api";
 import {UserService} from "../../services/api/user.service";
+import {showQueryToast} from "../../utils/common.utils";
+import {addBodyClass} from "@angular/cdk/schematics";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-edit-profile-data-form',
   standalone: true,
-    imports: [
-        CustomToastComponent,
-        NgIf,
-        PaginatorModule,
-        ReactiveFormsModule
-    ],
+  imports: [
+    CustomToastComponent,
+    NgIf,
+    PaginatorModule,
+    ReactiveFormsModule,
+    MatProgressSpinner
+  ],
   templateUrl: './edit-profile-data-form.component.html',
   styleUrl: './edit-profile-data-form.component.css'
 })
@@ -40,6 +44,8 @@ export class EditProfileDataFormComponent implements OnInit {
 
   @Input() user?: UserItem
   initialData?: UserItem
+  protected picFile?: File;
+  loading = false;
 
   profileDataForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -59,11 +65,25 @@ export class EditProfileDataFormComponent implements OnInit {
     const user = this.getUserData();
 
     this.userService.editProfileData(user).subscribe(res => {
-      const message: Message = {summary: res.message}
-      message.severity = res.data.executed ? "success" : "error"
+      if (this.picFile) {
+        this.changeUserAvatar(this.user?.id!, res)
+      } else {
+        showQueryToast(res.data.executed, res.message, this.messageService)
+      }
 
-      this.messageService.add(message);
+      this.loading = false;
     });
+  };
+
+  protected handleFile = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+
+    const file = input.files?.item(0);
+
+    if (file) {
+      this.picFile = file
+      console.log(this.picFile)
+    }
   };
 
   private getUserData = () => {
@@ -78,5 +98,13 @@ export class EditProfileDataFormComponent implements OnInit {
     }
 
     return user;
+  }
+
+  private changeUserAvatar = (id: number, res: CrudEditResponse) => {
+    this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
+      showQueryToast(res.data.executed, res.message, this.messageService)
+
+      this.loading = false
+    });
   }
 }

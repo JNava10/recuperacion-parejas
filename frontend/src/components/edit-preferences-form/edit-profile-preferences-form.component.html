@@ -1,12 +1,27 @@
-<div [formGroup]="choicePreferencesForm">
+<div [formGroup]="choicePreferencesForm!">
   @for (preference of preferences?.choice!; track preference.id) {
+    <p>{{preference.name}}</p>
+    <p>{{preference.description}}</p>
     <div>
-      <select>
+      <select [formControlName]="preference.id!" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         @for (option of preference.options!; track $index) {
-          <option value="{{option.option_value}}">{{option.option_name}}</option>
+          <option [selected]="option.option_value === preference.userValues![0].value" value="{{option.option_value}}">{{option.option_name}}</option>
         }
       </select>
     </div>
   }
 
+  @for (preference of preferences?.range!; track $index) {
+    <div>
+      <p>{{preference.name}}</p>
+      <p>{{preference.description}}</p>
+
+      <div [formGroup]="rangePreferencesForm!" class="flex flex-row gap-1 items-center">
+        <span class="bg-gray-100 text-gray-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{{this.rangePreferencesForm!.value[preference.id!]}}</span>
+        <input id="default-range" type="range" min="{{preference.values?.min_value}}"  max="{{preference.values?.max_value}}" [formControlName]="preference.id!" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+      </div>
+    </div>
+  }
+
+  <button (click)="getPreferencesFormData()">Guardar preferencias</button>
 </div>

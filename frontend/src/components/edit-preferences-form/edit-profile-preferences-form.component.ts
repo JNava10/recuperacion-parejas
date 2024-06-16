@@ -1,41 +1,74 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ChoicePreference, PreferenceList} from "../../interfaces/api/preference/preferenceItem";
-import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+  ChoicePreference,
+  PreferenceList, PreferenceValue, PreferenceValueFormItem, RangePreference
+} from "../../interfaces/api/preference/preferenceItem";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {SliderModule} from "primeng/slider";
+import {InputTextModule} from "primeng/inputtext";
+import {preferencesToFormGroup, showQueryToast} from "../../utils/common.utils";
+import {UserService} from "../../services/api/user.service";
+import {MessageService} from "primeng/api";
 
 @Component({
   selector: 'app-profile-edit-preferences-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SliderModule,
+    FormsModule,
+    InputTextModule
   ],
   templateUrl: './edit-profile-preferences-form.component.html',
   styleUrl: './edit-profile-preferences-form.component.css'
 })
 export class EditProfilePreferencesFormComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private userService: UserService, private messageService: MessageService) {
+  }
 
   ngOnInit() {
-    this.preferences?.choice.forEach(preference => {
-      this.createChoicePreference(preference)
-    })
+    this.choicePreferencesForm = preferencesToFormGroup(this.preferences!.choice)
+    this.rangePreferencesForm = preferencesToFormGroup(this.preferences!.range)
   }
 
   @Input() preferences?: PreferenceList
+  choicePreferencesForm?: FormGroup
+  rangePreferencesForm?: FormGroup
 
-  choicePreferencesForm = this.formBuilder.group({
-    preferences: this.formBuilder.array([])
-  });
+  isSelectedOption(preference: ChoicePreference, $index: number) {
+    const userValue = preference.userValues![0].value;
 
-  get choicePreferences() {
-    return this.choicePreferencesForm.get('preferences') as FormArray;
+    return preference.options![$index].option_value === userValue;
   }
 
-  createChoicePreference = (preference: ChoicePreference) => {
-    this.choicePreferences.push(
-      this.formBuilder.group({
-        id: preference.id,
-        value: [preference.userValues?.value, [Validators.required]]
-      })
-    )
+  getPreferencesFormData = () => {
+    const choiceValues =  Object.entries(this.choicePreferencesForm?.value);
+    const rangeValues =  Object.entries(this.rangePreferencesForm?.value);
+
+
+    const choices: PreferenceValueFormItem[] = []
+    const ranges: PreferenceValueFormItem[] = []
+
+    choiceValues.forEach(entry => {
+      const preferenceId = entry[0];
+      const preferenceValue = entry[1];
+
+      choices.push({preference: Number(preferenceId), value: Number(preferenceValue)})
+    });
+
+    console.log(choices)
+
+    rangeValues.forEach(entry => {
+      const preferenceId = entry[0];
+      const preferenceValue = entry[1];
+
+      ranges.push({preference: Number(preferenceId), value: Number(preferenceValue)})
+    });
+
+    const preferences = [...choices, ...ranges]
+
+    this.userService.updateOwnPreferences(preferences).subscribe(body => {
+      showQueryToast(body.data.executed, body.message, this.messageService)
+    })
   }
 }
