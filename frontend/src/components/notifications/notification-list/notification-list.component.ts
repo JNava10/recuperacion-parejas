@@ -6,6 +6,7 @@ import {user} from "../../../utils/const/regex.constants";
 import {DatePipe} from "@angular/common";
 import {StyleClassModule} from "primeng/styleclass";
 import {getTimeAgo} from "../../../utils/common.utils";
+import {NewMatchArgs} from "../../../interfaces/socket/notification";
 
 @Component({
   selector: 'app-notification-list',
@@ -22,14 +23,26 @@ export class NotificationListComponent implements OnInit {
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
+    this.getAllNotifications();
+  }
+
+  private getAllNotifications() {
     this.userService.getNotifications().subscribe(body => {
-      this.newMatchNotifications = body.data.query
+      this.notifications = body.data.query
     })
   }
 
-  // @Input() newMatchNotifications?: NewMatchNotification[]
-  newMatchNotifications?: NewMatchNotification[]
+// @Input() newMatchNotifications?: NewMatchNotification[]
+  notifications?: NewMatchNotification[]
   protected readonly user = user;
   protected readonly getTimeAgo = getTimeAgo;
   protected readonly Date = Date;
+
+  readAllNotifications() {
+    this.userService.readAllNotifications().subscribe(body => {
+      if (body.data.executed) {
+        this.getAllNotifications()
+      }
+    })
+  }
 }

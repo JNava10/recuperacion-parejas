@@ -16,6 +16,6 @@ export class MatchesListComponent {
   @Input() matches?: UserItem[];
 
   goToChat = async (user: UserItem) => {
-    await this.router.navigate(['available-events', {id: user.id}]);
+    await this.router.navigate(['chat', {id: user.id}]);
   };
 }

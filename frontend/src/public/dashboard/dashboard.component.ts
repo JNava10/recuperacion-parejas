@@ -55,7 +55,6 @@ export class DashboardComponent implements OnInit {
     this.userService.getChats().subscribe(body => {
 
       body.data.chats.notPending.forEach((user) => {
-        console.log(user)
         this.notPending.set(user.id!, user!)
       })
 

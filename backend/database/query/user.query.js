@@ -379,7 +379,7 @@ class UserQuery {
                         },
                         {
                             [Op.not]: {user: userToIgnore}
-                        }
+                        },
                     ]
                 },
                 attributes: ['user']
@@ -729,6 +729,17 @@ class UserQuery {
         }
 
         return new QuerySuccess(true, 'Se han modificado las preferencias correctamente.');
+    };
+
+    static readUserNotifications = async (user) => {
+        try {
+            const updated = await models.NewMatchNotification.update({seen: true}, {where: {to: user}})
+
+            return new QuerySuccess(updated !== null, 'Se ha quitado el rol correctamente.');
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
     };
 }
 

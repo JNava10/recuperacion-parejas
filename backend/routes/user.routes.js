@@ -34,6 +34,7 @@ router.put('/preferences/:id?', [validateToken], UserController.updateUserPrefer
 
 router.get('/notifications', [validateToken], UserController.getSelfNotifications)
 
+router.put('/notifications/read', [validateToken], UserController.readUserNotifications)
 router.get('/roles', [validateToken], UserController.getSelfRoles)
 router.put('/avatar/:id', [validateToken], UserController.updateUserAvatar)
 router.delete('/:id', [validateToken], UserController.deleteUser)

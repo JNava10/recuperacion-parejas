@@ -151,12 +151,17 @@ export class UserService {
     return this.http.get<GetCountResponse>(`${environment.apiUrl}/user/role-users/${roleName}`, {params: {...sendTokenParam}});
   }
 
+  // TODO: Mover a NotificationApiService
   getNotifications = () => {
     return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}});
   }
 
+  // TODO: Mover a NotificationApiService
+  readAllNotifications = () => {
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/notifications/read`, {}, {params: {...sendTokenParam}});
+  }
 
-  // TODO: Mover a PreferenceService
+  // TODO: Mover a PreferenceApiService
   updateOwnPreferences = (preferences: PreferenceValueFormItem[]) => {
     return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/preferences/`,{preferences}, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {

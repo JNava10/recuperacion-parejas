@@ -11,6 +11,7 @@ const {getRecoverCodeMail} = require("../constants/mail.constants");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
 const {roleNames} = require("../constants/seed.const");
 const CustomError = require("../classes/customError");
+const models = require("../database/models");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -429,22 +430,26 @@ class UserController {
             ).value;
 
             // Estas serán las preferencias que se tendrán en cuenta a la hora de buscar usuarios (los usuarios dentro de rangeAffineUsers).
+            // Se tendrán en cuenta las preferencias que estén en un rango de afinidad del 30% con el usuario.
             const userMaxPreferences = userPreferences.query.values.filter(item => item.value > userMaxPreferenceValue * 0.85);
             const userMinPreferences = userPreferences.query.values.filter(item => item.value < userMinPreferenceValue * 1.15);
 
             // 5. Obtener los IDs de los usuarios cuyos valores de preferencia se acerquen a las de userMaxPreferences y userMinPreferences.
 
-            const matchableUserIds = [];
+            let matchableUserIds = [];
             // Borramos las preferencias repetidas, introduciendolas en un map.
             const preferencesForFind = new Map([...userMaxPreferences, ...userMinPreferences].map(item => [item.preference, item.value]));
 
+            // Filtramos según los usuarios tengan los mismos valores de preferencias, con un rango del 35%
             preferencesForFind.forEach((value, preference) => {
                 rangeAffineUsers.forEach(user => {
-                    const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.75 && prefItem.value < value * 1.35))
+                    const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.65 && prefItem.value < value * 1.35))
 
                     if (matchedPreference) matchableUserIds.push(user.user)
                 });
             });
+
+            // Si no hay resultados, filtramos con un rango del 65%
 
             if (matchableUserIds.length === 0) {
                 preferencesForFind.forEach((value, preference) => {
@@ -455,6 +460,17 @@ class UserController {
                     });
                 });
             }
+
+            // Filtramos para quitar a los que ya se han dado like
+            const alreadyLikedUsers = await models.Friendship.findAll({
+                where: {requesting_user: userId},
+                attributes: ['requested_user']
+            })
+
+            const alreadyLikedIds = alreadyLikedUsers.map(user => user.requested_user)
+            console.log(alreadyLikedIds)
+
+            matchableUserIds = matchableUserIds.filter(user => !alreadyLikedIds.includes(user))
 
             const {message, query} = await UserQuery.getUsersById(matchableUserIds)
 
@@ -668,6 +684,7 @@ class UserController {
         }
     };
 
+    // TODO: Mover a NotificationController
     static getSelfNotifications = async (req, res) => {
         try {
             const userId = req.payload.userId;
@@ -689,6 +706,29 @@ class UserController {
         }
     };
 
+    // TODO: Mover a NotificationController
+    static readUserNotifications = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            const notifications = await UserQuery.readUserNotifications(userId);
+
+            return res.status(200).json(
+                new StdResponse(notifications.message, {
+                    executed: notifications.executed,
+                    query: notifications.query
+                })
+            );
+        } catch (e) {
+            console.log(e)
+
+            return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    // TODO: Mover a RoleController
     static getSelfRoles = async (req, res) => {
         try {
             const userId = req.payload.userId;
