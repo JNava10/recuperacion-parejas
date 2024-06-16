@@ -39,11 +39,21 @@ export const getUserMenuItems = () => {
 
 }
 
+export const userPreferencesToFormGroup = (preferences: Preference[]) => {
+  const group: any = {};
+
+  preferences.forEach((preference) => {
+    group[preference.id!] = new FormControl(preference.userValues![0].value || 1, Validators.required)
+  });
+
+  return new FormGroup(group);
+}
+
 export const preferencesToFormGroup = (preferences: Preference[]) => {
   const group: any = {};
 
   preferences.forEach((preference) => {
-    group[preference.id!] = new FormControl(preference.userValues![0].value || '', Validators.required)
+    group[preference.id!] = new FormControl(1, Validators.required)
   });
 
   return new FormGroup(group);

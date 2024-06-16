@@ -155,6 +155,8 @@ export class UserService {
     return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}});
   }
 
+
+  // TODO: Mover a PreferenceService
   updateOwnPreferences = (preferences: PreferenceValueFormItem[]) => {
     return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/preferences/`,{preferences}, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
@@ -162,6 +164,6 @@ export class UserService {
 
         return of(error);
       })
-    );;
+    );
   }
 }

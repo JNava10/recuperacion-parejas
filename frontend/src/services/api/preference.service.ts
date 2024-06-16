@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {GetUsersResponse} from "../../interfaces/api/user/user";
+import {CrudEditResponse, GetUsersResponse} from "../../interfaces/api/user/user";
 import {environment} from "../../environments/environment";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {map} from "rxjs";
-import {HttpClient} from "@angular/common/http";
+import {catchError, map, of} from "rxjs";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {
   CreateChoicePreferenceItem, CreatePreferencesResponse,
   CreateRangePreferenceItem,
@@ -40,6 +40,12 @@ export class PreferenceService {
   }
 
   createUserPreferences = (preferences: UserPreferenceItem[]) => {
-    return this.http.post<CreatePreferencesResponse>(`${environment.apiUrl}/preference/user-preferences`, preferences, {params: {...sendTokenParam}});
+    return this.http.post<CreatePreferencesResponse>(`${environment.apiUrl}/preference/user`, preferences, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CreatePreferencesResponse;
+
+        return of(error);
+      })
+    );
   }
 }

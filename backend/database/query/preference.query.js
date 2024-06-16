@@ -137,6 +137,14 @@ class PreferenceQuery {
         }
     };
 
+    static userHasPreferences = async (userId) => {
+        const exists = await models.UserPreference.findOne({where: {user: userId}, attributes: ['user']}) !== null;
+
+        const message = exists ? 'El usuario ya tiene preferencias.' : 'El usuario no tiene preferencias.'
+
+        return new QuerySuccess(true, message, exists);
+    };
+
     static getUserPreferences = async (user) => {
         try {
             const rangePreferences = await models.Preference.findAll({
