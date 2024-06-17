@@ -32,10 +32,8 @@ class UserController {
                )
            )
        } catch (e) {
-           console.log(e)
-
-           return res.status(500).json(
-               new StdResponse(e.message,{executed: false})
+           return res.status(203).json(
+               new StdResponse('Ha ocurrido un problema al actualizar al buscar los usuarios.',{executed: false, error: e.message})
            )
        }
     };
@@ -52,11 +50,9 @@ class UserController {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+        }  catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al buscar los usuarios.',{executed: false, error: e.message})
             )
         }
     };
@@ -71,10 +67,8 @@ class UserController {
                 )
             }
         } catch (e) {
-            console.error(e)
-
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al obtener los usuarios',{executed: false, error: e.message})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios.',{executed: false, error: e.message})
             )
         }
     };
@@ -90,10 +84,8 @@ class UserController {
                 )
             }
         } catch (e) {
-            console.error(e)
-
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al obtener los usuarios',{executed: false, error: e.message})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios.',{executed: false, error: e.message})
             )
         }
     };
@@ -119,11 +111,9 @@ class UserController {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } catch (e) {
-            console.error(e)
-
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al crear el usuario',{executed: false, error: e.message})
+        }  catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear el usuario.',{executed: false, error: e.message})
             )
         }
 
@@ -244,11 +234,9 @@ class UserController {
             return res.status(200).json(
                 new StdResponse('Se ha enviado el correo correctamente',{executed: true})
             )
-        } catch (e) {
-            console.log(e)
-
+        }  catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al enviar el email de recuperación.',{executed: false, error: e.message})
             )
         }
     };
@@ -263,10 +251,8 @@ class UserController {
                 new StdResponse(message,{isValid, token})
             )
         } catch (e) {
-            console.log(e)
-
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al comprobar el codigo de recuperación.',{executed: false, error: e.message})
             )
         }
     };
@@ -289,7 +275,7 @@ class UserController {
             )
         } catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al cambiar la contraseña.',{executed: false, error: e.message})
             )
         }
     };
@@ -439,7 +425,7 @@ class UserController {
             )
         } catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al actualizar el perfil del usuario.',{executed: false, error: e.message})
             )
         }
     };
@@ -464,7 +450,7 @@ class UserController {
             );
         } catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al actualizar el perfil del usuario.',{executed: false, error: e.message})
             )
         }
     };
@@ -510,7 +496,7 @@ class UserController {
             }
 
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al actualizar el avatar del usuario.',{executed: false, error: e.message})
             )
         }
     };
@@ -530,7 +516,7 @@ class UserController {
             );
         } catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al obtener los chats.',{executed: false, error: e.message})
             )
         }
     };
@@ -556,10 +542,8 @@ class UserController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios.',{executed: false, error: e.message})
             )
         }
     };
@@ -577,10 +561,8 @@ class UserController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al obtener las notificaciones.',{executed: false, error: e.message})
             )
         }
     };
@@ -599,7 +581,7 @@ class UserController {
             );
         } catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al leer las notificaciones del usuario.',{executed: false, error: e.message})
             )
         }
     };
@@ -627,7 +609,7 @@ class UserController {
             );
         } catch (e) {
             return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
             )
         }
     };

@@ -26,8 +26,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha creado el evento correctamente.', query);
         } catch (e) {
-            console.log(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -41,7 +41,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -53,7 +54,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -64,29 +66,19 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha borrado el evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
     static getAllEvents = async () => {
         try {
-            const query = await models.Event.findAll({
-                // include: {
-                //     model: models.User,
-                //     attributes: [
-                //         [models.sequelize.fn('COUNT', models.Sequelize.col(`user`)), 'count'],
-                //     ],
-                //     group: 'event',
-                //     as: 'assistants'
-                // },
-            });
-
-            console.log(query)
+            const query = await models.Event.findAll();
 
             return new QuerySuccess(true, 'Se han obtenido los eventos correctamente.', query);
         } catch (e) {
-            console.log(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -98,6 +90,20 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha obtenido el evento correctamente.', query);
         } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
+    static eventExists = async (id) => {
+        try {
+            const query = (await models.Event.findOne({where: {id}}) !== null);
+
+            const message = query ? 'El evento indicado existe.' : 'El evento indicado no existe.'
+
+            return new QuerySuccess(true, message, query);
+        } catch (e) {
+            console.error(e)
             throw e
         }
     };
@@ -118,7 +124,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -135,7 +142,8 @@ class CreateEvent {
             return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
         } catch (e) {
             console.log(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 

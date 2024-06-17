@@ -10,39 +10,43 @@ const UserQuery = require("../database/query/user.query");
 class EventController {
 
     static createEvent = async (req, res) => {
-        const eventBody = req.body;
-        eventBody.author = req.payload.userId;
+        try {
+            const eventBody = req.body;
+            eventBody.author = req.payload.userId;
 
-        const {message, executed, query, error} = await EventQuery.createEvent(eventBody);
+            const {message, executed, query, error} = await EventQuery.createEvent(eventBody);
 
+            const event = query;
 
-        const event = query;
+            const summaryFile = await EventUtils.generateSummaryFile(event)
 
-        const summaryFile = await EventUtils.generateSummaryFile(event)
+            await EventQuery.updateEventSummary(event.id, summaryFile.secure_url);
 
-        await EventQuery.updateEventSummary(event.id, summaryFile.secure_url);
-
-        if (executed) {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear el evento.',{executed: false, error: e.message})
             )
         }
     };
 
     static editEventDetails = async (req, res) => {
         try {
+            // TODO: Cambiar a params
             const event = req.body;
             event.author = req.payload.userId;
 
-            const isClosed = await EventQuery.eventIsClosed(req.body.id);
+            const eventExists = await EventQuery.eventExists(req.body.id);// TODO: Validator
+
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+
+            const isClosed = await EventQuery.eventIsClosed(req.body.id);// TODO: Validator
 
             if (isClosed.query) return res.status(200).json(
                 new StdResponse(isClosed.message,{executed: false})
@@ -54,157 +58,170 @@ class EventController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al comprobar el codigo de recuperación.',{executed: false, error: e.message})
             )
         }
     };
 
     static editEventPlace = async (req, res) => {
-        const event = req.body;
-        event.author = req.payload.userId;
+        try {
+            const event = req.body;
+            event.author = req.payload.userId;
 
-        const {message, executed, query, error} = await EventQuery.editEventPlace(event);
+            const eventExists = await EventQuery.eventExists(req.body.id);// TODO: Validator
 
-        if (executed) {
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+
+            const isClosed = await EventQuery.eventIsClosed(req.body.id);// TODO: Validator
+
+            if (isClosed.query) return res.status(200).json(
+                new StdResponse(isClosed.message,{executed: false})
+            )
+
+            const {message, executed, query} = await EventQuery.editEventPlace(event);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error)
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al comprobar el codigo de recuperación.',{executed: false, error: e.message})
             )
         }
     };
 
     static deleteEventById = async (req, res) => {
         try {
-            const {id} = req.params;
 
-            const isClosed = await EventQuery.eventIsClosed(req.body.id);
+            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
+
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+
+            const isClosed = await EventQuery.eventIsClosed(req.params.eventId);// TODO: Validator
 
             if (isClosed.query) return res.status(200).json(
                 new StdResponse(isClosed.message,{executed: false})
             )
 
-            const {message, executed, query, error} = await EventQuery.deleteEvent(id);
+            const {message, executed, query} = await EventQuery.deleteEvent(id);
 
-            if (executed) {
-                return res.status(200).json(
-                    new StdResponse(message,{executed, query})
-                )
-            }
-        }  catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al borrar el evento.',{executed: false, error: e.message})
             )
         }
     };
 
     static getAllEvent = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.getAllEvents();
+        try {
+            const {message, executed, query} = await EventQuery.getAllEvents();
 
-        if (executed) {
+            if (query.length === 0) return res.status(404).json(
+                new StdResponse("No se ha encontrado ningun evento",{executed, query})
+            )
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los eventos.',{executed: false, error: e.message})
             )
         }
     };
 
     static getEvent = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.getEvent(req.params.id);
+        try {
+            const {message, executed, query} = await EventQuery.getEvent(req.params.eventId);
 
-        if (executed) {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener el evento.',{executed: false, error: e.message})
             )
         }
     };
 
     static getIfRegisteredToEvent = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.getIfSubscribedToEvent(req.params.id, req.payload.userId);
+        try {
+            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
 
-        if (executed) {
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+
+            const {message, executed, query} = await EventQuery.getIfSubscribedToEvent(req.params.eventId, req.payload.userId);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener el evento.',{executed: false, error: e.message})
             )
         }
     };
 
     static getEventsRegistered = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.getEventsRegistered(req.payload.userId);
+        try {
+            const {message, executed, query} = await EventQuery.getEventsRegistered(req.payload.userId);
 
-        if (executed) {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los eventos.',{executed: false, error: e.message})
             )
         }
     };
 
-
     static getAvailableEvents = async (req, res) => {
-        const {message, executed, query, error} = await EventQuery.getAvailableEvents();
+       try {
+           const {message, executed, query} = await EventQuery.getAvailableEvents();
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error)
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
+           if (query.length === 0) return res.status(404).json(
+               new StdResponse('No hay ningun evento disponible.',{executed, query})
+           )
+
+           return res.status(200).json(
+               new StdResponse(message,{executed, query})
+           )
+       } catch (e) {
+           return res.status(203).json(
+               new StdResponse("Ha ocurrido un problema al obtener los eventos",{executed: false, error: e.message})
+           )
+       }
+
     };
 
     static subscribeToEvent = async (req, res) => {
       try {
-          const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));
+          const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
+
+          if (!eventExists.query) return res.status(200).json(
+              new StdResponse(eventExists.message, {
+                  executed: false
+              })
+          );
+
+          const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));// TODO: Validator
 
           if (isClosed.query) return res.status(200).json(
               new StdResponse(isClosed.message, {
@@ -213,7 +230,17 @@ class EventController {
               })
           );
 
-          const userId = req.params.userId ?? req.payload.userId;
+          const userId = req.params.userId || req.payload.userId;
+
+          if (req.params.userId) {
+              const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+
+              if (userExists.query) return res.status(404).json(
+                  new StdResponse(userExists.message, {
+                      executed: false
+                  })
+              );
+          }
 
           const {message, executed} = await EventQuery.subscribeToEvent(req.params.eventId, userId);
 
@@ -224,17 +251,25 @@ class EventController {
               })
           );
       } catch (e) {
-          console.log(e)
-
-          return res.status(500).json(
-              new StdResponse(e.message,{executed: false})
+          return res.status(203).json(
+              new StdResponse('Ha ocurrido un problema al suscribirse al evento.',{executed: false, error: e.message})
           )
       }
     };
 
     static withdrawEvent = async (req, res) => {
          try {
-             const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));
+             const eventId = req.params.eventId
+
+             const eventExists = await EventQuery.eventExists(eventId);// TODO: Validator
+
+             if (!eventExists.query) return res.status(200).json(
+                 new StdResponse(eventExists.message, {
+                     executed: false
+                 })
+             );
+
+             const isClosed = (await EventQuery.eventIsClosed(eventId));// TODO: Validator
 
              if (isClosed.query) return res.status(200).json(
                  new StdResponse(isClosed.message, {
@@ -244,38 +279,70 @@ class EventController {
              );
 
              const userId = req.params.userId || req.payload.userId;
-             const {message, executed, query} = await EventQuery.withdrawEvent(req.params.eventId, userId);
+
+             if (req.params.userId) {
+                 const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+
+                 if (userExists.query) return res.status(404).json(
+                     new StdResponse(userExists.message, {
+                         executed: false
+                     })
+                 );
+             }
+
+             const {message, executed, query} = await EventQuery.withdrawEvent(eventId, userId);
 
              return res.status(200).json(
                  new StdResponse(message,{executed, query})
              )
-         } catch (e) {
-             return res.status(500).json(
-                 new StdResponse('Ha ocurrido un problema al desapuntar al usuario.', {executed: false, error: e.toString()})
+         }  catch (e) {
+             return res.status(203).json(
+                 new StdResponse('Ha ocurrido un problema al actualizar el perfil del usuario.',{executed: false, error: e.message})
              )
          }
     };
 
     static getSummaryFile = async (req, res) => {
         try {
-            const event = (await EventQuery.getEvent(req.params.id)).query;
+            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
 
-            if (!event) return res.status(200).json(
-                new StdResponse('No se ha encontrado ningun evento con el ID indicado.', {executed: false})
-            )
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
 
             return res.status(200).json(
                 new StdResponse('Se ha creado correctamente el archivo', {file: {url: uploadedFile.secure_url}})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al crear el archivo.', {executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener el archivo de resumen.', {executed: false, error: e.message})
             )
         }
     };
 
     static updateEventPic = async (req, res) => {
         try {
+            const eventId = req.params.eventId
+
+            const eventExists = await EventQuery.eventExists(eventId); // TODO: Validator
+
+            if (!eventExists.query) return res.status(200).json(
+                new StdResponse(eventExists.message, {
+                    executed: false
+                })
+            );
+
+            const isClosed = (await EventQuery.eventIsClosed(eventId)); // TODO: Validator
+
+            if (isClosed.query) return res.status(200).json(
+                new StdResponse(isClosed.message, {
+                    executed: true,
+                    closed: true
+                })
+            );
+
             const key = 'pic';
 
             if (!req.files || !req.files[key]) return res.status(400).json(
@@ -291,9 +358,7 @@ class EventController {
 
             const picUrl = uploadedNames.get(key).secure_url;
 
-            const {id} = req.params;
-
-            const {message, query, executed} = await EventQuery.updateEventPic(id, picUrl)
+            const {message, query, executed} = await EventQuery.updateEventPic(eventId, picUrl)
 
             return res.status(200).json(
                 new StdResponse(message, {
@@ -302,24 +367,21 @@ class EventController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
             if (e instanceof CustomError) {
                 return res.status(400).json(
                     new StdResponse(e.message,{executed: false})
                 )
             }
 
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el evento.', {executed: false, error: e.message})
             )
         }
     };
 
     static getEventMembers = async (req, res) => {
         try {
-            // TODO: Cambiar a getIfEventExists
-            const eventExists = await EventQuery.getEvent(req.params.id);
+            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
 
             if (!eventExists.query) return res.status(200).json(
                 new StdResponse(eventExists.message, {
@@ -327,7 +389,7 @@ class EventController {
                 })
             );
             
-            const {message, query, executed} = await EventQuery.getEventMembers(req.params.id);
+            const {message, query, executed} = await EventQuery.getEventMembers(req.params.eventId);
 
             return res.status(200).json(
                 new StdResponse(message, {
@@ -346,9 +408,7 @@ class EventController {
 
     static getEventNotMembers = async (req, res) => {
         try {
-
-            // TODO: Cambiar a getIfEventExists
-            const eventExists = await EventQuery.getEvent(req.params.id);
+            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
 
             if (!eventExists.query) return res.status(200).json(
                 new StdResponse(eventExists.message, {
@@ -356,7 +416,7 @@ class EventController {
                 })
             );
 
-            const {message, query, executed} = await EventQuery.getEventNonAssistants(req.params.id);
+            const {message, query, executed} = await EventQuery.getEventNonAssistants(req.params.eventId);
 
             return res.status(200).json(
                 new StdResponse(message, {
@@ -373,14 +433,13 @@ class EventController {
         }
     };
 
-    // TODO: Fusionar con la ruta de apuntarse a si mismo
     static addMemberToEvent = async (req, res) => {
         try {
             const event = req.params.eventId;
             const user = req.params.userId;
 
-            const eventExists = await EventQuery.getEvent(event);
-            const userExists = await UserQuery.checkIfIdExists(user);
+            const eventExists = await EventQuery.eventExists(event); // TODO: Validator
+            const userExists = await UserQuery.checkIfIdExists(user); // TODO: Validator
 
             if (!eventExists.query && !userExists.query) return res.status(200).json(
                 new StdResponse("No existen ni el usuario ni el evento indicados.", {
@@ -424,26 +483,25 @@ class EventController {
         }
     };
 
-    // TODO: Fusionar con la ruta de desapuntarse a si mismo
     static removeFromEvent = async (req, res) => {
         try {
             const event = req.params.eventId;
             const user = req.params.userId;
 
-            const eventExists = await EventQuery.getEvent(event);
-            const userExists = await EventQuery.getEvent(user);
+            const eventExists = await EventQuery.eventExists(event);// TODO: Validator
+            const userExists = await UserQuery.checkIfIdExists(user);// TODO: Validator
 
-            if (!eventExists.query && !userExists.query) return res.status(200).json(
+            if (!eventExists.query && !userExists.query) return res.status(404).json(
                 new StdResponse("No existen ni el usuario ni el evento indicados.", {
                     executed: false
                 })
             );
-            else if (!eventExists.query) return res.status(200).json(
+            else if (!eventExists.query) return res.status(404).json(
                 new StdResponse(eventExists.message, {
                     executed: false
                 })
             );
-            else if (!userExists.query) return res.status(200).json(
+            else if (!userExists.query) return res.status(404).json(
                 new StdResponse(userExists.message, {
                     executed: false
                 })
@@ -458,8 +516,6 @@ class EventController {
                 })
             );
         } catch (e) {
-            console.log(e);
-
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al borrar el usuario del evento.', {executed: false, error: e.toString()})
             );
