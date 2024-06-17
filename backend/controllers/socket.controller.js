@@ -22,11 +22,19 @@ class SocketController {
         return userList.filter(entry => ids.includes(entry[0]))
     }
 
+    /**
+     *
+     * @param {Socket} socket
+     * @param io
+     */
     static onConnect = (socket, io) => {
         SocketController.io = io;
 
         SocketController.usersConnected.set(socket.user.userId, socket)
 
+        io.emit('user-connected', {count: SocketController.usersConnected.size});
+
+        console.log(SocketController.usersConnected.size)
         socket.on('disconnect', () => SocketController.onDisconnect(socket))
         socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
         socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
@@ -36,6 +44,9 @@ class SocketController {
     }
 
     static onDisconnect = (socket) => {
+        SocketController.usersConnected.delete(socket.user.userId)
+        SocketController.io.emit('user-disconnected', {count: SocketController.usersConnected.size});
+
         console.log(`Se ha cerrado la conexion ${socket.id} (Usuario con ID ${socket.user.userId})`);
 
         console.log('Intentando desconectarse de las rooms...')

@@ -20,6 +20,12 @@ const getRandomFromRange = (min, max) => {
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
 
+const removeAccentMarks = (text) => {
+    // Con normalize podemos convertir un string a distintos formatos. En este caso, convertimos el string a caracteres unicode.
+    // Y replace se utiliza aqui para reemplazar algunos caracteres raros que tiene unicode a ''.
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 /**
  *
  * @param response
@@ -59,5 +65,6 @@ module.exports = {
     sendStandardResponse,
     generateSecureHex,
     generateSecureInt,
-    getEventCloseDate
+    getEventCloseDate,
+    removeAccentMarks
 };

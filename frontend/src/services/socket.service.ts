@@ -23,6 +23,10 @@ export class SocketService {
     }
   }
 
+  onDisconnect = (callback: Function) => {
+    callback()
+  }
+
   sendMessage = (content: SendMessageSocketParams, idToSend: number) => {
     this.socket?.emit('msg', {content, idToSend});
   }
@@ -49,6 +53,14 @@ export class SocketService {
 
   listenFileMessages = (callback: Function) => {
     this.socket?.on('msg-file', (params) => callback(params));
+  }
+
+  listenUserConnected = (callback: Function) => {
+    this.socket?.on('user-connected', (params) => callback(params));
+  }
+
+  listenUsersDisconnected = (callback: Function) => {
+    this.socket?.on('user-disconnected', (params) => callback(params));
   }
 
   listenJoinChat = (callback: Function) => {

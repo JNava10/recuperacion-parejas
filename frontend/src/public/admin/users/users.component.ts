@@ -4,6 +4,7 @@ import {User, UserItem} from "../../../interfaces/api/user/user";
 import {UserTableComponent} from "../../../components/users/user-table/user-table.component";
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 import {DatePipe} from "@angular/common";
+import {RouterOutlet} from "@angular/router";
 
 @Component({
   selector: 'app-users',
@@ -12,7 +13,8 @@ import {DatePipe} from "@angular/common";
     UserTableComponent,
     CdkDropList,
     CdkDrag,
-    DatePipe
+    DatePipe,
+    RouterOutlet
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'

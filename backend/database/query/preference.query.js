@@ -6,6 +6,7 @@ const QueryError = require("../../classes/QueryError");
 const PreferenceOption = require("../../classes/preferenceOption");
 const {preferenceTypes} = require("../../constants/seed.const");
 const {el} = require("@faker-js/faker");
+const CustomError = require("../../classes/customError");
 
 class PreferenceQuery {
     static getActivatedPreferences = async () => {
@@ -47,7 +48,16 @@ class PreferenceQuery {
                 });
 
                 await models.PreferenceOption.bulkCreate(preferenceOptions);
-            }
+
+                const usersId = await models.User.findAll({attributes: ['id'], where: {deletedAt: null}})
+                const usersPreference = [];
+
+                usersId.forEach(user => {
+                    usersPreference.push({user: user.id, preference: createdPreference.id, value: 1})
+                });
+
+                await models.UserPreference.bulkCreate(usersPreference);
+            } else throw new CustomError('No se ha podido obtener la preferencia creada.')
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
         } catch (e) {
@@ -73,6 +83,15 @@ class PreferenceQuery {
                     min_value: range.min,
                     max_value: range.max,
                 });
+
+                const usersId = await models.User.findAll({attributes: ['id'], where: {deletedAt: null}})
+                const usersPreference = [];
+
+                usersId.forEach(user => {
+                    usersPreference.push({user: user.id, preference: createdPreference.id, value: range.min})
+                });
+
+                await models.UserPreference.bulkCreate(usersPreference);
             }
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');

@@ -28,8 +28,8 @@ export class UserTableComponent {
 
   @Input() users: UserItem[] = [];
 
-  goToAddForm = () => {
-    this.router.navigate(['add-user']);
+  goToAddForm = async () => {
+    await this.router.navigate(['/admin/users/add']);
   };
 
   @Output() refresh = new EventEmitter<null>()
@@ -56,7 +56,7 @@ export class UserTableComponent {
   }
 
   goToEditUser = (user: UserItem) => {
-    this.router.navigate(['edit-user'], {queryParams: {id: user.id}})
+    this.router.navigate(['/admin/users/edit'], {queryParams: {id: user.id}})
   }
 
   cancelDeleteUser = () => {

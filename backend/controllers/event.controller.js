@@ -204,7 +204,7 @@ class EventController {
 
     static subscribeToEvent = async (req, res) => {
       try {
-          const isClosed = (await EventQuery.eventIsClosed(req.params.id));
+          const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));
 
           if (isClosed.query) return res.status(200).json(
               new StdResponse(isClosed.message, {
@@ -215,7 +215,7 @@ class EventController {
 
           const userId = req.params.userId ?? req.payload.userId;
 
-          const {message, executed} = await EventQuery.subscribeToEvent(req.params.id, userId);
+          const {message, executed} = await EventQuery.subscribeToEvent(req.params.eventId, userId);
 
           return res.status(200).json(
               new StdResponse(message, {
@@ -243,7 +243,7 @@ class EventController {
                  })
              );
 
-             const userId = req.params.userId ?? req.payload.userId;
+             const userId = req.params.userId || req.payload.userId;
              const {message, executed, query} = await EventQuery.withdrawEvent(req.params.eventId, userId);
 
              return res.status(200).json(

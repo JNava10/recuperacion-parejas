@@ -103,6 +103,7 @@ class UserController {
     }
 
     static pushMessage = async (req, res) => {
+        // TODO: Añadir try-catch
         const receiverId = req.body.receiver;
         const message = req.body.message;
         const emitterId = req.payload.userId;
@@ -127,6 +128,7 @@ class UserController {
 
     static getRoleUsers = async (req, res) => {
         try {
+            // TODO: Comprobar que el rol indicado existe
             const {message, executed, query} = await UserQuery.getRoleUsers(req.params.role);
 
             return res.status(200).json(
@@ -142,6 +144,7 @@ class UserController {
     };
 
     static getNotDeletedUsers = async (req, res) => {
+        // TODO: Añadir try-catch
         const {message, executed, query, error} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
         if (executed) {
@@ -161,6 +164,7 @@ class UserController {
 
 
     static getNotDeletedUsersWithRoles = async (req, res) => {
+        // TODO: Añadir try-catch
         const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);
 
         if (executed) {
@@ -182,13 +186,13 @@ class UserController {
         try {
             const user = req.body;
 
-            const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
+            const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar a validator
 
             if (emailExists) return res.status(200).json(
                 new StdResponse("El correo indicado ya existe",{executed: false})
             )
 
-            const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al validator
 
             if (nicknameExists) return res.status(200).json(
                 new StdResponse(nicknameExists.message,{executed: false})
@@ -212,9 +216,10 @@ class UserController {
     };
 
     static updateUserData = async (req, res) => {
+        // TODO: Añadir try-catch
         const newUserData = req.body;
 
-        const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar al middleware
+        const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar a validator
 
         if (nicknameExists) return res.status(409).json(
             new StdResponse("El nick del usuario indicado ya existe",{executed: false})
@@ -238,6 +243,8 @@ class UserController {
     };
 
     static addUserRoles = async (req, res) => {
+        // TODO: Comprobar que el rol está ya insertado
+        // TODO: Añadir try-catch
         const {message, executed, query, error} = await UserQuery.insertUserRoles(req.body.roles, req.params.id);
 
         if (executed) {
@@ -257,7 +264,7 @@ class UserController {
 
     static deleteUserRoles = async (req, res) => {
         try {
-            const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query;
+            const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query; // TODO: Validator
 
             if (adminsRemaining >= 1)  return res.status(200).json(
                 new StdResponse('No se pueden borrar mas administradores.',{executed: false})
@@ -295,8 +302,8 @@ class UserController {
 
     static registerUser = async (req, res) => {
         try {
-            const emailExists = (await UserQuery.checkIfEmailExists(req.body.email)).query;
-            const nicknameExists = (await UserQuery.checkIfNicknameExists(req.body.nickname)).query;
+            const emailExists = (await UserQuery.checkIfEmailExists(req.body.email)).query; // TODO: Validator
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(req.body.nickname)).query; // TODO: Validator
 
             if (emailExists && nicknameExists) return res.status(200).json(
                 new StdResponse("El email y nombre de usuario introducidos ya existen",{executed: false})
@@ -325,15 +332,13 @@ class UserController {
         try {
             const {email} = req.body
 
-            const emailExists = await UserQuery.checkIfEmailExists(email);
+            const emailExists = await UserQuery.checkIfEmailExists(email); // TODO: Validator
 
             if (!emailExists.query)  return res.status(200).json(
                 new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
             )
 
             const {recoverCode, expiresAt} = RecoverController.set(email);
-
-            console.log(recoverCode)
 
             sendEmail(
                 email,
@@ -377,7 +382,7 @@ class UserController {
             const {password} = req.body
             const {recovertoken} = req.headers
 
-            const validatingData = await RecoverController.validateToken(recovertoken); // TODO: Middleware
+            const validatingData = await RecoverController.validateToken(recovertoken);
 
             if (!validatingData.email) return res.status(200).json(
                 new StdResponse(validatingData.message,{executed: false})
@@ -486,6 +491,7 @@ class UserController {
         }
     };
 
+    // TODO: Comprobar que el usuario existe y si está o no habilitado
     static enableOrDisableUser = async (req, res) => {
         try {
             const {userId} = req.params;
@@ -505,6 +511,7 @@ class UserController {
         }
     };
 
+    // TODO: Añadir try-catch
     static deleteUser = async (req, res) => {
         const isAdmin = await UserQuery.userHasRole(req.params.id, roleNames.admin.name);
         const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
@@ -535,6 +542,7 @@ class UserController {
         }
     };
 
+    // TODO: Pulir try-catch
     static editProfileData = async (req, res) => {
         try {
             const {message, executed, query, error} = await UserQuery.editProfileData(req.payload.userId, req.body);
@@ -568,8 +576,6 @@ class UserController {
 
             const userData = (await UserQuery.getUsersById([userId])).query[0];
             const userPreferences = (await PreferenceQuery.getUserPreferences(userId)).query;
-
-            console.log(userPreferences)
 
             return res.status(200).json(
                 new StdResponse(
@@ -608,6 +614,8 @@ class UserController {
             const avatarUrl = uploadedNames.get(key).secure_url;
 
             const {id} = req.params;
+
+            // TODO: Comprobar que el usuario existe
 
             const {message, query, executed} = await UserQuery.editProfileAvatar(id, avatarUrl)
 

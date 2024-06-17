@@ -16,7 +16,7 @@ import {CustomToastComponent} from "../../../components/custom-toast/custom-toas
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {Message, MessageService} from "primeng/api";
 import {FileValidationOptions} from "../../../interfaces/fileValidation";
-import {validateFiles} from "../../../utils/common.utils";
+import {showQueryToast, validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-edit-user-form',
@@ -61,6 +61,7 @@ export class EditUserFormComponent implements OnInit {
   }, {  validators: [customValidators.passwordsMatch('password', 'confirmPassword')], updateOn: "submit"});
 
   editUser = (event: SubmitEvent) => {
+
     if (this.userDataForm.invalid) return
 
     event.preventDefault();
@@ -70,21 +71,12 @@ export class EditUserFormComponent implements OnInit {
     this.userService.editUserData(user!, this.user?.id!).subscribe(body => {
       this.loading = true
 
-      if (!body.data.executed) {
-        const message: Message = {summary: body.message}
-        message.severity = body.data.executed ? "success" : "error"
-        this.messageService.add(message);
-      }
-
       if (this.picFile) {
         this.changeUserAvatar(this.user?.id!, body)
-      } else {
-        const message: Message = {summary: body.message}
-        message.severity = body.data.executed ? "success" : "error"
-        this.messageService.add(message);
-
-        this.loading = false;
       }
+
+      showQueryToast(body.data.executed, body.message, this.messageService)
+
     });
   };
 
@@ -136,11 +128,7 @@ export class EditUserFormComponent implements OnInit {
 
   private changeUserAvatar = (id: number, res: CrudEditResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
-      const message: Message = {summary: res.message}
-
-      message.severity = res.data.executed ? "success" : "error";
-
-      this.messageService.add(message);
+      showQueryToast(body.data.executed, body.message, this.messageService)
 
       this.loading = false
     });

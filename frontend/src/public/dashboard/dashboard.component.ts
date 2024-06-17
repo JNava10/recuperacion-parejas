@@ -6,7 +6,7 @@ import {FriendshipService} from "../../services/api/friendship.service";
 import {UserService} from "../../services/api/user.service";
 import {PendingChatUserItem, UserItem} from "../../interfaces/api/user/user";
 import {DialogModule} from "primeng/dialog";
-import {Router, RouterOutlet} from "@angular/router";
+import {NavigationEnd, Router, RouterOutlet} from "@angular/router";
 import {MatchesListComponent} from "../../components/friendship/matches-list/matches-list.component";
 import {RecentChatListComponent} from "../../components/recent-chat-list/recent-chat-list.component";
 import {SocketService} from "../../services/socket.service";
@@ -18,6 +18,7 @@ import {MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 import {ButtonModule} from "primeng/button";
 import { user } from '../../utils/const/regex.constants';
+import {onConnectParams} from "../../interfaces/socket/socket";
 
 @Component({
   selector: 'app-dashboard',
@@ -48,18 +49,37 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.getMatchedUsers();
 
+    this.socketService.listenUserConnected((params: onConnectParams) => {
+      console.log(params.count)
+      this.usersConnected = params.count
+    })
+
+    this.socketService.listenUsersDisconnected((params: onConnectParams) => {
+      console.log(params.count)
+      this.usersConnected = params.count
+    })
+
     this.friendshipService.getOwnMatches().subscribe(matches => {
       this.matches = matches;
     })
 
     this.userService.getChats().subscribe(body => {
-
       body.data.chats.notPending.forEach((user) => {
         this.notPending.set(user.id!, user!)
       })
 
       body.data.chats.pending.forEach((user) => {
         this.pending.set(user.id!, user!)
+      })
+
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          this.socketService.removeAllListeners();
+        }
+      });
+
+      this.socketService.onDisconnect(() => {
+        this.usersConnected = 0;
       })
     })
 
@@ -80,6 +100,8 @@ export class DashboardComponent implements OnInit {
       this.userService.findUserById(args.from).subscribe(user => this.notifyNewMatch(user))
     })
   }
+
+  usersConnected = 0;
 
   private switchToPending(user: UserItem) {
     this.notPending.delete(user.id!);

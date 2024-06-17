@@ -1,6 +1,8 @@
 @if (usersFetched) {
   <app-user-table [users]="activatedUsers!" (refresh)="getUsers()"></app-user-table>
 
+  <router-outlet></router-outlet>
+
   <h2>Activar/desactivar usuarios</h2>
 
 <!--  <div class="flex flex-row gap-3">-->

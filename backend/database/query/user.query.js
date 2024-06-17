@@ -148,7 +148,7 @@ class UserQuery {
         try {
             const edited = await models.User.update(data, {where: {id}});
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', edited);
+            return new QuerySuccess(true, 'Se ha actualizado el usuario correctamente.', edited);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -170,7 +170,7 @@ class UserQuery {
         try {
             const logged = await models.User.update({lastLogin: new Date(Date.now())}, {where: {id}});
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', logged);
+            return new QuerySuccess(true, 'Se ha actualizado el login del usuario correctamente.', logged);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -181,7 +181,7 @@ class UserQuery {
         try {
             const firstLogin = await models.User.findOne({where: {id}, attributes: ['lastLogin']});
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', firstLogin === true);
+            return new QuerySuccess(true, 'Se ha ejecutado la consulta correctamente.', firstLogin === true);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
@@ -460,7 +460,7 @@ class UserQuery {
         try {
             const query = await models.User.destroy({where: {id}});
 
-            return new QuerySuccess(true, 'Se han obtenido los usuarios correctamente.', query);
+            return new QuerySuccess(true, 'Se ha borrado el usuario correctamente.', query);
         } catch (e) {
             return new QueryError(false, e)
         }
@@ -531,7 +531,7 @@ class UserQuery {
 
             if (!users) return new QuerySuccess(false, 'El usuario indicado no existe.');
 
-            return new QuerySuccess(true, 'Se han obtenido los usuario correctamente.', users);
+            return new QuerySuccess(true, 'Se han obtenido los chats correctamente.', users);
         } catch (e) {
             console.log(e)
             throw e
