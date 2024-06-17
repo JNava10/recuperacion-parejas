@@ -112,7 +112,7 @@ class EventController {
                 new StdResponse(isClosed.message,{executed: false})
             )
 
-            const {message, executed, query} = await EventQuery.deleteEvent(id);
+            const {message, executed, query} = await EventQuery.deleteEvent(req.params.eventId);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
@@ -281,7 +281,7 @@ class EventController {
              const userId = req.params.userId || req.payload.userId;
 
              if (req.params.userId) {
-                 const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+                 const userExists = (await UserQuery.checkIfIdExists(eventId)).query // TODO: Validator
 
                  if (userExists.query) return res.status(404).json(
                      new StdResponse(userExists.message, {
@@ -290,14 +290,14 @@ class EventController {
                  );
              }
 
-             const {message, executed, query} = await EventQuery.withdrawEvent(eventId, userId);
+             const {message, executed, query} = await EventQuery.withdrawFromEvent(eventId, userId);
 
              return res.status(200).json(
                  new StdResponse(message,{executed, query})
              )
          }  catch (e) {
              return res.status(203).json(
-                 new StdResponse('Ha ocurrido un problema al actualizar el perfil del usuario.',{executed: false, error: e.message})
+                 new StdResponse('Ha ocurrido un problema al desapuntar al usuario.',{executed: false, error: e.message})
              )
          }
     };
@@ -398,8 +398,6 @@ class EventController {
                 })
             );
         } catch (e) {
-            console.log(e);
-
             return res.status(500).json(
                 new StdResponse('Ha ocurrido un problema al buscar los usuarios', {executed: false, error: e.toString()})
             );
@@ -425,11 +423,9 @@ class EventController {
                 })
             );
         } catch (e) {
-            console.log(e);
-
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al buscar los usuarios.', {executed: false, error: e.toString()})
-            );
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios no miembros.', {executed: false, error: e.message})
+            )
         }
     };
 
@@ -475,11 +471,9 @@ class EventController {
                 })
             );
         } catch (e) {
-            console.log(e);
-
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al suscribir el usuario del evento.', {executed: false, error: e.toString()})
-            );
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al añadir el miembro al evento.', {executed: false, error: e.message})
+            )
         }
     };
 
@@ -507,7 +501,7 @@ class EventController {
                 })
             );
 
-            const {message, query, executed} = await EventQuery.withdrawEvent(event, user);
+            const {message, query, executed} = await EventQuery.withdrawFromEvent(event, user);
 
             return res.status(200).json(
                 new StdResponse(message, {
@@ -516,9 +510,9 @@ class EventController {
                 })
             );
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al borrar el usuario del evento.', {executed: false, error: e.toString()})
-            );
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al desapuntar al usuario.', {executed: false, error: e.message})
+            )
         }
     };
 }

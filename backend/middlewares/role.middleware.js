@@ -12,7 +12,7 @@ const isAdmin = async (req, res, next) => {
 
     const {userEmail} = req.payload;
 
-    const hasRole = await UserQuery.userHasRoleByEmail(userEmail, roleNames.admin.name)
+    const hasRole = (await UserQuery.userHasRoleByEmail(userEmail, roleNames.admin.name))
 
     if (!hasRole) return res.status(401).json(
         new StdResponse(

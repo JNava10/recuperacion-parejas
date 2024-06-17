@@ -1,55 +1,55 @@
-const {sendStandardResponse} = require("../helpers/common.helper");
-const UserQuery = require("../database/query/user.query");
-const {compare} = require("bcrypt");
-const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
-const {tokenTypes} = require("../constants/common.constants");
+
+
+const {generateToken} = require("../helpers/jwt.helper");
 
 class AuthController {
-    static login = async (req, res) => {
-        const email = req.body.email;
-        const password = req.body.password;
+    static blacklistedTokens = [];
 
-        console.log('Body:', req.body)
+    static addToBlacklist = (token) => {
+        AuthController.blacklistedTokens.push(token);
+    }
 
-        const user = await UserQuery.findUserByEmail(email);
+    static tokenIsRevoked = (token) => {
+        return AuthController.blacklistedTokens.includes(token)
+    }
 
-        if (!user) {
+    static temp = async (req, res) => {
+        try {
+            const token = generateToken({})
+
             return res.status(200).json(
-                new StdResponse(
-                    'Credenciales invalidas. Vuelve a intentarlo.',
-                    {logged: false}
-                )
+                new StdResponse('Si', {
+                    token
+                })
+            );
+        } catch (e) {
+            console.log(e)
+            return res.status(203).json(
+                new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
             )
         }
-        
-        const passwordsMatch = await compare(password, user.password);
-
-        if (!passwordsMatch) {
-            return res.status(200).json(
-                new StdResponse(
-                    'Credenciales invalidas. Vuelve a intentarlo.',
-                    {logged: false}
-                )
-            )
-        }
-
-        const apiToken = generateToken({userId: user.id, userEmail: user.email, type: tokenTypes.api});
-        const socketToken = generateToken({userId: user.id, type: tokenTypes.socket});
-
-        const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id);
-
-        await UserQuery.updateUserLogin(user.id)
-
-        console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
-        
-        return res.status(200).json(
-            new StdResponse(
-                'Se ha iniciado sesión correctamente.',
-                {logged: true, token: apiToken, socketToken, firstLogin: isFirstUserLogin}
-            )
-        )
     };
+
+    static logout = (req, res) => {
+        const token = req.header('x-token');
+
+        if (!token) return res.status(400).json(
+            new StdResponse('No hay token en la petición',{executed: false})
+        )
+
+        AuthController.addToBlacklist(token);
+
+        return res.status(200).json(
+            new StdResponse('Se ha cerrado sesión exitosamente.',{executed: true})
+        )
+    }
+
+    // La funcion de Login deberia estar aqui.
+    // Pero por algún motivo, la misma funcion
+    // aquí no detecta el metodo generateToken(),
+    // mientras que si copio la funcion y la pego
+    // en cualquier otro controlador, funciona perfectamente...
 }
 
 module.exports = AuthController

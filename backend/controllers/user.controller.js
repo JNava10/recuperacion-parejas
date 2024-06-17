@@ -2,8 +2,6 @@
 const {hashPassword} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
 const StdResponse = require("../classes/stdResponse");
-const QuerySuccess = require("../classes/QuerySuccess");
-const {findRecentChatMessages} = require("../database/query/message.query");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
@@ -11,7 +9,9 @@ const {getRecoverCodeMail} = require("../constants/mail.constants");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
 const {roleNames} = require("../constants/seed.const");
 const CustomError = require("../classes/customError");
-const models = require("../database/models");
+const {generateToken} = require("../helpers/jwt.helper");
+const {compare} = require("bcrypt");
+const {tokenTypes} = require("../constants/common.constants");
 const RoleQuery = require("../database/query/role.query");
 
 class UserController {
@@ -147,26 +147,6 @@ class UserController {
         }
     };
 
-    static deleteUserRoles = async (req, res) => {
-        try {
-            const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query; // TODO: Validator
-
-            if (adminsRemaining >= 1) return res.status(200).json(
-                new StdResponse('No se pueden borrar mas administradores.',{executed: false})
-            )
-
-            const {message, executed, query} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
-
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } catch (e) {
-            return res.status(203).json(
-                new StdResponse(e.message,{executed: false})
-            )
-        }
-    };
-
     static updateUserPassword = async (req, res) => {
         try {
             const password = await hashPassword(req.body.password);
@@ -276,92 +256,6 @@ class UserController {
         } catch (e) {
             return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al cambiar la contraseña.',{executed: false, error: e.message})
-            )
-        }
-    };
-
-    static getPossibleMatches = async (req, res) => {
-        try {
-            const userId = req.payload.userId;
-
-            // 1. Obtener preferencias del usuario
-            const userPreferences = await UserQuery.getUserPreferences(userId);
-
-            if (!userPreferences.executed) return res.status(400).json(
-                new StdResponse(userPreferences.error,{executed: false})
-            )
-
-            // 2. Obtener usuarios con algunos de mismos valores de preferencias de eleccion que el usuario
-            let choiceAffineUsers = await UserQuery.getUsersByChoicePrefs(userPreferences.query.choices, userId);
-
-            choiceAffineUsers = choiceAffineUsers.query.map(item => item.user);
-            choiceAffineUsers = [...new Set(choiceAffineUsers)] // Haciendo un Set a partir de los valores, podemos quitar elementos repetidos.
-
-            // 3. Obtener valores de las preferencias de valor de los usuarios obtenidos en el paso anterior
-
-            let rangeAffineUsers = (await UserQuery.getValuesOfUserRangePrefs(choiceAffineUsers)).query;
-
-            // 4. Obtener las preferencias cuyos valores se acerquen los valores minimo y maximo de preferencias de rango del usuario.
-
-            // Al utilizar reduce, podemos iterar sobre el array y descartar los valores que no sean el que queremos de forma sencilla.
-            const userMaxPreferenceValue = userPreferences.query.values.reduce((previous, current) =>
-                previous && previous.value > current.value ? previous : current
-            ).value;
-
-            const userMinPreferenceValue = userPreferences.query.values.reduce((previous, current) =>
-                previous && previous.value < current.value ? previous : current
-            ).value;
-
-            // Estas serán las preferencias que se tendrán en cuenta a la hora de buscar usuarios (los usuarios dentro de rangeAffineUsers).
-            // Se tendrán en cuenta las preferencias que estén en un rango de afinidad del 30% con el usuario.
-            const userMaxPreferences = userPreferences.query.values.filter(item => item.value > userMaxPreferenceValue * 0.85);
-            const userMinPreferences = userPreferences.query.values.filter(item => item.value < userMinPreferenceValue * 1.15);
-
-            // 5. Obtener los IDs de los usuarios cuyos valores de preferencia se acerquen a las de userMaxPreferences y userMinPreferences.
-
-            let matchableUserIds = [];
-            // Borramos las preferencias repetidas, introduciendolas en un map.
-            const preferencesForFind = new Map([...userMaxPreferences, ...userMinPreferences].map(item => [item.preference, item.value]));
-
-            // Filtramos según los usuarios tengan los mismos valores de preferencias, con un rango del 35%
-            preferencesForFind.forEach((value, preference) => {
-                rangeAffineUsers.forEach(user => {
-                    const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.65 && prefItem.value < value * 1.35))
-
-                    if (matchedPreference) matchableUserIds.push(user.user)
-                });
-            });
-
-            // Si no hay resultados, filtramos con un rango del 65%
-
-            if (matchableUserIds.length === 0) {
-                preferencesForFind.forEach((value, preference) => {
-                    rangeAffineUsers.forEach(user => {
-                        const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.45 && prefItem.value < value * 1.65))
-
-                        if (matchedPreference) matchableUserIds.push(user.user)
-                    });
-                });
-            }
-
-            // Filtramos para quitar a los que ya se han dado like
-            const alreadyLikedUsers = await models.Friendship.findAll({
-                where: {requesting_user: userId},
-                attributes: ['requested_user']
-            })
-
-            const alreadyLikedIds = alreadyLikedUsers.map(user => user.requested_user)
-
-            matchableUserIds = matchableUserIds.filter(user => !alreadyLikedIds.includes(user))
-
-            const {message, query} = await UserQuery.getUsersById(matchableUserIds)
-
-            return res.status(200).json(
-                new StdResponse(message,{executed: query !== null, query})
-            )
-        } catch (e) {
-            return res.status(203).json(
-                new StdResponse('Ha ocurrido un problema al obtener los matches',{executed: false, error: e.message})
             )
         }
     };
@@ -501,31 +395,11 @@ class UserController {
         }
     };
 
-    static getChats = async (req, res) => {
-        try {
-            const {userId} = req.payload;
-
-            const pending = (await UserQuery.getPendingChats(userId)).query
-            const notPending = (await UserQuery.getNotPendingChats(userId)).query
-
-            return res.status(200).json(
-                new StdResponse("Se han obtenido la lista de chats correctamente", {
-                    executed: true,
-                    chats: {pending, notPending}
-                })
-            );
-        } catch (e) {
-            return res.status(203).json(
-                new StdResponse('Ha ocurrido un problema al obtener los chats.',{executed: false, error: e.message})
-            )
-        }
-    };
-
     static getRoleUsersRemaining = async (req, res) => {
         try {
             const roleName = req.params.role;
 
-            const roleExists = (await UserQuery.roleExists(roleName)).query; // TODO: Validator
+            const roleExists = (await RoleQuery.roleExists(roleName)).query; // TODO: Validator
 
             if (!roleExists) return res.status(404).json(
                 new StdResponse("El rol buscado no existe", {
@@ -610,6 +484,74 @@ class UserController {
         } catch (e) {
             return res.status(203).json(
                 new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static temp = async (req, res) => {
+        try {
+            const token = generateToken({})
+
+            return res.status(200).json(
+                new StdResponse('Si', {
+                    token
+                })
+            );
+        } catch (e) {
+            console.log(e)
+            return res.status(203).json(
+                new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static login = async (req, res) => {
+        try {
+            const email = req.body.email;
+            const password = req.body.password;
+
+            const user = (await UserQuery.findUserByEmail(email)).query;
+
+            if (!user) {
+                return res.status(203).json(
+                    new StdResponse(
+                        'Credenciales invalidas. Vuelve a intentarlo.',
+                        {logged: false}
+                    )
+                )
+            }
+
+            const passwordsMatch = await compare(password, user.password);
+
+            if (!passwordsMatch) {
+                return res.status(203).json(
+                    new StdResponse(
+                        'Credenciales invalidas. Vuelve a intentarlo.',
+                        {logged: false}
+                    )
+                )
+            }
+
+            const apiToken = generateToken({userId: 1, userEmail: 's', type: tokenTypes.api});
+            const socketToken = generateToken({userId: user.id, type: tokenTypes.socket});
+
+            const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id);
+
+            await UserQuery.updateUserLogin(user.id)
+
+            console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
+            const token = generateToken({})
+
+            return res.status(200).json(
+                new StdResponse(
+                    'Se ha iniciado sesión correctamente.',
+                    {logged: true, token: apiToken, socketToken, firstLogin: isFirstUserLogin}
+                )
+            )
+        } catch (e) {
+            console.error(e)
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al iniciar sesión.',{logged: false, error: e.message})
             )
         }
     };

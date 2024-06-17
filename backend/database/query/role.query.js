@@ -27,6 +27,26 @@ class RoleQuery {
         }
     };
 
+
+    // TODO: Mover a RoleQuery
+    static roleExists = async (name) => {
+        try {
+            const role = (await models.Role.findOne(
+                {
+                    where: {name},
+                    raw: true
+                }
+            )) !== null;
+
+            const message = role ? 'El rol indicado existe' : 'El rol indicado no existe.';
+
+            return new QuerySuccess(true, message, role);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
     static checkIfRoleInserted = (roles, userId) => {
 
     };

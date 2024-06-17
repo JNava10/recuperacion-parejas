@@ -29,7 +29,7 @@ class RoleController {
 
     static getRoleUsers = async (req, res) => {
         try {
-            const roleExists = await UserQuery.roleExists(req.params.role);
+            const roleExists = await RoleQuery.roleExists(req.params.role);
 
             if (!roleExists.query) return res.status(400).json(
                 new StdResponse(roleExists.message,{executed: false})
@@ -86,6 +86,26 @@ class RoleController {
             console.log(e)
 
             return res.status(500).json(
+                new StdResponse(e.message,{executed: false})
+            )
+        }
+    };
+
+    static deleteUserRoles = async (req, res) => {
+        try {
+            const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query; // TODO: Validator
+
+            if (adminsRemaining >= 1) return res.status(200).json(
+                new StdResponse('No se pueden borrar mas administradores.',{executed: false})
+            )
+
+            const {message, executed, query} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }

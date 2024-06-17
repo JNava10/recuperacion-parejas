@@ -10,14 +10,12 @@ class PreferenceController {
         try {
             const {message, query} = await PreferenceQuery.getActivatedPreferences();
 
-            console.log(query)
-
             return res.status(200).json(
                 new StdResponse(message,{executed: true, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las preferencias activadas',{executed: false, error: e.message})
             )
         }
     };
@@ -30,8 +28,8 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear la preferencia de elección.',{executed: false, error: e.message})
             )
         }
     };
@@ -44,8 +42,8 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear la preferencia de rango.',{executed: false, error: e.message})
             )
         }
     };
@@ -58,8 +56,8 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las preferencias.',{executed: false, error: e.message})
             )
         }
     };
@@ -78,9 +76,8 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            console.log(e)
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear la preferencias del usuario.',{executed: false, error: e.message})
             )
         }
     };
@@ -93,8 +90,8 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las preferencias.',{executed: false, error: e.message})
             )
         }
     };

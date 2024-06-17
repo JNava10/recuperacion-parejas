@@ -22,8 +22,6 @@ class CreateEvent {
 
             const query = await models.Event.create(data);
 
-            console.log('Creado:', query)
-
             return new QuerySuccess(true, 'Se ha creado el evento correctamente.', query);
         } catch (e) {
             console.error(e)
@@ -61,7 +59,6 @@ class CreateEvent {
 
     static deleteEvent = async (id) => {
         try {
-            console.log(id)
             const query = await models.Event.destroy({where: {id: id}});
 
             return new QuerySuccess(true, 'Se ha borrado el evento correctamente.', query);
@@ -85,8 +82,6 @@ class CreateEvent {
     static getEvent = async (id) => {
         try {
             const query = await models.Event.findOne({where: {id}});
-
-            console.log(query)
 
             return new QuerySuccess(true, 'Se ha obtenido el evento correctamente.', query);
         } catch (e) {
@@ -114,7 +109,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha realizado la consulta correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -141,7 +137,6 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se han obtenido los eventos disponibles correctamente.', query);
         } catch (e) {
-            console.log(e)
             console.error(e)
             throw e
         }
@@ -160,11 +155,12 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha inscrito al evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
-    static withdrawEvent = async (event, user) => {
+    static withdrawFromEvent = async (event, user) => {
         try {
             const query = await models.EventAssistant.destroy(
                 {
@@ -174,7 +170,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha retirado del evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -188,7 +185,8 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha actualizado el evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -202,17 +200,13 @@ class CreateEvent {
 
             return new QuerySuccess(true, 'Se ha actualizado el evento correctamente.', query);
         } catch (e) {
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
     static eventIsClosed = async (eventId) => {
         try {
-            // const query = await models.sequelize.query(
-            //     `SELECT * FROM ${models.Event.tableName} WHERE close_date_time < NOW() AND id = :id`,
-            //     {replacements: {id: eventId}}
-            // ) !== null;
-
             const query = await models.Event.findOne({
                 where: {
                     [Op.and]: [
@@ -227,43 +221,52 @@ class CreateEvent {
 
             return new QuerySuccess(true, message, query);
         } catch (e) {
+            console.error(e)
             throw e
         }
     };
 
     static getEventMembers = async (eventId) => {
-        const query = (await models.Event.findOne({
-            include: {
-                model: models.User,
-                as: 'assistants'
-            },
-            where: {
-                id: eventId
-            }
-        })).assistants;
+      try {
+          const query = (await models.Event.findOne({
+              include: {
+                  model: models.User,
+                  as: 'assistants'
+              },
+              where: {
+                  id: eventId
+              }
+          })).assistants;
 
-        console.log(query)
-
-        return new QuerySuccess(true, "Se han obtenido los miembros del evento correctamente", query);
+          return new QuerySuccess(true, "Se han obtenido los miembros del evento correctamente", query);
+      } catch (e) {
+          console.error(e)
+          throw e
+      }
     };
 
     static getEventNonAssistants = async (eventId) => {
-        const assistants = ((await models.Event.findOne({
-            include: {
-                model: models.User,
-                as: 'assistants'
-            },
-            where: {
-                id: eventId
-            }
-        })).assistants).map(user => user.id);
+        try {
+            const assistants = ((await models.Event.findOne({
+                include: {
+                    model: models.User,
+                    as: 'assistants'
+                },
+                where: {
+                    id: eventId
+                }
+            })).assistants).map(user => user.id);
 
-        const nonAssistants = await models.User.findAll({
-            where: {id: {[Op.notIn]: assistants}}
-        })
+            const nonAssistants = await models.User.findAll({
+                where: {id: {[Op.notIn]: assistants}}
+            })
 
-        return new QuerySuccess(true, "Se han obtenido los usuarios no miembros del evento correctamente", nonAssistants);
-    };
+            return new QuerySuccess(true, "Se han obtenido los usuarios no miembros del evento correctamente", nonAssistants);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    }
 }
 
 module.exports = CreateEvent;

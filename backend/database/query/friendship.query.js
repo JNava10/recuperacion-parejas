@@ -103,8 +103,6 @@ class FriendshipQuery {
                 ]
             });
 
-            console.log('Matched', matchedUsers)
-
             return new QuerySuccess(matchedUsers, 'Se han obtenido los amigos correctamente.', matchedUsers);
         } catch (e) {
             console.warn(e)

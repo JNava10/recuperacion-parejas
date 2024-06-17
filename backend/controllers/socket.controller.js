@@ -52,7 +52,6 @@ class SocketController {
         const connectedFriends = SocketController.findUsersById(friends)
 
         connectedFriends.forEach(([friendId, friendSocket]) => {
-            console.log('friend connected')
             friendSocket.emit('friend-connected', {id: ownId})
         })
 

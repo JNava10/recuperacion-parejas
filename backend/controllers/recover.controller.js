@@ -33,7 +33,6 @@ class RecoverController {
     }
 
     static validateCode = (inputEmail, inputCode) => {
-        console.log(RecoverController.entries)
         const entry = RecoverController.entries.get(inputEmail);
 
         if (!entry.recoverCode) return {

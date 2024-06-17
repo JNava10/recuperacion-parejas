@@ -38,6 +38,26 @@ class ChatController {
         }
     }
 
+    static getChats = async (req, res) => {
+        try {
+            const {userId} = req.payload;
+
+            const pending = (await UserQuery.getPendingChats(userId)).query
+            const notPending = (await UserQuery.getNotPendingChats(userId)).query
+
+            return res.status(200).json(
+                new StdResponse("Se han obtenido la lista de chats correctamente", {
+                    executed: true,
+                    chats: {pending, notPending}
+                })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los chats.',{executed: false, error: e.message})
+            )
+        }
+    };
+
     static uploadMessageImages = async (req, res) => {
         try {
             const filesUploaded = await uploadFiles(req.files, {fileExtension: ['jpg', 'png', 'jpeg'], dir: 'chat_images', numberLimit: 4});

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const StdResponse = require("../classes/stdResponse");
-const BlacklistController = require("../controllers/blacklist.controller");
 const CustomError = require("../classes/customError");
+const AuthController = require("../controllers/auth.controller");
 
 const validateAuthToken = (req , res , next) => {
     const token = req.header('x-token');
@@ -11,13 +11,12 @@ const validateAuthToken = (req , res , next) => {
     }
 
     try {
-        const tokenIsRevoked = BlacklistController.tokenIsRevoked(token)
-
-        console.log(tokenIsRevoked)
+        const tokenIsRevoked = AuthController.tokenIsRevoked(token)
 
         if (tokenIsRevoked) throw new CustomError('El token ya fue revocado.')
 
         const {userId, userEmail} = jwt.verify(token, process.env.PRIVATE_KEY);
+
 
         req.payload = {userId, userEmail};
 
@@ -44,12 +43,23 @@ const validateAuthToken = (req , res , next) => {
 }
 
 // Funcion usada para validar el token unicamente, y no como middleware.
-const verifyToken = (token) => jwt.verify(token, process.env.PRIVATE_KEY);
+const verifyToken = (token) => {
+    try {
+        return jwt.verify(token, process.env.PRIVATE_KEY)
+    } catch (e) {
+        console.error(e)
+        return false
+    }
+};
 
 const generateToken = (payloadData, expiresAt) => {
-    const expiresIn = expiresAt || process.env.TOKEN_EXPIRE_TIME;
+    try {
+        const expiresIn = expiresAt || process.env.TOKEN_EXPIRE_TIME;
 
-    return jwt.sign(payloadData, process.env.PRIVATE_KEY, {expiresIn});
+        return jwt.sign(payloadData, process.env.PRIVATE_KEY, {expiresIn});
+    } catch (e) {
+        return false
+    }
 }
 
 module.exports = {
