@@ -74,7 +74,7 @@ class RoleController {
         try {
             const userId = req.payload.userId;
 
-            const {query, message, executed} = await UserQuery.getUserRolesWithItems(userId);
+            const {query, message, executed} = await RoleQuery.getUserRolesWithItems(userId);
 
             return res.status(200).json(
                 new StdResponse(message, {

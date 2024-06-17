@@ -13,6 +13,7 @@ const {generateToken} = require("../helpers/jwt.helper");
 const {compare} = require("bcrypt");
 const {tokenTypes} = require("../constants/common.constants");
 const RoleQuery = require("../database/query/role.query");
+const NotificationQuery = require("../database/query/notification.query");
 
 class UserController {
     static findUser = async (req, res) => {
@@ -72,7 +73,6 @@ class UserController {
             )
         }
     };
-
 
     static getNotDeletedUsersWithRoles = async (req, res) => {
         try {
@@ -426,7 +426,7 @@ class UserController {
         try {
             const userId = req.payload.userId;
 
-            const notifications = await UserQuery.getUserNotifications(userId);
+            const notifications = await NotificationQuery.getUserNotifications(userId);
 
             return res.status(200).json(
                 new StdResponse(notifications.message, {
@@ -441,11 +441,12 @@ class UserController {
         }
     };
 
+    // TODO: Mover a notificationController
     static readUserNotifications = async (req, res) => {
         try {
             const userId = req.payload.userId;
 
-            const notifications = await UserQuery.readUserNotifications(userId);
+            const notifications = await NotificationQuery.readUserNotifications(userId);
 
             return res.status(200).json(
                 new StdResponse(notifications.message, {
@@ -460,6 +461,7 @@ class UserController {
         }
     };
 
+    // TODO: Mover a preferenceController
     static updateUserPreferences = async (req, res) => {
         try {
             const userId = req.params.id || req.payload.userId;
@@ -482,23 +484,6 @@ class UserController {
                 })
             );
         } catch (e) {
-            return res.status(203).json(
-                new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
-            )
-        }
-    };
-
-    static temp = async (req, res) => {
-        try {
-            const token = generateToken({})
-
-            return res.status(200).json(
-                new StdResponse('Si', {
-                    token
-                })
-            );
-        } catch (e) {
-            console.log(e)
             return res.status(203).json(
                 new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
             )

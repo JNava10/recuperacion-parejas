@@ -2,13 +2,9 @@
 const models = require('../models/index');
 const {QueryTypes, Op} = require("sequelize");
 const QuerySuccess = require("../../classes/QuerySuccess");
-const QueryError = require("../../classes/QueryError");
-const {logger} = require("sequelize/lib/utils/logger");
-const {mode} = require("@cloudinary/url-gen/actions/rotate");
-const {fi} = require("@faker-js/faker");
 const {getEventCloseDate} = require("../../helpers/common.helper");
 
-class CreateEvent {
+class EventQuery {
     static createEvent = async (event) => {
         try {
             const closeDateTime = event.closeDateTime ?? getEventCloseDate(new Date(event.scheduledDateTime));
@@ -269,4 +265,4 @@ class CreateEvent {
     }
 }
 
-module.exports = CreateEvent;
+module.exports = EventQuery;

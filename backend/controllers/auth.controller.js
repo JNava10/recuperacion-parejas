@@ -14,23 +14,6 @@ class AuthController {
         return AuthController.blacklistedTokens.includes(token)
     }
 
-    static temp = async (req, res) => {
-        try {
-            const token = generateToken({})
-
-            return res.status(200).json(
-                new StdResponse('Si', {
-                    token
-                })
-            );
-        } catch (e) {
-            console.log(e)
-            return res.status(203).json(
-                new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
-            )
-        }
-    };
-
     static logout = (req, res) => {
         const token = req.header('x-token');
 

@@ -21,8 +21,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(activatedPreferences !== null, 'Se han obtenido los amigos correctamente.', activatedPreferences);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -61,8 +61,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -96,8 +96,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -138,8 +138,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.', preferences);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -151,17 +151,22 @@ class PreferenceQuery {
 
             return new QuerySuccess(created.length > 0, 'Se han creado las preferencias de usuario correctamente.', created.length > 0);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
     static userHasPreferences = async (userId) => {
-        const exists = await models.UserPreference.findOne({where: {user: userId}, attributes: ['user']}) !== null;
+        try {
+            const exists = await models.UserPreference.findOne({where: {user: userId}, attributes: ['user']}) !== null;
 
-        const message = exists ? 'El usuario ya tiene preferencias.' : 'El usuario no tiene preferencias.'
+            const message = exists ? 'El usuario ya tiene preferencias.' : 'El usuario no tiene preferencias.'
 
-        return new QuerySuccess(true, message, exists);
+            return new QuerySuccess(true, message, exists);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
     };
 
     static getUserPreferences = async (user) => {
@@ -212,8 +217,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(true, 'Se han creado las preferencias de usuario correctamente.', {choice: choicePreferences, range: rangePreferences});
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 }

@@ -7,6 +7,7 @@ const {id_ID} = require("@faker-js/faker");
 const RoleQuery = require("../database/query/role.query");
 const {uploadFiles} = require("../helpers/cloudinary.helper");
 const UserQuery = require("../database/query/user.query");
+const MessageQuery = require("../database/query/message.query");
 
 class ChatController {
     static getMessages = async (req, res) => {
@@ -42,8 +43,8 @@ class ChatController {
         try {
             const {userId} = req.payload;
 
-            const pending = (await UserQuery.getPendingChats(userId)).query
-            const notPending = (await UserQuery.getNotPendingChats(userId)).query
+            const pending = (await MessageQuery.getPendingChats(userId)).query
+            const notPending = (await MessageQuery.getNotPendingChats(userId)).query
 
             return res.status(200).json(
                 new StdResponse("Se han obtenido la lista de chats correctamente", {
@@ -74,10 +75,8 @@ class ChatController {
                 })
             );
         } catch (e) {
-            console.error(e)
-
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al subir los archivos',{executed: false, error: e.message})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los chats.',{executed: false, error: e.message})
             )
         }
     }

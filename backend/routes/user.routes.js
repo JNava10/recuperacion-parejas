@@ -34,7 +34,6 @@ router.get('/', [validateToken], UserController.getNotDeletedUsers)
 router.put('/preferences/:id?', [validateToken], UserController.updateUserPreferences)
 
 // router.post('/logout', AuthController.logout)
-router.get('/temp', UserController.temp)
 
 router.get('/notifications', [validateToken], UserController.getSelfNotifications)
 router.put('/notifications/read', [validateToken], UserController.readUserNotifications)
