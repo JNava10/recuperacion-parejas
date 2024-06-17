@@ -2,6 +2,7 @@ const MessageQuery = require("../database/query/message.query");
 const RoomController = require("./room.controller");
 const NotificationQuery = require("../database/query/notification.query");
 const UserQuery = require("../database/query/user.query");
+const FriendshipQuery = require("../database/query/friendship.query");
 
 class SocketController {
     static io;
@@ -27,14 +28,35 @@ class SocketController {
      * @param {Socket} socket
      * @param io
      */
-    static onConnect = (socket, io) => {
+    static onConnect = async (socket, io) => {
         SocketController.io = io;
 
-        SocketController.usersConnected.set(socket.user.userId, socket)
+        let ownId = socket.user.userId;
+        SocketController.usersConnected.set(ownId, socket)
 
         io.emit('user-connected', {count: SocketController.usersConnected.size});
 
-        console.log(SocketController.usersConnected.size)
+        const query = (await FriendshipQuery.getMatchedUsersIds(ownId)).query
+
+
+        // Sacamos los amigos de la BD para decirles que el usuario se ha conectado.
+        let friends = [];
+
+        query.forEach(model => {
+            if (model.userMatch.id === ownId) friends.push(model.userMatched)
+            else if (model.userMatched.id === ownId) friends.push(model.userMatch)
+        });
+
+        friends = friends.map(user => user.id)
+
+        const connectedFriends = SocketController.findUsersById(friends)
+
+        connectedFriends.forEach(([friendId, friendSocket]) => {
+            console.log('friend connected')
+            friendSocket.emit('friend-connected', {id: ownId})
+        })
+
+        // Listeners
         socket.on('disconnect', () => SocketController.onDisconnect(socket))
         socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
         socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
@@ -147,13 +169,10 @@ class SocketController {
             from: socket.user.userId, to: targetId
         };
 
-        console.log(notificationData)
-
-
         await NotificationQuery.pushMatchNotification(notificationData);
 
         if (targetSocket) {
-            targetSocket.emit('new-match', {from: targetId});
+            targetSocket.emit('new-match', {from: socket.user.userId});
         }
     }
 

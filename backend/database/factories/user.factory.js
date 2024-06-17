@@ -29,8 +29,7 @@ const get = async (number) => {
 
         const isLogged = Boolean(Math.random());
 
-        user.last_login = isLogged ? new Date(Date.now()) : null;
-
+        user.last_login = new Date(Date.now())
 
         users.push(user);
     }

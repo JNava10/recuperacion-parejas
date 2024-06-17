@@ -59,6 +59,15 @@ export class SocketService {
     this.socket?.on('user-connected', (params) => callback(params));
   }
 
+  listenFriendConnected = (callback: Function) => {
+    this.socket?.on('friend-connected', (params) => callback(params));
+  }
+
+  listenFriendDisconnected = (callback: Function) => {
+    this.socket?.on('friend-connected', (params) => callback(params));
+  }
+
+
   listenUsersDisconnected = (callback: Function) => {
     this.socket?.on('user-disconnected', (params) => callback(params));
   }

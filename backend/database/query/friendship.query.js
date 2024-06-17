@@ -7,6 +7,7 @@ const QueryError = require("../../classes/QueryError");
 class FriendshipQuery {
     static checkIfIsLiked = async (userHasLike, userToLike) => {
         try {
+            console.log(userHasLike, userToLike)
             const liked = await models.Friendship.findOne({
                 where: {
                     [Op.or]: [
@@ -71,6 +72,38 @@ class FriendshipQuery {
                     }
                 ]
             });
+
+            return new QuerySuccess(matchedUsers, 'Se han obtenido los amigos correctamente.', matchedUsers);
+        } catch (e) {
+            console.warn(e)
+            return new QueryError(false, e)
+        }
+    };
+
+    static getMatchedUsersIds = async (userWhoMatched) => {
+        try {
+            const matchedUsers = await models.Match.findAll({
+                where: {[Op.or]: [
+                        {userWhoMatched: userWhoMatched},
+                        {userToMatch: userWhoMatched},
+                    ]
+                },
+                attributes: ['userWhoMatched', 'userToMatch'],
+                include: [
+                    {
+                        model: models.User,
+                        attributes: ['id'],
+                        as: 'userMatch'
+                    },
+                    {
+                        model: models.User,
+                        attributes: ['id'],
+                        as: 'userMatched'
+                    }
+                ]
+            });
+
+            console.log('Matched', matchedUsers)
 
             return new QuerySuccess(matchedUsers, 'Se han obtenido los amigos correctamente.', matchedUsers);
         } catch (e) {

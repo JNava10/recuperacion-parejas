@@ -18,7 +18,7 @@ import {MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 import {ButtonModule} from "primeng/button";
 import { user } from '../../utils/const/regex.constants';
-import {onConnectParams} from "../../interfaces/socket/socket";
+import {onConnectParams, onFriendConnectParams} from "../../interfaces/socket/socket";
 
 @Component({
   selector: 'app-dashboard',
@@ -50,17 +50,35 @@ export class DashboardComponent implements OnInit {
     this.getMatchedUsers();
 
     this.socketService.listenUserConnected((params: onConnectParams) => {
-      console.log(params.count)
       this.usersConnected = params.count
     })
 
     this.socketService.listenUsersDisconnected((params: onConnectParams) => {
-      console.log(params.count)
       this.usersConnected = params.count
     })
 
     this.friendshipService.getOwnMatches().subscribe(matches => {
       this.matches = matches;
+    })
+
+    this.socketService.listenFriendConnected((params: onFriendConnectParams) => {
+      const friendId = params.id;
+
+      const friend = this.matches?.find(user => user.id === friendId)!
+      const friendIndex = this.matches?.indexOf(friend);
+
+      this.matches![friendIndex!].connected = true
+
+      console.log(this.matches![friendIndex!].connected)
+    })
+
+    this.socketService.listenFriendDisconnected((params: onFriendConnectParams) => {
+      const friendId = params.id;
+
+      const friend = this.matches?.find(user => user.id === friendId)!
+      const friendIndex = this.matches?.indexOf(friend);
+
+      this.matches![friendIndex!].connected = false
     })
 
     this.userService.getChats().subscribe(body => {
