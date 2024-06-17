@@ -12,172 +12,88 @@ const {uploadFiles} = require("../helpers/cloudinary.helper");
 const {roleNames} = require("../constants/seed.const");
 const CustomError = require("../classes/customError");
 const models = require("../database/models");
+const RoleQuery = require("../database/query/role.query");
 
 class UserController {
     static findUser = async (req, res) => {
-        const inputSearch = req.body.input;
-        const inputIsOneWord = inputSearch.split(" ").length > 1;
+       try {
+           const inputSearch = req.body.input;
+           const inputIsOneWord = inputSearch.split(" ").length > 1;
 
-        let results;
+           let results;
 
-        if (inputIsOneWord) results = await UserQuery.findUserLikeFullname(inputSearch);
-        else results = await UserQuery.findUserByNickOrName(inputSearch);
+           if (inputIsOneWord) results = await UserQuery.findUserLikeFullname(inputSearch);
+           else results = await UserQuery.findUserByNickOrName(inputSearch);
 
-        return res.status(200).json(
-            new StdResponse(
-                'Se ha iniciado sesión correctamente.',
-                {founded: results.length > 0, results}
-            )
-        )
+           return res.status(200).json(
+               new StdResponse(
+                   'Se ha iniciado sesión correctamente.',
+                   {founded: results.length > 0, results}
+               )
+           )
+       } catch (e) {
+           console.log(e)
+
+           return res.status(500).json(
+               new StdResponse(e.message,{executed: false})
+           )
+       }
     };
 
     static findById = async (req, res) => {
-        const withRoles = req.query.withRoles;
-        let options = {};
-
-        if (withRoles) options.withRoles = true
-
-        const {message, executed, query, error} = await UserQuery.findById(req.params.id, options);
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
-    };
-
-    // TODO: Mover a chat.controller.js
-    static getMessages = async (req, res) => {
-        const receiverId = req.params.receiver;
-        const emitterId = req.payload.userId;
-
-        const result = await findRecentChatMessages(emitterId, receiverId)
-
-        if (result instanceof QuerySuccess) return res.status(200).json(
-            new StdResponse(
-                'Se ha insertado el mensaje correctamente.',
-                result
-            )
-        )
-        else {
-            return res.status(500).json(
-                new StdResponse(
-                    'Error al ejecutar la consulta.',
-                    result
-                )
-            )
-        }
-    }
-
-    // TODO: Mover a chat.controller.js
-    static uploadMessageImages = async (req, res) => {
-      try {
-          const filesUploaded = await uploadFiles(req.files, {fileExtension: ['jpg', 'png', 'jpeg'], dir: 'chat_images', numberLimit: 4});
-          const filesToSend = []
-
-          filesUploaded.forEach((file) => {
-              filesToSend.push(file.secure_url)
-          });
-
-          return res.status(200).json(
-              new StdResponse("Se han subido los archivos correctamente", {
-                  executed: true,
-                  files: filesToSend
-              })
-          );
-      } catch (e) {
-          console.log(e)
-
-          return res.status(500).json(
-              new StdResponse(e.message,{executed: false})
-          )
-      }
-    }
-
-    static pushMessage = async (req, res) => {
-        // TODO: Añadir try-catch
-        const receiverId = req.body.receiver;
-        const message = req.body.message;
-        const emitterId = req.payload.userId;
-
-        const result = await UserQuery.pushMessage(emitterId, receiverId, message)
-
-        if (result instanceof QuerySuccess) return res.status(200).json(
-            new StdResponse(
-                'Se ha insertado el mensaje correctamente.',
-                result
-            )
-        )
-        else {
-            return res.status(200).json(
-                new StdResponse(
-                    'Error al ejecutar la consulta.',
-                    result
-                )
-            )
-        }
-    }
-
-    static getRoleUsers = async (req, res) => {
         try {
-            // TODO: Comprobar que el rol indicado existe
-            const {message, executed, query} = await UserQuery.getRoleUsers(req.params.role);
+            const withRoles = req.query.withRoles;
+            const options = {};
+
+            if (withRoles) options.withRoles = true
+
+            const {message, executed, query} = await UserQuery.findById(req.params.id, options);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
-            );
+            )
         } catch (e) {
-            console.log(e);
+            console.log(e)
 
             return res.status(500).json(
                 new StdResponse(e.message,{executed: false})
-            );
+            )
         }
     };
 
     static getNotDeletedUsers = async (req, res) => {
-        // TODO: Añadir try-catch
-        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers(req.payload.userId);
+        try {
+            const {message, executed, query} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        } catch (e) {
+            console.error(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios',{executed: false, error: e.message})
             )
         }
     };
 
 
     static getNotDeletedUsersWithRoles = async (req, res) => {
-        // TODO: Añadir try-catch
-        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);
+        try {
+            const {message, executed, query} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        } catch (e) {
+            console.error(e)
+
             return res.status(500).json(
-                new StdResponse(message,{executed, error})
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios',{executed: false, error: e.message})
             )
         }
     };
@@ -200,64 +116,43 @@ class UserController {
 
             const {message, executed, query} = await UserQuery.createUser(user);
 
-            if (executed) {
-                return res.status(200).json(
-                    new StdResponse(message,{executed, query})
-                )
-            }
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
         } catch (e) {
-            console.log(e)
+            console.error(e)
 
             return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+                new StdResponse('Ha ocurrido un problema al crear el usuario',{executed: false, error: e.message})
             )
         }
 
     };
 
     static updateUserData = async (req, res) => {
-        // TODO: Añadir try-catch
-        const newUserData = req.body;
+        try {
+            const newUserData = req.body;
 
-        const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar a validator
+            const emailExists = await UserQuery.checkIfEmailExists(newUserData.email).query; // TODO: Pasar a validator
 
-        if (nicknameExists) return res.status(409).json(
-            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
-        )
+            if (emailExists) return res.status(409).json(
+                new StdResponse("El correo del usuario indicado ya existe",{executed: false})
+            )
 
-        const {message, executed, query, error} = await UserQuery.updateUserData(newUserData, req.params.id);
+            const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar a validator
 
-        if (executed) {
+            if (nicknameExists) return res.status(409).json(
+                new StdResponse("El nick del usuario indicado ya existe",{executed: false})
+            )
+
+            const {message, executed, query} = await UserQuery.updateUserData(newUserData, req.params.id);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
-    };
-
-    static addUserRoles = async (req, res) => {
-        // TODO: Comprobar que el rol está ya insertado
-        // TODO: Añadir try-catch
-        const {message, executed, query, error} = await UserQuery.insertUserRoles(req.body.roles, req.params.id);
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el usuario.',{executed: false, error: e.message})
             )
         }
     };
@@ -266,36 +161,42 @@ class UserController {
         try {
             const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query; // TODO: Validator
 
-            if (adminsRemaining >= 1)  return res.status(200).json(
+            if (adminsRemaining >= 1) return res.status(200).json(
                 new StdResponse('No se pueden borrar mas administradores.',{executed: false})
             )
 
-            const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
-        }  catch (e) {
-            console.log(e)
+            const {message, executed, query} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
 
-            return res.status(500).json(
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
     };
 
     static updateUserPassword = async (req, res) => {
-        const password = hashPassword(req.body.password);
+        try {
+            const password = await hashPassword(req.body.password);
 
-        const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
+            const userExists = (await UserQuery.checkIfIdExists(req.params.id)).query // TODO: Validator
 
-        if (executed) {
+            if (userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
+
+            const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
@@ -315,14 +216,13 @@ class UserController {
                 new StdResponse("El nombre de usuario ya existe",{executed: false})
             )
 
-
             const {message, query, executed} = await UserQuery.registerUser(req.body);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
             )
         }
@@ -331,12 +231,6 @@ class UserController {
     static sendRecoverEmail = async (req, res) => {
         try {
             const {email} = req.body
-
-            const emailExists = await UserQuery.checkIfEmailExists(email); // TODO: Validator
-
-            if (!emailExists.query)  return res.status(200).json(
-                new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
-            )
 
             const {recoverCode, expiresAt} = RecoverController.set(email);
 
@@ -353,7 +247,7 @@ class UserController {
         } catch (e) {
             console.log(e)
 
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -371,7 +265,7 @@ class UserController {
         } catch (e) {
             console.log(e)
 
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -394,9 +288,7 @@ class UserController {
                 new StdResponse(message,{executed})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -473,7 +365,6 @@ class UserController {
             })
 
             const alreadyLikedIds = alreadyLikedUsers.map(user => user.requested_user)
-            console.log(alreadyLikedIds)
 
             matchableUserIds = matchableUserIds.filter(user => !alreadyLikedIds.includes(user))
 
@@ -483,19 +374,24 @@ class UserController {
                 new StdResponse(message,{executed: query !== null, query})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los matches',{executed: false, error: e.message})
             )
         }
     };
 
-    // TODO: Comprobar que el usuario existe y si está o no habilitado
     static enableOrDisableUser = async (req, res) => {
         try {
             const {userId} = req.params;
             const {enabled} = req.body;
+
+            const userExists = (await UserQuery.checkIfIdExists(userId)).query // TODO: Validator
+
+            if (userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
 
             const {query, message, executed} = await UserQuery.enableOrDisableUser(userId, enabled);
 
@@ -503,68 +399,46 @@ class UserController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el estado del usuario.',{executed: false, error: e.message})
             )
         }
     };
 
-    // TODO: Añadir try-catch
     static deleteUser = async (req, res) => {
-        const isAdmin = await UserQuery.userHasRole(req.params.id, roleNames.admin.name);
-        const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
+        try {
+            const isAdmin = await UserQuery.userHasRole(req.params.id, roleNames.admin.name); // TODO: Validator
+            const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
 
-        if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
-            new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
-        )
+            if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
+                new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
+            )
 
-        if (req.params.id === req.payload.userId) return res.status(200).json(
-            new StdResponse("No puedes borrarte a tí mismo.",{executed: false})
-        )
+            if (req.params.id === req.payload.userId) return res.status(200).json(
+                new StdResponse("No puedes borrarte a tí mismo.",{executed: false})
+            )
 
-        const {message, executed, query, error} = await UserQuery.deleteUser(req.params.id);
+            const {message, executed, query} = await UserQuery.deleteUser(req.params.id);
 
-        if (executed) {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            console.log(error);
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al borrar el usuario.',{executed: false, error: e.message})
             )
         }
     };
 
-    // TODO: Pulir try-catch
     static editProfileData = async (req, res) => {
         try {
-            const {message, executed, query, error} = await UserQuery.editProfileData(req.payload.userId, req.body);
+            const {message, executed, query} = await UserQuery.editProfileData(req.payload.userId, req.body);
 
-            if (executed) {
-                return res.status(200).json(
-                    new StdResponse(message,{executed, query})
-                )
-            } else if (!executed && query) {
-                return res.status(200).json(
-                    new StdResponse(message,{executed, query})
-                )
-            } else if (!query) {
-                console.log(error);
-                return res.status(500).json(
-                    new StdResponse(message,{executed, error})
-                )
-            }
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -589,9 +463,7 @@ class UserController {
                     })
             );
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -600,6 +472,15 @@ class UserController {
     static updateUserAvatar = async (req, res) => {
         try {
             const key = 'avatar'
+            const {id} = req.params;
+
+            const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+
+            if (userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
 
             if (!req.files || !req.files[key]) return res.status(400).json(
                 new StdResponse(
@@ -613,10 +494,6 @@ class UserController {
 
             const avatarUrl = uploadedNames.get(key).secure_url;
 
-            const {id} = req.params;
-
-            // TODO: Comprobar que el usuario existe
-
             const {message, query, executed} = await UserQuery.editProfileAvatar(id, avatarUrl)
 
             return res.status(200).json(
@@ -626,16 +503,13 @@ class UserController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
             if (e instanceof CustomError) {
-                console.log('a')
                 return res.status(400).json(
                     new StdResponse(e.message,{executed: false})
                 )
             }
 
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -655,9 +529,7 @@ class UserController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -667,7 +539,7 @@ class UserController {
         try {
             const roleName = req.params.role;
 
-            const roleExists = (await UserQuery.findRoleByName(roleName)).query;
+            const roleExists = (await UserQuery.roleExists(roleName)).query; // TODO: Validator
 
             if (!roleExists) return res.status(404).json(
                 new StdResponse("El rol buscado no existe", {
@@ -686,13 +558,12 @@ class UserController {
         } catch (e) {
             console.log(e)
 
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
     };
 
-    // TODO: Mover a NotificationController
     static getSelfNotifications = async (req, res) => {
         try {
             const userId = req.payload.userId;
@@ -708,13 +579,12 @@ class UserController {
         } catch (e) {
             console.log(e)
 
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
     };
 
-    // TODO: Mover a NotificationController
     static readUserNotifications = async (req, res) => {
         try {
             const userId = req.payload.userId;
@@ -728,31 +598,7 @@ class UserController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
-            )
-        }
-    };
-
-    // TODO: Mover a RoleController
-    static getSelfRoles = async (req, res) => {
-        try {
-            const userId = req.payload.userId;
-
-            const {query, message, executed} = await UserQuery.getUserRolesWithItems(userId);
-
-            return res.status(200).json(
-                new StdResponse(message, {
-                    executed,
-                    query
-                })
-            );
-        } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }
@@ -760,7 +606,17 @@ class UserController {
 
     static updateUserPreferences = async (req, res) => {
         try {
-            const userId = req.params.userId ?? req.payload.userId;
+            const userId = req.params.id || req.payload.userId;
+
+            if (req.params.id) {
+                const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+
+                if (userExists.query) return res.status(200).json(
+                    new StdResponse(userExists.message, {
+                        executed: false
+                    })
+                );
+            }
 
             const {message, executed} = await UserQuery.setUserPreferences(userId, req.body.preferences);
 
@@ -770,9 +626,7 @@ class UserController {
                 })
             );
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse(e.message,{executed: false})
             )
         }

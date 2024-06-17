@@ -42,27 +42,6 @@ class MessageQuery {
         }
     };
 
-    static pushMessage = async (emitter, receiver, text) => {
-        try {
-            const data = {
-                emitter,
-                receiver,
-                text,
-                read: false,
-                created_at: new Date(),
-                updated_at: new Date(),
-            };
-
-            const query = await models.Message.create(data);
-
-            const message = query.get({plain: true})
-
-            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', message);
-        } catch (e) {
-            return new QueryError(false, e)
-        }
-    };
-
     /**
      *
      * @param {number} messageId

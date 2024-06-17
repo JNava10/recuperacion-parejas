@@ -676,7 +676,7 @@ class UserQuery {
     };
 
     // TODO: Mover a RoleQuery
-    static findRoleByName = async (name) => {
+    static roleExists = async (name) => {
         try {
             const role = (await models.Role.findOne(
                 {
@@ -685,7 +685,9 @@ class UserQuery {
                 }
             )) !== null;
 
-            return new QuerySuccess(true, 'Se ha realizado la consulta correctamente.', role);
+            const message = role ? 'El rol indicado existe' : 'El rol indicado no existe.';
+
+            return new QuerySuccess(true, message, role);
         } catch (e) {
             console.warn(e)
             return new QueryError(false, e)
