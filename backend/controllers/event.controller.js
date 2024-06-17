@@ -1,10 +1,8 @@
 const EventQuery = require("../database/query/event.query");
 const StdResponse = require("../classes/stdResponse");
-const convertHTMLToPDF = require("pdf-puppeteer");
-const {uploadFiles, uploadBuffer} = require("../helpers/cloudinary.helper");
+const {uploadFiles} = require("../helpers/cloudinary.helper");
 const EventUtils = require("../utils/event.utils");
 const CustomError = require("../classes/customError");
-const {fa} = require("@faker-js/faker");
 const UserQuery = require("../database/query/user.query");
 
 class EventController {
@@ -14,7 +12,7 @@ class EventController {
             const eventBody = req.body;
             eventBody.author = req.payload.userId;
 
-            const {message, executed, query, error} = await EventQuery.createEvent(eventBody);
+            const {message, executed, query} = await EventQuery.createEvent(eventBody);
 
             const event = query;
 
@@ -34,7 +32,6 @@ class EventController {
 
     static editEventDetails = async (req, res) => {
         try {
-            // TODO: Cambiar a params
             const event = req.body;
             event.author = req.payload.userId;
 
@@ -46,7 +43,7 @@ class EventController {
                 })
             );
 
-            const isClosed = await EventQuery.eventIsClosed(req.body.id);// TODO: Validator
+            const isClosed = await EventQuery.eventIsClosed(req.body.id);// TODO: Middleware
 
             if (isClosed.query) return res.status(200).json(
                 new StdResponse(isClosed.message,{executed: false})
@@ -98,7 +95,7 @@ class EventController {
     static deleteEventById = async (req, res) => {
         try {
 
-            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
+            const eventExists = await EventQuery.eventExists(req.params.eventId); // TODO: Validator
 
             if (!eventExists.query) return res.status(200).json(
                 new StdResponse(eventExists.message, {
@@ -106,7 +103,7 @@ class EventController {
                 })
             );
 
-            const isClosed = await EventQuery.eventIsClosed(req.params.eventId);// TODO: Validator
+            const isClosed = await EventQuery.eventIsClosed(req.params.eventId);// TODO: Middleware
 
             if (isClosed.query) return res.status(200).json(
                 new StdResponse(isClosed.message,{executed: false})
@@ -242,6 +239,8 @@ class EventController {
               );
           }
 
+          // TODO: Comprobar si el usuario está suscrito
+
           const {message, executed} = await EventQuery.subscribeToEvent(req.params.eventId, userId);
 
           return res.status(200).json(
@@ -269,8 +268,7 @@ class EventController {
                  })
              );
 
-             const isClosed = (await EventQuery.eventIsClosed(eventId));// TODO: Validator
-
+             const isClosed = (await EventQuery.eventIsClosed(eventId));// TODO: Middleware
              if (isClosed.query) return res.status(200).json(
                  new StdResponse(isClosed.message, {
                      executed: true,
@@ -290,6 +288,9 @@ class EventController {
                  );
              }
 
+             // TODO: Comprobar si el usuario está suscrito
+
+
              const {message, executed, query} = await EventQuery.withdrawFromEvent(eventId, userId);
 
              return res.status(200).json(
@@ -304,7 +305,7 @@ class EventController {
 
     static getSummaryFile = async (req, res) => {
         try {
-            const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
+            const eventExists = await EventQuery.eventExists(req.params.eventId); // TODO: Validator
 
             if (!eventExists.query) return res.status(200).json(
                 new StdResponse(eventExists.message, {
@@ -334,7 +335,7 @@ class EventController {
                 })
             );
 
-            const isClosed = (await EventQuery.eventIsClosed(eventId)); // TODO: Validator
+            const isClosed = (await EventQuery.eventIsClosed(eventId)); // TODO: Middleware
 
             if (isClosed.query) return res.status(200).json(
                 new StdResponse(isClosed.message, {

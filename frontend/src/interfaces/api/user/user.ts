@@ -90,6 +90,7 @@ export interface CrudEditResponse extends ApiResponse {
 
 export interface CreateUserResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: {
       id: number

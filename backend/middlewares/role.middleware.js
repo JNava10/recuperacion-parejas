@@ -1,49 +1,16 @@
-const StdResponse = require("../classes/stdResponse");
 const UserQuery = require("../database/query/user.query");
-const {roleNames} = require("../constants/seed.const");
+const StdResponse = require("../classes/stdResponse");
 
-const isAdmin = async (req, res, next) => {
-    if (!req.payload) return res.status(400).json(
-        new StdResponse(
-            'No se han podido obtener los datos del token.',
-            {auth: false}
-        )
-    );
+const moreOneAdminRemaining = async (req, res, next) => {
+    const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query;
 
-    const {userEmail} = req.payload;
-
-    const hasRole = (await UserQuery.userHasRoleByEmail(userEmail, roleNames.admin.name))
-
-    if (!hasRole) return res.status(401).json(
-        new StdResponse(
-            'No tienes permiso para acceder a esta ruta.',
-            {auth: false}
-        )
+    if (adminsRemaining >= 1) return res.status(200).json(
+        new StdResponse('No se pueden borrar mas administradores.',{executed: false})
     )
 
     next()
 }
 
-const isMember = async (req, res, next) => {
-    if (!req.payload) return res.status(400).json(
-        new StdResponse(
-            'No se han podido obtener los datos del token.',
-            {auth: false}
-        )
-    );
-
-    const {userEmail} = req.payload;
-
-    const hasRole = await UserQuery.userHasRoleByEmail(userEmail, roleNames.member.name)
-
-    if (!hasRole) return res.status(401).json(
-        new StdResponse(
-            'No tienes permiso para acceder a esta ruta.',
-            {auth: false}
-        )
-    )
-
-    next()
+module.exports = {
+    moreOneAdminRemaining
 }
-
-module.exports = {isAdmin, isMember}

@@ -1,8 +1,5 @@
 
-const UserQuery = require("../database/query/user.query");
 const StdResponse = require("../classes/stdResponse");
-const {el} = require("@faker-js/faker");
-const FriendshipQuery = require("../database/query/friendship.query");
 const PreferenceQuery = require("../database/query/preference.query");
 
 class PreferenceController {

@@ -60,74 +60,154 @@ export class UserService {
   }
 
   registerUser = (user: CreateUserItem) => {
-    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/register`, user)
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/register`, user).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CreateUserResponse;
+
+        return of(error);
+      })
+    )
   }
 
   sendRecoverEmail = (email: string) => {
     return this.http.post<SendRecoverEmailResponse>(`${environment.apiUrl}/user/send-recover-email`, {email}).pipe(
-      map(body => body.data.executed)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SendRecoverEmailResponse;
+
+        return of(error);
+      })
     )
   }
 
   sendRecoverCode = (code: string, email: string) => {
     return this.http.post<SendRecoverCodeResponse>(`${environment.apiUrl}/user/send-recover-code`, {code, email}).pipe(
-      map(body => body.data)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SendRecoverCodeResponse;
+
+        return of(error);
+      })
     )
   }
 
   updatePassword = (id: number, password: string) => {
     return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/password/${id}`, {password},{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageUserResponse;
+
+        return of(error);
+      })
     )
   }
 
   addRoles = (id: number, roles: number[]) => {
-    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}})
+    return this.http.post<ManageUserResponse>(`${environment.apiUrl}/user/roles/${id}`, {roles},{params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageUserResponse;
+
+        return of(error);
+      })
+    )
   }
 
   deleteRoles = (id: number, roles: number[]) => {
-    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}})
+    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/user/roles/delete/${id}`, {roles}, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
+    )
   }
 
   editUserData = (data: CreateUserItem, id: number) => {
-    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}})
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/data/${id}`, data,{params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
+    )
   }
 
   sendNewPassword = (password: string, recoverToken: string) => {
     return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/recover-account/password`, {password},{params: {...sendTokenParam}, headers: {recoverToken}}).pipe(
-      map(body => body.data.executed)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as RecoverPasswordResponse;
+
+        return of(error);
+      })
     )
   }
 
   enableOrDisableUser = (user: UserItem, enabled: boolean) => {
     return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/enable-or-disable/${user.id}`, {enabled},{params: {...sendTokenParam}}).pipe(
-      map(body => body.data.executed)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as RecoverPasswordResponse;
+
+        return of(error);
+      })
     )
   }
 
   deleteUser = (user: UserItem) => {
-    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}} )
+    return this.http.delete<DeleteUserResponse>(`${environment.apiUrl}/user/${user.id}`, {params: {...sendTokenParam}} ).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as DeleteUserResponse;
+
+        return of(error);
+      })
+    )
   }
 
 
   editProfileData = (user: UserItem) => {
-    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/profile/data/${user.id}`, user, {params: {...sendTokenParam}});
+    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/profile/data/${user.id}`, user, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageUserResponse;
+
+        return of(error);
+      })
+    )
   }
 
   getOwnData = () => {
-    return this.http.get<GetProfileResponse>(`${environment.apiUrl}/user/profile`, {params: {...sendTokenParam}});
+    return this.http.get<GetProfileResponse>(`${environment.apiUrl}/user/profile`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetProfileResponse;
+
+        return of(error);
+      })
+    )
   }
 
   getChats = () => {
-    return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}});
+    return this.http.get<GetPendingChatsResponse>(`${environment.apiUrl}/user/pending-chats`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetPendingChatsResponse;
+
+        return of(error);
+      })
+    )
   }
 
   getRoleUsers = (role: string) => {
-    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/role/${role}`, {params: {...sendTokenParam}});
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/role/${role}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+
+        return of(error);
+      })
+    )
   }
 
   getSelfRoles = () => {
-    return this.http.get<GetSelfRoles>(`${environment.apiUrl}/user/roles`, {params: {...sendTokenParam}});
+    return this.http.get<GetSelfRoles>(`${environment.apiUrl}/user/roles`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetSelfRoles;
+
+        return of(error);
+      })
+    )
   }
 
   updateUserAvatar = (id: number, file: File) => {
@@ -148,17 +228,35 @@ export class UserService {
   }
 
   getRoleUsersCount = (roleName: string) => {
-    return this.http.get<GetCountResponse>(`${environment.apiUrl}/user/role-users/${roleName}`, {params: {...sendTokenParam}});
+    return this.http.get<GetCountResponse>(`${environment.apiUrl}/user/role-users/${roleName}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetCountResponse;
+
+        return of(error);
+      })
+    )
   }
 
   // TODO: Mover a NotificationApiService
   getNotifications = () => {
-    return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}});
+    return this.http.get<GetNotificationsResponse>(`${environment.apiUrl}/user/notifications`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetNotificationsResponse;
+
+        return of(error);
+      })
+    )
   }
 
   // TODO: Mover a NotificationApiService
   readAllNotifications = () => {
-    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/notifications/read`, {}, {params: {...sendTokenParam}});
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/notifications/read`, {}, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
+    )
   }
 
   // TODO: Mover a PreferenceApiService

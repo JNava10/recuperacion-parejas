@@ -27,7 +27,6 @@ class RoleQuery {
         }
     };
 
-
     static roleExists = async (name) => {
         try {
             const role = (await models.Role.findOne(

@@ -1,8 +1,5 @@
 const StdResponse = require("../classes/stdResponse");
 
-
-const {generateToken} = require("../helpers/jwt.helper");
-
 class AuthController {
     static blacklistedTokens = [];
 

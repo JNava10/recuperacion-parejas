@@ -235,8 +235,6 @@ class UserQuery {
         try {
             const entries = [];
 
-            console.log(roles)
-
             roles.forEach(role => entries.push({user, role}))
             const created = await models.AssignedRole.bulkCreate(entries);
 
@@ -517,7 +515,6 @@ class UserQuery {
         }
     };
 
-    // TODO: Mover a RoleQuery
     static getRoleUsersRemaining = async (roleName) => {
         try {
             const remainingCount = (await models.User.findOne(

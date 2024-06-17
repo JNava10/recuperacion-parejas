@@ -1,7 +1,4 @@
-const {events} = require("../constants/socket.const");
-const MessageQuery = require("../database/query/message.query");
 const { v4: getUniqueId } = require('uuid');
-const {fa} = require("@faker-js/faker");
 
 // Las Rooms son 'salas' que incluye Socket.io para poder enviar peticiones a usuarios especificos. Esto es genial para hacer un chat.
 // La idea que se ha planteado es que sea el backend el que se encargue de manejar estas rooms.

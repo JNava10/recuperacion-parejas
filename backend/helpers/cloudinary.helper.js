@@ -16,7 +16,7 @@ cloudinary.config( process.env.CLOUDINARY_URL);
 const uploadFiles = async (requestFiles, settings) => {
     const filesUploaded = new Map();
     const files = Object.entries(requestFiles);
-    const maxBytesSize = settings.sizeLimit * (1024 * 1024) || (1024 * 1024);
+    const maxBytesSize = settings.sizeLimit * (1024 * 1024) || (1024 * 1024); // 1024^2 B = 1MB
 
     const fileExtsValid = files.every(([key, file]) => {
         const fileNameArray = file.name.split('.');

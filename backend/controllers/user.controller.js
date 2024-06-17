@@ -287,18 +287,19 @@ class UserController {
 
     static deleteUser = async (req, res) => {
         try {
-            const isAdmin = await UserQuery.userHasRole(req.params.id, roleNames.admin.name); // TODO: Validator
+            let userId = req.params.userId;
+            const isAdmin = await UserQuery.userHasRole(userId, roleNames.admin.name);
             const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
 
             if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
                 new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
             )
 
-            if (req.params.id === req.payload.userId) return res.status(200).json(
+            if (userId === req.payload.userId) return res.status(200).json(
                 new StdResponse("No puedes borrarte a tí mismo.",{executed: false})
             )
 
-            const {message, executed, query} = await UserQuery.deleteUser(req.params.id);
+            const {message, executed, query} = await UserQuery.deleteUser(userId);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
@@ -352,9 +353,9 @@ class UserController {
     static updateUserAvatar = async (req, res) => {
         try {
             const key = 'avatar'
-            const {id} = req.params;
+            const {userId} = req.params;
 
-            const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+            const userExists = (await UserQuery.checkIfIdExists(userId)).query // TODO: Validator
 
             if (userExists.query) return res.status(200).json(
                 new StdResponse(userExists.message, {
@@ -362,7 +363,7 @@ class UserController {
                 })
             );
 
-            if (!req.files || !req.files[key]) return res.status(400).json(
+            if (!req.files || !req.files[key]) return res.status(400).json( // TODO: Middleware
                 new StdResponse(
                     "No se ha subido ningun archivo.",
                     {
@@ -374,7 +375,7 @@ class UserController {
 
             const avatarUrl = uploadedNames.get(key).secure_url;
 
-            const {message, query, executed} = await UserQuery.editProfileAvatar(id, avatarUrl)
+            const {message, query, executed} = await UserQuery.editProfileAvatar(userId, avatarUrl)
 
             return res.status(200).json(
                 new StdResponse(message, {
@@ -441,7 +442,6 @@ class UserController {
         }
     };
 
-    // TODO: Mover a notificationController
     static readUserNotifications = async (req, res) => {
         try {
             const userId = req.payload.userId;
@@ -461,13 +461,12 @@ class UserController {
         }
     };
 
-    // TODO: Mover a preferenceController
     static updateUserPreferences = async (req, res) => {
         try {
-            const userId = req.params.id || req.payload.userId;
+            const userId = req.params.userId || req.payload.userId;
 
             if (req.params.id) {
-                const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
+                const userExists = (await UserQuery.checkIfIdExists(req.params.id)).query // TODO: Validator
 
                 if (userExists.query) return res.status(200).json(
                     new StdResponse(userExists.message, {
@@ -520,12 +519,11 @@ class UserController {
             const apiToken = generateToken({userId: 1, userEmail: 's', type: tokenTypes.api});
             const socketToken = generateToken({userId: user.id, type: tokenTypes.socket});
 
-            const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id);
+            const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id); // TODO: Middleware
 
             await UserQuery.updateUserLogin(user.id)
 
             console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
-            const token = generateToken({})
 
             return res.status(200).json(
                 new StdResponse(
