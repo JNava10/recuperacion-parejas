@@ -27,6 +27,16 @@ export class PreferenceService {
     );
   }
 
+  deletePreference = (id: number) => {
+    return this.http.delete<CrudEditResponse>(`${environment.apiUrl}/preference/${id}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
+    );
+  }
+
   saveChoicePreference = (preference: CreateChoicePreferenceItem) => {
     return this.http.post<GetPreferenceResponse>(`${environment.apiUrl}/preference/save/choice`, preference, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {

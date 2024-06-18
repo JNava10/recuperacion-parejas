@@ -3,9 +3,9 @@ const StdResponse = require("../classes/stdResponse");
 const PreferenceQuery = require("../database/query/preference.query");
 
 class PreferenceController {
-    static getActivatedPreferences = async (req, res) => {
+    static getNotDeletedPreferences = async (req, res) => {
         try {
-            const {message, query} = await PreferenceQuery.getActivatedPreferences();
+            const {message, query} = await PreferenceQuery.getNotDeletedPreferences();
 
             return res.status(200).json(
                 new StdResponse(message,{executed: true, query})
@@ -47,7 +47,7 @@ class PreferenceController {
 
     static getAllPreferences = async (req, res) => {
         try {
-            const {message, query, executed} = await PreferenceQuery.getAllPreferences(req.body);
+            const {message, query, executed} = await PreferenceQuery.getAllPreferences();
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
@@ -89,6 +89,20 @@ class PreferenceController {
         } catch (e) {
             return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al obtener las preferencias.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static deletePreference = async (req, res) => {
+        try {
+            const {message, executed, query} = await PreferenceQuery.deletePreference(req.params.id);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al borrar la preferencia.',{executed: false, error: e.message})
             )
         }
     };
