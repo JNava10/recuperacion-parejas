@@ -38,8 +38,6 @@ export class EditProfilePreferencesFormComponent implements OnInit {
   getPreferencesFormData = () => {
     const choiceValues =  Object.entries(this.choicePreferencesForm?.value);
     const rangeValues =  Object.entries(this.rangePreferencesForm?.value);
-
-
     const choices: PreferenceValueFormItem[] = []
     const ranges: PreferenceValueFormItem[] = []
 
@@ -50,8 +48,6 @@ export class EditProfilePreferencesFormComponent implements OnInit {
       choices.push({preference: Number(preferenceId), value: Number(preferenceValue)})
     });
 
-    console.log(choices)
-
     rangeValues.forEach(entry => {
       const preferenceId = entry[0];
       const preferenceValue = entry[1];
@@ -59,10 +55,14 @@ export class EditProfilePreferencesFormComponent implements OnInit {
       ranges.push({preference: Number(preferenceId), value: Number(preferenceValue)})
     });
 
-    const preferences = [...choices, ...ranges]
+    const preferences = [...choices, ...ranges];
 
     this.userService.updateOwnPreferences(preferences).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
     })
   }
 }

@@ -6,12 +6,13 @@ const QueryError = require("../../classes/QueryError");
 const PreferenceOption = require("../../classes/preferenceOption");
 const {preferenceTypes} = require("../../constants/seed.const");
 const {el} = require("@faker-js/faker");
+const CustomError = require("../../classes/customError");
 
 class PreferenceQuery {
-    static getActivatedPreferences = async () => {
+    static getNotDeletedPreferences = async () => {
         try {
             const activatedPreferences = await models.Preference.findAll({
-                attributes: ['name', 'description', 'typeId', 'createdAt', 'updatedAt'],
+                attributes: ['id', 'name', 'description', 'typeId', 'createdAt', 'updatedAt'],
                 include: {
                     model: models.PreferenceType,
                     as: 'type'
@@ -20,8 +21,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(activatedPreferences !== null, 'Se han obtenido los amigos correctamente.', activatedPreferences);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -47,12 +48,21 @@ class PreferenceQuery {
                 });
 
                 await models.PreferenceOption.bulkCreate(preferenceOptions);
-            }
+
+                const usersId = await models.User.findAll({attributes: ['id'], where: {deletedAt: null}})
+                const usersPreference = [];
+
+                usersId.forEach(user => {
+                    usersPreference.push({user: user.id, preference: createdPreference.id, value: 1})
+                });
+
+                await models.UserPreference.bulkCreate(usersPreference);
+            } else throw new CustomError('No se ha podido obtener la preferencia creada.')
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -73,12 +83,21 @@ class PreferenceQuery {
                     min_value: range.min,
                     max_value: range.max,
                 });
+
+                const usersId = await models.User.findAll({attributes: ['id'], where: {deletedAt: null}})
+                const usersPreference = [];
+
+                usersId.forEach(user => {
+                    usersPreference.push({user: user.id, preference: createdPreference.id, value: range.min})
+                });
+
+                await models.UserPreference.bulkCreate(usersPreference);
             }
 
             return new QuerySuccess(true, 'Se ha insertado la preferencia correctamente.');
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -119,8 +138,8 @@ class PreferenceQuery {
 
             return new QuerySuccess(true, 'Se han obtenido las preferencias correctamente.', preferences);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -132,17 +151,22 @@ class PreferenceQuery {
 
             return new QuerySuccess(created.length > 0, 'Se han creado las preferencias de usuario correctamente.', created.length > 0);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
     static userHasPreferences = async (userId) => {
-        const exists = await models.UserPreference.findOne({where: {user: userId}, attributes: ['user']}) !== null;
+        try {
+            const exists = await models.UserPreference.findOne({where: {user: userId}, attributes: ['user']}) !== null;
 
-        const message = exists ? 'El usuario ya tiene preferencias.' : 'El usuario no tiene preferencias.'
+            const message = exists ? 'El usuario ya tiene preferencias.' : 'El usuario no tiene preferencias.'
 
-        return new QuerySuccess(true, message, exists);
+            return new QuerySuccess(true, message, exists);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
     };
 
     static getUserPreferences = async (user) => {
@@ -193,8 +217,58 @@ class PreferenceQuery {
 
             return new QuerySuccess(true, 'Se han creado las preferencias de usuario correctamente.', {choice: choicePreferences, range: rangePreferences});
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
+        }
+    };
+
+    static preferenceExists = async (id) => {
+        try {
+            const preference = await models.Preference.findOne(
+                {
+                    where: {id}
+                }
+            )
+
+            if (!preference) return new QuerySuccess(true, 'La preferencia no existe.', false);
+
+            return new QuerySuccess(true, 'Se ha borrado la preferencia correctamente   .', true);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
+    static deletePreference = async (id) => {
+        try {
+            const preference = await models.Preference.findOne(
+                {
+                    where: {id},
+                    include: {
+                        model: models.PreferenceType,
+                        as: 'type'
+                    }
+                }
+            )
+
+            if (!preference) return new QuerySuccess(false, 'La preferencia no existe o ya está borrada.', false);
+
+            const deleted = await models.Preference.destroy({where: {id}});
+
+            if (deleted) {
+                if (preference.type.text === preferenceTypes.choice.text) {
+                    await models.PreferenceOption.destroy({where: {preference: id}})
+                } else {
+                    await models.PreferenceValue.destroy({where: {preference: id}})
+                }
+
+                await models.UserPreference.destroy({where: {preference: id}})
+            }
+
+            return new QuerySuccess(true, 'Se ha borrado la preferencia correctamente.', deleted);
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     };
 }

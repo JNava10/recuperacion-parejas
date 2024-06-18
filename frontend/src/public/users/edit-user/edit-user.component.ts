@@ -22,8 +22,8 @@ export class EditUserComponent implements OnInit {
 
     if (!userId) return;
 
-    this.userService.findUserById(userId).subscribe(user => {
-      this.user = user
+    this.userService.findUserById(userId).subscribe(body => {
+      this.user = body.data.query
     });
 
     this.roleService.getAllRoles().subscribe(roles => {

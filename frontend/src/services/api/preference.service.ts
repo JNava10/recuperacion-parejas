@@ -19,23 +19,51 @@ export class PreferenceService {
 
   getActivatedPreferences = () => {
     return this.http.get<GetPreferenceResponse>(`${environment.apiUrl}/preference/activated`, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetPreferenceResponse;
+
+        return of(error);
+      })
+    );
+  }
+
+  deletePreference = (id: number) => {
+    return this.http.delete<CrudEditResponse>(`${environment.apiUrl}/preference/${id}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
     );
   }
 
   saveChoicePreference = (preference: CreateChoicePreferenceItem) => {
     return this.http.post<GetPreferenceResponse>(`${environment.apiUrl}/preference/save/choice`, preference, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetPreferenceResponse;
+
+        return of(error);
+      })
     );
   }
 
   saveRangePreference = (preference: CreateRangePreferenceItem) => {
-    return this.http.post<SavePreferenceResponse>(`${environment.apiUrl}/preference/save/range`, preference, {params: {...sendTokenParam}})
+    return this.http.post<SavePreferenceResponse>(`${environment.apiUrl}/preference/save/range`, preference, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SavePreferenceResponse;
+
+        return of(error);
+      })
+    );
   }
 
   getAllPreferences = () => {
     return this.http.get<GetPreferencesResponse>(`${environment.apiUrl}/preference/`, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetPreferencesResponse;
+
+        return of(error);
+      })
     );
   }
 

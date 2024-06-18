@@ -30,6 +30,8 @@ export class ManageEventMembersFormComponent implements OnInit {
   ngOnInit() {
     this.getEventAssistants();
 
+    console.log(Date.parse(this.event?.closeDateTime!), Date.now())
+
     this.getNonAssistants();
   }
 
@@ -52,7 +54,11 @@ export class ManageEventMembersFormComponent implements OnInit {
 
   addToEvent = (user: UserItem) => {
     this.eventService.addMemberToEvent(this.event!.id!, user.id!).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (body.data.executed) {
         this.getEventAssistants()
@@ -65,7 +71,11 @@ export class ManageEventMembersFormComponent implements OnInit {
     console.log(user)
 
     this.eventService.withdrawMemberFromEvent(this.event!, user).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (body.data.executed) {
         this.getEventAssistants()
@@ -73,4 +83,5 @@ export class ManageEventMembersFormComponent implements OnInit {
       }
     })
   };
+    protected readonly Date = Date;
 }

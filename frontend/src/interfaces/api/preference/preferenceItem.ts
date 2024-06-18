@@ -1,8 +1,8 @@
 import {ApiResponse} from "../apiResponse";
-import {FormControl} from "@angular/forms";
 
 export interface GetPreferenceResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: PreferenceItemWithType[]
   }
@@ -10,12 +10,14 @@ export interface GetPreferenceResponse extends ApiResponse {
 
 export interface SavePreferenceResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
   }
 }
 
 export interface GetPreferencesResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: PreferenceList
   }
@@ -24,6 +26,7 @@ export interface GetPreferencesResponse extends ApiResponse {
 
 export interface CreatePreferencesResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: boolean
   }

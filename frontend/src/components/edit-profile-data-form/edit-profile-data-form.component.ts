@@ -11,6 +11,7 @@ import {UserService} from "../../services/api/user.service";
 import {showQueryToast} from "../../utils/common.utils";
 import {addBodyClass} from "@angular/cdk/schematics";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MenuService} from "../../services/menu.service";
 
 @Component({
   selector: 'app-edit-profile-data-form',
@@ -26,11 +27,9 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
   styleUrl: './edit-profile-data-form.component.css'
 })
 export class EditProfileDataFormComponent implements OnInit {
-  constructor(private userService: UserService, private messageService: MessageService) {}
+  constructor(private menuService: MenuService, private userService: UserService, private messageService: MessageService) {}
 
   ngOnInit() {
-    console.log(this.user)
-
     this.profileDataForm.patchValue({
       email: this.user?.email,
       name: this.user?.name,
@@ -47,7 +46,7 @@ export class EditProfileDataFormComponent implements OnInit {
   protected picFile?: File;
   loading = false;
 
-  maxFileSize = 1024; // 1 MB
+  maxFileSize = (1024 * 1024); // 1 MB
 
   profileDataForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -66,11 +65,15 @@ export class EditProfileDataFormComponent implements OnInit {
 
     const user = this.getUserData();
 
-    this.userService.editProfileData(user).subscribe(res => {
-      showQueryToast(res.data.executed, res.message, this.messageService)
+    this.userService.editProfileData(user).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (this.picFile) {
-        this.changeUserAvatar(this.user?.id!, res)
+        this.changeUserAvatar(this.user?.id!)
       }
 
       this.loading = false;
@@ -120,9 +123,17 @@ export class EditProfileDataFormComponent implements OnInit {
     return message.detail === undefined;
   }
 
-  private changeUserAvatar = (id: number, res: CrudEditResponse) => {
+  private changeUserAvatar = (id: number) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+
+      if (body.data.executed) {
+        this.menuService.updateAvatar(body.data.avatarUrl!)
+      }
 
       this.loading = false
     });

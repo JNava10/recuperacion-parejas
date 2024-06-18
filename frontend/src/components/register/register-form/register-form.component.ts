@@ -12,7 +12,7 @@ import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {MessageService} from "primeng/api";
 import {MessageModule} from "primeng/message";
 import {tap} from "rxjs";
-import {getQueryToast, validateFiles} from "../../../utils/common.utils";
+import {getQueryToast, showQueryToast, validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-register-form',
@@ -74,9 +74,11 @@ export class RegisterFormComponent {
     if (!this.user) return;
 
     this.userService.registerUser(this.user!).subscribe(body => {
-      const message = getQueryToast(body.data.executed, body.message)
-
-      this.messageService.add(message);
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (body.data.executed) {
         this.registeredId = body.data.query.id;
@@ -106,8 +108,11 @@ export class RegisterFormComponent {
       if (!valid) return;
 
       this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
-        const message = getQueryToast(body.data.executed, body.message)
-        this.messageService.add(message)
+        if (body.data.errors) {
+          body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(body.data.executed, body.message, this.messageService)
+        }
 
         if (body.data.executed) {
           this.finishRegister()

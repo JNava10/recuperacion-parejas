@@ -13,7 +13,7 @@ import {PreferenceService} from "../../../services/api/preference.service";
 import * as regex from "../../../utils/const/regex.constants";
 import {CreateRangePreferenceItem} from "../../../interfaces/api/preference/preferenceItem";
 import {rangeValidation} from "../../../utils/validators/customValidators";
-import {getQueryToast} from "../../../utils/common.utils";
+import {getQueryToast, showQueryToast} from "../../../utils/common.utils";
 import {MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 
@@ -68,9 +68,11 @@ export class CreateRangePreferenceFormComponent {
     }
 
     this.preferenceService.saveRangePreference(rangePreference).subscribe(body => {
-      const message = getQueryToast(body.data.executed, body.message);
-
-      this.messageService.add(message);
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
     })
   }
 }

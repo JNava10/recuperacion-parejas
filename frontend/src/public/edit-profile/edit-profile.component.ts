@@ -7,9 +7,7 @@ import {PreferenceList} from "../../interfaces/api/preference/preferenceItem";
 import {
   EditProfilePreferencesFormComponent
 } from "../../components/edit-preferences-form/edit-profile-preferences-form.component";
-import {
-  EditUserPreferencesFormComponent
-} from "../../components/edit-user-preferences-form/edit-user-preferences-form.component";
+
 import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 
 @Component({
@@ -19,7 +17,6 @@ import {CustomToastComponent} from "../../components/custom-toast/custom-toast.c
     EditUserFormComponent,
     EditProfileDataFormComponent,
     EditProfilePreferencesFormComponent,
-    EditUserPreferencesFormComponent,
     CustomToastComponent
   ],
   templateUrl: './edit-profile.component.html',
@@ -31,7 +28,6 @@ export class EditProfileComponent implements OnInit {
   ngOnInit() {
     this.userService.getOwnData().subscribe((body) => {
       this.user = body.data.query.user;
-      console.log(body.data.query)
       this.preferences = body.data.query.preferences;
       this.userFetched = true
     })

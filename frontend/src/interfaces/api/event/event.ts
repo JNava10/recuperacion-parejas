@@ -4,6 +4,7 @@ export interface EventResponse extends ApiResponse {
   data: {
     executed: true
     query: EventItem
+    errors?: string[]
   }
 }
 
@@ -11,6 +12,7 @@ export interface SubscribeEventResponse extends ApiResponse {
   data: {
     executed: boolean
     closed: boolean
+    errors?: string[]
   }
 }
 
@@ -58,6 +60,7 @@ export interface SummaryFile {
 
 export interface SubscribedToEventResponse {
   data: {
+    errors?: string[]
     executed: true
     query: boolean
   }
@@ -65,6 +68,7 @@ export interface SubscribedToEventResponse {
 
 export interface EventSummaryResponse {
   data: {
+    errors?: string[]
     executed: true
     file: SummaryFile
   }
@@ -72,6 +76,7 @@ export interface EventSummaryResponse {
 
 export interface ManageEventResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: {
       id: number

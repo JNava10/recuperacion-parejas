@@ -13,6 +13,7 @@ export interface NewMatchNotification {
 
 export interface GetNotificationsResponse extends ApiResponse {
   data: {
+    errors?: string[]
     query: NewMatchNotification[]
   }
 }

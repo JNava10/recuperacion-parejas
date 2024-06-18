@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {SelectRolesEditComponent} from "../../../components/roles/select-roles/select-roles.component";
@@ -16,7 +16,7 @@ import {CustomToastComponent} from "../../../components/custom-toast/custom-toas
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {Message, MessageService} from "primeng/api";
 import {FileValidationOptions} from "../../../interfaces/fileValidation";
-import {validateFiles} from "../../../utils/common.utils";
+import {showQueryToast, validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-edit-user-form',
@@ -41,6 +41,7 @@ export class EditUserFormComponent implements OnInit {
 
   @Input() roles?: RoleItem[];
   @Input() user?: UserItem;
+  @Output() edited = new EventEmitter<null>();
 
   protected picFile?: File;
   loading = false;
@@ -61,6 +62,7 @@ export class EditUserFormComponent implements OnInit {
   }, {  validators: [customValidators.passwordsMatch('password', 'confirmPassword')], updateOn: "submit"});
 
   editUser = (event: SubmitEvent) => {
+
     if (this.userDataForm.invalid) return
 
     event.preventDefault();
@@ -70,21 +72,17 @@ export class EditUserFormComponent implements OnInit {
     this.userService.editUserData(user!, this.user?.id!).subscribe(body => {
       this.loading = true
 
-      if (!body.data.executed) {
-        const message: Message = {summary: body.message}
-        message.severity = body.data.executed ? "success" : "error"
-        this.messageService.add(message);
-      }
-
       if (this.picFile) {
         this.changeUserAvatar(this.user?.id!, body)
-      } else {
-        const message: Message = {summary: body.message}
-        message.severity = body.data.executed ? "success" : "error"
-        this.messageService.add(message);
-
-        this.loading = false;
       }
+
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+
+      this.loading = false
     });
   };
 
@@ -131,16 +129,23 @@ export class EditUserFormComponent implements OnInit {
 
     const password = this.passwordsForm.value.passwords?.password;
 
-    this.userService.updatePassword(this.user?.id!, password!).subscribe();
+    this.userService.updatePassword(this.user?.id!, password!).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+    });
   };
 
   private changeUserAvatar = (id: number, res: CrudEditResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
-      const message: Message = {summary: res.message}
 
-      message.severity = res.data.executed ? "success" : "error";
-
-      this.messageService.add(message);
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       this.loading = false
     });

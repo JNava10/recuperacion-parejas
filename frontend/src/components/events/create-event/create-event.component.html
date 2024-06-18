@@ -15,15 +15,29 @@
       <input type="date" formControlName="scheduledDate" class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       <input type="time" formControlName="scheduledTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
     </div>
-    <span class="text-red-400" *ngIf="!this.createEventForm.get('scheduledDate')?.valid && form.submitted">Campo no valido</span>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('scheduledDate')?.valid && form.submitted">Fecha no valida</p>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('scheduledTime')?.valid && form.submitted">Hora no valida</p>
+    <p class="text-red-400" *ngIf="this.createEventForm.errors && this.createEventForm.errors['schedulePast'] && form.submitted">Fecha pasada</p>
   </div>
+  <div class="mb-5">
+    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de cierre de inscripciones</label>
+    <div class="flex">
+      <input type="date" formControlName="closeDate" class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <input type="time" formControlName="closeTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+    </div>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('closeDate')?.valid && form.submitted">Fecha no valida</p>
+    <p class="text-red-400" *ngIf="!this.createEventForm.get('closeTime')?.valid && form.submitted">Hora no valida</p>
+  </div>
+  <p class="text-red-400" *ngIf="this.createEventForm.errors && this.createEventForm.errors['invalidCloseTime'] && form.submitted">Fecha de cierre invalida</p>
+  <p class="text-red-400" *ngIf="this.createEventForm.errors && this.createEventForm.errors['closePast'] && form.submitted">Fecha pasada</p>
+
   <div class="flex">
     <app-map-event-marker (positionChange)="changeEventPos($event)"></app-map-event-marker>
   </div>
 
   <div class="mt-4 ">
     <button (click)="$event.preventDefault(); file.click()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-      {{ this.picFile?.name || "Seleccionar foto de perfil" }}
+      {{ this.picFile?.name || "Seleccionar foto del evento" }}
     </button>
     <input type="file" (change)="handleFile($event)" #file [hidden]="true" accept=".jpg,.jpeg,.png">
     <button type="submit" class="text-white flex flex-row gap-3 items-center bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">

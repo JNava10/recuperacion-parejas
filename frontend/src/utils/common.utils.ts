@@ -1,9 +1,6 @@
 import {Message, MessageService} from "primeng/api";
 import TimeAgo from 'javascript-time-ago'
 import es from 'javascript-time-ago/locale/es'
-import {inject} from "@angular/core";
-import {UserService} from "../services/api/user.service";
-import {userMenuItems} from "./const/menu.constants";
 import {Preference} from "../interfaces/api/preference/preferenceItem";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {FileValidationOptions} from "../interfaces/fileValidation";
@@ -36,10 +33,6 @@ export const getTimeAgo = (timestamp: number) => {
   return timeAgo.format(date)
 }
 
-export const getUserMenuItems = () => {
-
-}
-
 export const userPreferencesToFormGroup = (preferences: Preference[]) => {
   const group: any = {};
 
@@ -66,8 +59,6 @@ export const validateFiles = (files: File[], options: FileValidationOptions, mes
   const hasFiles = files.length > 0;
 
   const message: Message = {severity: 'warn', summary: '¡Ojo!'};
-
-  console.log(fileSizeValid, files[0].size, options.maxSizeMb * 1048576)
 
   if (!fileSizeValid) {
     message.detail = 'Has intentado subir un archivo demaisado grande.';

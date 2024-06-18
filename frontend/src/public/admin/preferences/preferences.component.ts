@@ -9,6 +9,9 @@ import {ButtonModule} from "primeng/button";
 import {OverlayPanelModule} from "primeng/overlaypanel";
 import {TableModule} from "primeng/table";
 import {StyleClassModule} from "primeng/styleclass";
+import {showQueryToast} from "../../../utils/common.utils";
+import {MessageService} from "primeng/api";
+import {CustomToastComponent} from "../../../components/custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-preferences',
@@ -22,25 +25,40 @@ import {StyleClassModule} from "primeng/styleclass";
     ButtonModule,
     OverlayPanelModule,
     TableModule,
-    StyleClassModule
+    StyleClassModule,
+    CustomToastComponent
   ],
   templateUrl: './preferences.component.html',
   styleUrl: './preferences.component.css'
 })
 export class PreferencesComponent implements OnInit {
-  constructor(private preferenceService: PreferenceService, private router: Router) {}
+  constructor(private preferenceService: PreferenceService, private router: Router, private messageService: MessageService) {}
 
   ngOnInit() {
-    this.preferenceService.getActivatedPreferences().subscribe(preferences => {
-      this.preferences = preferences
+    this.getPreferences();
+  }
+
+  protected getPreferences() {
+    this.preferenceService.getActivatedPreferences().subscribe(body => {
+        this.preferences = body.data.query
+      console.log(this.preferences)
       }
     )
   }
 
   @Input() preferences?: PreferenceItemWithType[];
 
+  deletePref(id: number) {
+    this.preferenceService.deletePreference(id).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
-  goToCreateChoicePreference = () => {
-    this.router.navigate(['create-choice-preference'])
-  };
+      if (body.data.executed) {
+        this.getPreferences()
+      }
+    })
+  }
 }

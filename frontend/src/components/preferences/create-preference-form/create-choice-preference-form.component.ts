@@ -8,19 +8,23 @@ import {
   PreferenceOption
 } from "../../../interfaces/api/preference/preferenceItem";
 import {PreferenceService} from "../../../services/api/preference.service";
+import {MessageService} from "primeng/api";
+import {showQueryToast} from "../../../utils/common.utils";
+import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 
 @Component({
   selector: 'app-create-preference-form',
   standalone: true,
   imports: [
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CustomToastComponent
   ],
   templateUrl: './create-choice-preference-form.component.html',
   styleUrl: './create-choice-preference-form.component.css'
 })
 export class CreateChoicePreferenceFormComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService) {
+  constructor(private formBuilder: FormBuilder, private preferenceService: PreferenceService, private messageService: MessageService) {
   }
 
   ngOnInit() {
@@ -45,7 +49,7 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
 
   optionFields = 1;
 
-  handleForm($event: MouseEvent) {
+  handleForm($event: SubmitEvent) {
     if (this.choicePreferenceForm.invalid) return;
 
     const formValues = this.choicePreferenceForm.value;
@@ -56,7 +60,14 @@ export class CreateChoicePreferenceFormComponent implements OnInit {
       options: this.options.value,
     }
 
-    this.preferenceService.saveChoicePreference(choicePreference).subscribe()
+    this.preferenceService.saveChoicePreference(choicePreference).subscribe(body => {
+      console.log(body)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+    })
   }
   createPreferenceOptions = () => {
     for (let i = 0; i < this.optionFields; i++) {

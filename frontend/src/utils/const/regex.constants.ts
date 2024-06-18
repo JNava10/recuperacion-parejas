@@ -14,11 +14,11 @@ export const user = {
   secondLastname: /[A-Za-z\s.]{1,20}$/,
   nickname: /[A-Za-z0-9._]{1,20}$/,
   email: /[A-Za-z0-9]{4,25}@[A-Za-z]{3,10}.[A-Za-z]{2,7}$/,
-  password: /[\w!"·$%&\/(\\)=?*¿+\-`<>.:,;|@#~½¬{\[\]}ªº]{3,20}/
+  password: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
 }
 
 export const preference = {
-  name: /[A-Za-z¿?,\s.]{1,25}$/,
+  name: /[A-Za-z0-9¿?,\s.]{1,25}$/,
   description: /[A-Za-z¿?,\s.]{1,50}$/,
   option: /[\w¿?,\s.]{1,20}$/,
 }

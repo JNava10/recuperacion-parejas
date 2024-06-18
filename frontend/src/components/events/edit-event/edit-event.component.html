@@ -16,8 +16,19 @@
         <input type="date" formControlName="scheduledDate" class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         <input type="time" formControlName="scheduledTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
-      <span class="text-red-400" *ngIf="!this.editEventForm.get('scheduledDate')?.valid && form.submitted">Campo no valido</span>
+      <p class="text-red-400" *ngIf="!this.editEventForm.get('scheduledDate')?.valid && form.submitted">Fecha no valida</p>
+      <p class="text-red-400" *ngIf="!this.editEventForm.get('scheduledTime')?.valid && form.submitted">Hora no valida</p>
     </div>
+    <div class="mb-5">
+      <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha de cierre de inscripciones</label>
+      <div class="flex">
+        <input type="date" formControlName="closeDate" class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <input type="time" formControlName="closeTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      </div>
+      <p class="text-red-400" *ngIf="!this.editEventForm.get('closeDate')?.valid && form.submitted">Fecha no valida</p>
+      <p class="text-red-400" *ngIf="!this.editEventForm.get('closeTime')?.valid && form.submitted">Hora no valida</p>
+    </div>
+    <span class="text-red-400" *ngIf="this.editEventForm.errors && this.editEventForm.errors['invalidCloseTime'] && form.submitted">Fecha de cierre invalida</span>
 
     <button (click)="$event.preventDefault(); file.click()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
       {{ this.picFile?.name || "Seleccionar imagen del evento" }}
@@ -34,7 +45,8 @@
   </form>
   <form [formGroup]="editEventPlaceForm" (submit)="handleEditPlaceForm()">
     <div class="w-full">
-      <button type="submit" class="text-white text-m bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar ubicación</button>
+      <button type="submit" class="text-white text-m mb-4 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        Guardar ubicación</button>
       <app-map-event-marker [position]="getEventPos()" class="w-3 rounded-xl" (positionChange)="setPlaceValue($event)">
       </app-map-event-marker>
       <span class="text-red-400" *ngIf="!this.editEventPlaceForm.get('latLng')?.valid && form.submitted">Campo no valido</span>

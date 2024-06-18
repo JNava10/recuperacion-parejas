@@ -9,7 +9,7 @@ import {SelectRolesEditComponent} from "../../roles/select-roles/select-roles.co
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
 import {Message, MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
-import {getQueryToast, validateFiles} from "../../../utils/common.utils";
+import {getQueryToast, showQueryToast, validateFiles} from "../../../utils/common.utils";
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
@@ -62,18 +62,21 @@ export class UserFormComponent {
     this.userService.createUser(user).subscribe(res => {
       this.loading = true
 
-      if (!res.data.executed) {
-        const message: Message = {summary: res.message}
-        message.severity = res.data.executed ? "success" : "error"
-        this.messageService.add(message);
-      }
-
       if (this.picFile) {
         this.changeUserAvatar(res.data.query.id, res)
+        this.loading = false
+
       } else {
-        const message: Message = {summary: res.message}
-        message.severity = res.data.executed ? "success" : "error"
-        this.messageService.add(message);
+        if (res.data.errors) {
+          res.data.errors.forEach(error => showQueryToast(res.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(res.data.executed, res.message, this.messageService)
+        }
+
+        this.loading = false
+        this.userForm.reset()
+        this.userForm.markAsUntouched()
+
       }
     });
   };
@@ -108,12 +111,12 @@ export class UserFormComponent {
   };
 
   private changeUserAvatar = (id: number, createdRes: CreateUserResponse) => {
-    this.userService.updateUserAvatar(id, this.picFile!).subscribe(() => {
-      const message: Message = {summary: createdRes.message}
-
-      message.severity = createdRes.data.executed ? "success" : "error";
-
-      this.messageService.add(message);
+    this.userService.updateUserAvatar(id, this.picFile!).subscribe(res => {
+      if (res.data.errors) {
+        res.data.errors.forEach(error => showQueryToast(res.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(res.data.executed, res.message, this.messageService)
+      }
 
       this.loading = false
     });

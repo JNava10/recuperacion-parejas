@@ -27,14 +27,16 @@ import {StartComponent} from "../public/start/start.component";
 import {AdminComponent} from "../public/admin/admin.component";
 import {EditProfileComponent} from "../public/edit-profile/edit-profile.component";
 import {NotificationListComponent} from "../components/notifications/notification-list/notification-list.component";
+import {PendingChatsComponent} from "../public/pending-chats/pending-chats.component";
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'chat', component: ChatComponent },
   { path: 'available-events', component: FindAvailableEventsComponent },
-  { path: 'event-info', component: EventInfoComponent },
   { path: 'notifications', component: NotificationListComponent },
+  { path: 'pending-chats', component: PendingChatsComponent },
+  { path: 'chat', component: ChatComponent },
+  { path: 'event-info', component: EventInfoComponent },
   { path: 'create-choice-preference', component: CreateChoicePreferenceFormComponent },
   { path: 'create-range-preference', component: CreateRangePreferenceComponent },
   { path: 'register', component: RegisterComponent },

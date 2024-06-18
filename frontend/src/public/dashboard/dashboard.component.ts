@@ -6,7 +6,7 @@ import {FriendshipService} from "../../services/api/friendship.service";
 import {UserService} from "../../services/api/user.service";
 import {PendingChatUserItem, UserItem} from "../../interfaces/api/user/user";
 import {DialogModule} from "primeng/dialog";
-import {Router, RouterOutlet} from "@angular/router";
+import {NavigationEnd, Router, RouterOutlet} from "@angular/router";
 import {MatchesListComponent} from "../../components/friendship/matches-list/matches-list.component";
 import {RecentChatListComponent} from "../../components/recent-chat-list/recent-chat-list.component";
 import {SocketService} from "../../services/socket.service";
@@ -18,6 +18,7 @@ import {MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../components/custom-toast/custom-toast.component";
 import {ButtonModule} from "primeng/button";
 import { user } from '../../utils/const/regex.constants';
+import {onConnectParams, onFriendConnectParams} from "../../interfaces/socket/socket";
 
 @Component({
   selector: 'app-dashboard',
@@ -48,20 +49,36 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.getMatchedUsers();
 
+    this.socketService.listenUserConnected((params: onConnectParams) => {
+      this.usersConnected = params.count
+    })
+
+    this.socketService.listenUsersDisconnected((params: onConnectParams) => {
+      this.usersConnected = params.count
+    })
+
     this.friendshipService.getOwnMatches().subscribe(matches => {
       this.matches = matches;
     })
 
     this.userService.getChats().subscribe(body => {
-
       body.data.chats.notPending.forEach((user) => {
-        console.log(user)
         this.notPending.set(user.id!, user!)
       })
 
       body.data.chats.pending.forEach((user) => {
         this.pending.set(user.id!, user!)
       })
+    })
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.socketService.removeAllListeners();
+      }
+    });
+
+    this.socketService.onDisconnect(() => {
+      this.usersConnected = 0;
     })
 
     this.socketService.listenNewMesages((args: NewMessageArgs) => {
@@ -78,9 +95,11 @@ export class DashboardComponent implements OnInit {
     })
 
     this.socketService.listenNewMatch((args: NewMatchArgs) => {
-      this.userService.findUserById(args.from).subscribe(user => this.notifyNewMatch(user))
+      this.userService.findUserById(args.from).subscribe(body => this.notifyNewMatch(body.data.query))
     })
   }
+
+  usersConnected = 0;
 
   private switchToPending(user: UserItem) {
     this.notPending.delete(user.id!);
@@ -94,10 +113,10 @@ export class DashboardComponent implements OnInit {
   }
 
   private getNewSender(args: NewMessageArgs) {
-    this.userService.findUserById(args.from).subscribe(user => {
-      const pendingUser: PendingChatUserItem = {...user, pendingCount: 1}
+    this.userService.findUserById(args.from).subscribe(body => {
+      const pendingUser: PendingChatUserItem = {...body, pendingCount: 1}
 
-      return this.pending.set(user.id!, pendingUser);
+      return this.pending.set(body.data.query.id!, pendingUser);
     })
   }
 

@@ -70,7 +70,11 @@ export class StartFormComponent implements OnInit {
     const preferences = [...choices, ...ranges]
 
     this.preferenceService.createUserPreferences(preferences).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (body.data.executed) {
         this.router.navigate(['/dashboard'])

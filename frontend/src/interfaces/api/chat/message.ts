@@ -2,6 +2,7 @@ import {ApiResponse} from "../apiResponse";
 
 export interface ChatMessages extends ApiResponse {
   data: {
+    errors?: string[]
     executed: boolean,
     query: {
       emitterUser: MessageUser,
@@ -13,6 +14,7 @@ export interface ChatMessages extends ApiResponse {
 
 export interface SendFilesResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: boolean,
     files: string[]
   }

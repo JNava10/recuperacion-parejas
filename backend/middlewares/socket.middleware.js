@@ -4,8 +4,6 @@ const {tokenTypes} = require("../constants/common.constants");
 const authMiddleware = (socket, next) => {
     const token = socket.handshake.headers.token;
 
-    console.log('token', token, token === null)
-
     if (token === null) throw new Error('Unauthorized')
 
     const {userId, type} = verifyToken(token);

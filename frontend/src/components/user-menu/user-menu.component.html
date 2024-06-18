@@ -1,1 +1,12 @@
-<p-menu [model]="menuItems" styleClass="w-full h-md"/>
+@if (menuBuild && show) {
+  <p-menu [model]="menuItems" styleClass="w-full h-md">
+    <ng-template pTemplate="end">
+      <button pRipple class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround">
+        <p-avatar image="{{this.user?.picUrl}}" class="mr-2" shape="circle" />
+        <span class="inline-flex flex-column">
+                <span class="font-bold">{{this.user?.nickname}}</span>
+            </span>
+      </button>
+    </ng-template>
+  </p-menu>
+}

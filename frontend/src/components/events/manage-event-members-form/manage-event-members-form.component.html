@@ -20,24 +20,26 @@
       </p-table>
     }
 
-    <div>
-      <h1>Añadir miembros al evento</h1>
-      <p-table scrollable scrollHeight="300px"  [value]="nonAssistants!">
-        <ng-template pTemplate="body" let-user>
-          <tr>
-            <p-avatar
-              image="{{user['picUrl']}}"
-              styleClass="mr-2"
-              size="normal"
-              shape="circle" />
-            <td>{{ user.nickname }}</td>
-            <button (click)="addToEvent(user)" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+    @if (Date.parse(event?.closeDateTime!) > Date.now()) {
+      <div>
+        <h1>Añadir miembros al evento</h1>
+        <p-table scrollable scrollHeight="300px"  [value]="nonAssistants!">
+          <ng-template pTemplate="body" let-user>
+            <tr>
+              <p-avatar
+                image="{{user['picUrl']}}"
+                styleClass="mr-2"
+                size="normal"
+                shape="circle" />
+              <td>{{ user.nickname }}</td>
+              <button (click)="addToEvent(user)" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
   </div>
 } @else {
   <span>No se han podido obtener los miembros</span>
