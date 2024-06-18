@@ -13,7 +13,7 @@ import {Message, MessageService} from 'primeng/api';
 import {getQueryToast, showQueryToast, validateFiles} from '../../../utils/common.utils';
 import { CustomToastComponent } from "../../custom-toast/custom-toast.component";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {closeDateIsValid} from "../../../utils/validators/customValidators";
+import {closeDateIsValid, dateIsNotPast} from "../../../utils/validators/customValidators";
 
 @Component({
     selector: 'app-edit-event',
@@ -77,7 +77,7 @@ export class EditEventComponent implements OnInit {
     closeTime: new FormControl('', [
       Validators.required, Validators.pattern(regex.event.scheduledTime)
     ]),
-  }, {updateOn: "change", validators: [closeDateIsValid('scheduledDate', 'closeDate')]});
+  }, {updateOn: "change", validators:[closeDateIsValid('scheduledDate', 'closeDate'), dateIsNotPast('scheduledDate', 'closeDate')]});
 
   editEventPlaceForm = new FormGroup({
     latLng: new FormControl(this.latLng, [Validators.required])

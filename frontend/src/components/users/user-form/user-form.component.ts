@@ -72,7 +72,11 @@ export class UserFormComponent {
         } else {
           showQueryToast(res.data.executed, res.message, this.messageService)
         }
+
         this.loading = false
+        this.userForm.reset()
+        this.userForm.markAsUntouched()
+
       }
     });
   };

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {SelectRolesEditComponent} from "../../../components/roles/select-roles/select-roles.component";
@@ -41,6 +41,7 @@ export class EditUserFormComponent implements OnInit {
 
   @Input() roles?: RoleItem[];
   @Input() user?: UserItem;
+  @Output() edited = new EventEmitter<null>();
 
   protected picFile?: File;
   loading = false;

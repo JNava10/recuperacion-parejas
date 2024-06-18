@@ -23,10 +23,7 @@ export class UsersComponent implements OnInit {
   constructor(private userService: UserService) {}
 
   usersFetched = false;
-  activatedUsers?: UserItem[]
-  nonActivatedUsers?: UserItem[]
-  activatedUsersId = "activatedUsers"
-  nonActivatedUsersId = "nonActivatedUsers"
+  users?: UserItem[]
 
   ngOnInit() {
     this.getUsers();
@@ -34,41 +31,8 @@ export class UsersComponent implements OnInit {
 
   protected getUsers() {
     this.userService.getNotDeletedWithRoles().subscribe(body => {
-      this.nonActivatedUsers = body.data.query?.filter(user => user.enabled === false)
-      this.activatedUsers = body.data.query?.filter(user => user.enabled === true)
+      this.users = body.data.query
       this.usersFetched = true;
     })
-  }
-
-  drop(event: CdkDragDrop<UserItem[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    }
-
-    const user = event.item.data as UserItem;
-
-    if (event.previousContainer.id === this.activatedUsersId) {
-      this.userService.enableOrDisableUser(user, false).subscribe(executed => {
-        if (executed) {
-          transferArrayItem(
-            event.previousContainer.data,
-            event.container.data,
-            event.previousIndex,
-            event.currentIndex,
-          );
-        }
-      })
-    } else {
-      this.userService.enableOrDisableUser(user, true).subscribe(executed => {
-        if (executed) {
-          transferArrayItem(
-            event.previousContainer.data,
-            event.container.data,
-            event.previousIndex,
-            event.currentIndex,
-          );
-        }
-      })
-    }
   }
 }

@@ -45,7 +45,8 @@
   </form>
   <form [formGroup]="editEventPlaceForm" (submit)="handleEditPlaceForm()">
     <div class="w-full">
-      <button type="submit" class="text-white text-m bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar ubicación</button>
+      <button type="submit" class="text-white text-m mb-4 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        Guardar ubicación</button>
       <app-map-event-marker [position]="getEventPos()" class="w-3 rounded-xl" (positionChange)="setPlaceValue($event)">
       </app-map-event-marker>
       <span class="text-red-400" *ngIf="!this.editEventPlaceForm.get('latLng')?.valid && form.submitted">Campo no valido</span>

@@ -30,6 +30,8 @@ export class ManageEventMembersFormComponent implements OnInit {
   ngOnInit() {
     this.getEventAssistants();
 
+    console.log(Date.parse(this.event?.closeDateTime!), Date.now())
+
     this.getNonAssistants();
   }
 
@@ -81,4 +83,5 @@ export class ManageEventMembersFormComponent implements OnInit {
       }
     })
   };
+    protected readonly Date = Date;
 }

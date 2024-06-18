@@ -7,7 +7,7 @@ const {getEventCloseDate} = require("../../helpers/common.helper");
 class EventQuery {
     static createEvent = async (event) => {
         try {
-            const closeDateTime = event.closeDateTime ?? getEventCloseDate(new Date(event.scheduledDateTime));
+            const closeDateTime = event.closeDateTime || getEventCloseDate(new Date(event.scheduledDateTime));
 
             const data = {
                 ...event,
@@ -27,11 +27,12 @@ class EventQuery {
 
     static editEventDetails = async (eventDetails) => {
         try {
-            const {name, description, scheduledDateTime} = eventDetails;
+            const {name, description, scheduledDateTime, closeDateTime} = eventDetails;
 
-            const date = new Date(scheduledDateTime);
+            const scheduleDate = new Date(scheduledDateTime);
+            const closeDate = new Date(closeDateTime);
 
-            const query = await models.Event.update({name, description, scheduledDateTime: date}, {where: {id: eventDetails.id}});
+            const query = await models.Event.update({name, description, scheduledDateTime: scheduleDate,  closeDateTime: closeDate}, {where: {id: eventDetails.id}});
 
             return new QuerySuccess(true, 'Se ha editado el evento correctamente.', query);
         } catch (e) {

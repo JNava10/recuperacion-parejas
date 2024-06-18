@@ -74,6 +74,7 @@ export class UserMenuComponent implements OnInit {
               if (body.data.executed) {
                 this.storageService.removeAll()
                 await this.router.navigate(['/login'])
+                window.location.reload()
               }
             })
         }},

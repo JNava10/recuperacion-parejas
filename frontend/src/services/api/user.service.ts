@@ -163,10 +163,10 @@ export class UserService {
     )
   }
 
-  enableOrDisableUser = (user: UserItem, enabled: boolean) => {
-    return this.http.put<RecoverPasswordResponse>(`${environment.apiUrl}/user/enable-or-disable/${user.id}`, {enabled},{params: {...sendTokenParam}}).pipe(
+  enableOrDisableUser = (user: UserItem, enable: boolean) => {
+    return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/enable-or-disable/${user.id}`, {enabled: enable},{params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
-        const error = res.error as RecoverPasswordResponse;
+        const error = res.error as CrudEditResponse;
 
         return of(error);
       })
