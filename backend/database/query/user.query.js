@@ -253,11 +253,12 @@ class UserQuery {
         }
     };
 
-    static isFirstUserLogin = async (id) => {
+    static needToStart = async (id) => {
         try {
             const firstLogin = await models.User.findOne({where: {id}, attributes: ['lastLogin']});
+            const havePreferences = (await models.UserPreference.findOne({where: {user: id}, attributes: ['user']})) !== null;
 
-            return new QuerySuccess(true, 'Se ha ejecutado la consulta correctamente.', firstLogin === true);
+            return new QuerySuccess(true, 'Se ha ejecutado la consulta correctamente.', (firstLogin === true && !havePreferences));
         } catch (e) {
             console.error(e)
             throw e

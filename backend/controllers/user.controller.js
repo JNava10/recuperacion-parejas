@@ -530,7 +530,7 @@ class UserController {
             const apiToken = generateToken({userId: user.id, userEmail: email, type: tokenTypes.api});
             const socketToken = generateToken({userId: user.id, type: tokenTypes.socket});
 
-            const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id);
+            const needToStart = (await UserQuery.needToStart(user.id)).query;
 
             await UserQuery.updateUserLogin(user.id)
 
@@ -539,7 +539,7 @@ class UserController {
             return res.status(200).json(
                 new StdResponse(
                     'Se ha iniciado sesión correctamente.',
-                    {logged: true, token: apiToken, socketToken, firstLogin: isFirstUserLogin}
+                    {logged: true, token: apiToken, socketToken, firstLogin: needToStart}
                 )
             )
         } catch (e) {
