@@ -1,0 +1,30 @@
+@if (file) {
+  <div class="flex items-start my-2.5 bg-gray-50 dark:bg-gray-600 rounded-xl p-2">
+    <div class="me-2">
+     <span class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white pb-2">
+       <div [innerHTML]="getTypeIcon()"></div>
+        <div>
+          @if (this.file!.name.length <= nameCharLimit) {
+            {{file.name}}
+          } @else {
+            {{file.name | slice:0:nameCharLimit}}...
+          }
+        </div>
+     </span>
+      <span class="flex text-xs font-normal text-gray-500 dark:text-gray-400 gap-2">
+          <div>
+            {{getFileSize()}}
+          </div>
+          <div>
+            {{file.type}}
+          </div>
+       </span>
+    </div>
+    @if (canDownload) {
+      <div class="inline-flex self-center items-center">
+        Descargar
+      </div>
+    }
+  </div>
+
+}

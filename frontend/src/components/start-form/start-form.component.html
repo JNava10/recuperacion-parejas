@@ -1,37 +1,32 @@
-<form #form=ngForm (submit)="submitStartPreferences()" class="flex flex-col gap-5" [formGroup]="startForm">
-  <h1>Selecciona las preferencias según tus gustos</h1>
-  <div>
-    <div class="flex flex-row gap-4">
-    @for (preference of choices.controls; track $index) {
+<form (submit)="$event.preventDefault(); this.showDialog()" class="flex flex-col gap-5">
+  <h1>Rellena el formulario según tus gustos</h1>
+  <form #form=ngForm [formGroup]="choicePreferencesForm!">
+    @for (preference of preferences?.choice!; track preference.id) {
+      <p>{{preference.name}}</p>
+      <p>{{preference.description}}</p>
       <div>
-        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{preference.get('name')?.value | titlecase}}</label>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{preference.get('description')?.value}}</p>
-        <select (change)="setChoice($event, $index)" [formControlName]="$index" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          <option selected>Selecciona una opción</option>
-          @for ((option of preference.get('options')?.value?? []); track $index) { // Con '??' conseguimos inicializar un valor (el array) como valor por defecto, haciendo que sea de tipo array. Esto evita errores con Any.
+        <select [formControlName]="preference.id!" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          @for (option of preference.options!; track $index) {
             <option value="{{option.option_value}}">{{option.option_name}}</option>
           }
         </select>
-        <span class="text-red-400" *ngIf="!this.startForm.valid && form.submitted">Campo no valido</span>
+
+        <span class="text-red-400" *ngIf="!this.rangePreferencesForm!.valid && form.submitted">Formulario no valido</span>
       </div>
     }
-    </div>
-  </div>
 
-  <div>
-    <div class="flex flex-row gap-4">
-      @for (preference of ranges.controls; track $index) {
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{preference.get('name')?.value | titlecase}}</label>
-          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{preference.get('description')?.value}}</p>
-          <input type="range" [formControlName]="$index" (change)="setRange($event, $index)" value="{{preference.get('min_value')?.value}}" min="{{preference.get('min_value')?.value}}" max="{{preference.get('max_value')?.value}}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-          <span class="text-red-400" *ngIf="!this.preference.get('rangeValue')!.valid && form.submitted">Campo no valido</span>
+    @for (preference of preferences?.range!; track $index) {
+      <div>
+        <p>{{preference.name}}</p>
+        <p>{{preference.description}}</p>
+
+        <div [formGroup]="rangePreferencesForm!" class="flex flex-row gap-1 items-center">
+          <span class="bg-gray-100 text-gray-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{{this.rangePreferencesForm!.value[preference.id!]}}</span>
+          <input id="default-range" type="range" min="{{preference.values?.min_value}}"  max="{{preference.values?.max_value}}" [formControlName]="preference.id!" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
         </div>
-      }
-    </div>
-  </div>
-
-  <span class="text-red-400" *ngIf="!this.startForm.valid && form.submitted">Formulario no valido</span>
+      </div>
+    }
+  </form>
 
   <div>
     <button type="submit" class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -40,7 +35,12 @@
   </div>
 </form>
 
-<app-custom-toast></app-custom-toast>
+<p-dialog header="Edit Profile" [modal]="true" [(visible)]="confirmPreferences" [style]="{ width: '25rem' }">
+  <span class="p-text-secondary block mb-5">¿Seguro que te gustan estas preferencias?</span>
+  <button (click)="getPreferencesFormData()">Si</button>
+</p-dialog>
+
+<app-toast></app-toast>
 
 
 

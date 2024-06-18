@@ -33,6 +33,7 @@
     "@types/googlemaps": "^3.43.3",
     "flowbite": "^2.3.0",
     "flowbite-datepicker": "^1.2.6",
+    "javascript-time-ago": "^2.5.10",
     "primeng": "^17.13.0",
     "rxjs": "~7.8.0",
     "socket.io": "^4.7.5",

@@ -1,23 +1,28 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {SearchResponse} from "../../interfaces/api/user/search";
 import {environment} from "../../environments/environment";
 import {
+  ManageEventResponse,
   EventItem,
-  EventResponse,
+  EventResponse, EventSummaryResponse,
   GetEventsResponse,
   SubscribedToEventResponse,
-  SubscribeEventResponse
+  SubscribeEventResponse, CreateEventItem
 } from "../../interfaces/api/event/event";
 import {sendTokenParam} from "../../utils/const/url.constants";
-import {map, tap} from "rxjs";
+import {catchError, map, of, tap} from "rxjs";
+import {CrudEditResponse, GetUsersResponse, ManageUserResponse, UserItem} from "../../interfaces/api/user/user";
+import {MessageService} from "primeng/api";
+import {getQueryToast} from "../../utils/common.utils";
+import {user} from "../../utils/const/regex.constants";
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private messageService: MessageService) { }
 
   createEvent = (event: EventItem) => {
     return this.http.post<EventResponse>(`${environment.apiUrl}/event`, event, {params: {...sendTokenParam}})
@@ -41,8 +46,16 @@ export class EventService {
     )
   }
 
-  editEventDetails = (event: EventItem) => {
-    return this.http.put<EventResponse>(`${environment.apiUrl}/event/details`, event, {params: {...sendTokenParam}})
+  editEventDetails = (event: CreateEventItem) => {
+    return this.http.put<EventResponse>(
+      `${environment.apiUrl}/event/details`,
+      event,
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as EventResponse;
+        return of(error);
+      })
+    )
   }
 
   editEventPlace = (event: EventItem) => {
@@ -65,15 +78,89 @@ export class EventService {
     )
   }
 
-  registerToEvent(event: EventItem) {
-    return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/subscribe/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+  registerSelfToEvent(event: EventItem) {
+    return this.http.post<SubscribeEventResponse>(
+      `${environment.apiUrl}/event/subscribe/${event.id}`,
+      {},
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SubscribeEventResponse;
+        return of(error);
+      })
     )
   }
 
-  withdrawFromEvent(event: EventItem) {
-    return this.http.post<SubscribeEventResponse>(`${environment.apiUrl}/event/withdraw/${event.id}`, {}, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+  withdrawSelfFromEvent(event: EventItem) {
+    return this.http.post<SubscribeEventResponse>(
+      `${environment.apiUrl}/event/withdraw/${event.id}`,
+      {},
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SubscribeEventResponse;
+
+        return of(error);
+      })
     )
   }
+
+  getSummaryFile(event: EventItem) {
+    return this.http.get<EventSummaryResponse>(`${environment.apiUrl}/event/summary/${event.id}`, {params: {...sendTokenParam}})
+  }
+
+  updateEventPic = (id: number, file: File) => {
+    const fileKey = 'pic';
+
+    const formData = new FormData();
+    formData.append(fileKey, file)
+
+    return this.http.put<ManageEventResponse>(`${environment.apiUrl}/event/pic/${id}`, formData, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as ManageEventResponse;
+
+        return of(error);
+      })
+    );
+  }
+
+  getEventMembers = (id: number) => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/event/members/${id}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+        return of(error);
+      })
+    );
+  }
+
+  getNonEventAssistants = (id: number) => {
+    return this.http.get<GetUsersResponse>(`${environment.apiUrl}/event/not-members/${id}`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+        return of(error);
+      })
+    );
+  }
+
+  addMemberToEvent = (eventId: number, userId: number) => {
+    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/event/members/add/${eventId}/${userId}`, {},{params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+
+        return of(error);
+      })
+    );
+  }
+
+  withdrawMemberFromEvent(event: EventItem, user: UserItem) {
+    return this.http.post<SubscribeEventResponse>(
+      `${environment.apiUrl}/event/withdraw/${event.id}/${user.id}`,
+      {},
+      {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SubscribeEventResponse;
+
+        return of(error);
+      })
+    )
+  }
+
 }

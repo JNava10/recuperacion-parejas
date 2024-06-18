@@ -17,13 +17,11 @@ class FriendshipQuery {
                 attributes: ['requesting_user', 'requested_user']
             });
 
-            console.log('liked', liked, liked !== null)
-
             if (liked !== null) return new QuerySuccess(true, "Ya se habia dado `me gusta' anteriormente.", {isMatch: true});
             else return new QuerySuccess(true, "No se ha encontrado ningun 'me gusta' con los usuarios indicados.", {isMatch: false});
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -33,8 +31,8 @@ class FriendshipQuery {
 
             return new QuerySuccess(liked, 'Se ha insertado el like correctamente.', {isMatch: false});
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -44,8 +42,8 @@ class FriendshipQuery {
 
             return new QuerySuccess(liked, 'Se ha insertado el like correctamente.', {isMatch: false});
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
         }
     };
 
@@ -74,8 +72,38 @@ class FriendshipQuery {
 
             return new QuerySuccess(matchedUsers, 'Se han obtenido los amigos correctamente.', matchedUsers);
         } catch (e) {
-            console.warn(e)
-            return new QueryError(false, e)
+            console.error(e)
+            throw e
+        }
+    };
+
+    static getMatchedUsersIds = async (userWhoMatched) => {
+        try {
+            const matchedUsers = await models.Match.findAll({
+                where: {[Op.or]: [
+                        {userWhoMatched: userWhoMatched},
+                        {userToMatch: userWhoMatched},
+                    ]
+                },
+                attributes: ['userWhoMatched', 'userToMatch'],
+                include: [
+                    {
+                        model: models.User,
+                        attributes: ['id'],
+                        as: 'userMatch'
+                    },
+                    {
+                        model: models.User,
+                        attributes: ['id'],
+                        as: 'userMatched'
+                    }
+                ]
+            });
+
+            return new QuerySuccess(matchedUsers, 'Se han obtenido los amigos correctamente.', matchedUsers);
+        } catch (e) {
+            console.error(e)
+            throw e
         }
     };
 }

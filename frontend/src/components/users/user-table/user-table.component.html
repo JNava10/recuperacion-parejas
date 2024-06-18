@@ -1,8 +1,12 @@
-<div class="relative overflow-x-auto">
-  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+<button (click)="showCreateForm()" type="button" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<div class="relative overflow-x-visible">
+  <p-table [value]="users" scrollable="true" scrollHeight="500px" styleClass="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <ng-template pTemplate="header" pStyleClass="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
     <tr>
-      <th scope="col" class="px-6 py-3">
+      <th scope="col" pStyleClass="px-6 py-3">
         Email
       </th>
       <th scope="col" class="px-6 py-3">
@@ -18,11 +22,13 @@
         Roles
       </th>
       <th scope="col" class="px-6 py-3">
+        Activado
+      </th>
+      <th scope="col" class="px-6 py-3">
       </th>
     </tr>
-    </thead>
-    <tbody>
-      @for (user of users; track user.id) {
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
           <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
             {{user.email}}
@@ -43,20 +49,38 @@
               }
             </ul>
           </td>
+          <td>
+            @if (user.enabled) {
+              <span class="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                <i class="fa-solid fa-check"></i>
+              </span>
+            } @else {
+              <span class="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-red-800 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                <i class="fa-solid fa-x"></i>
+              </span>
+            }
+
+          </td>
           <td class="px-6 py-4">
             <button type="button" (click)="showIfDeleteUser(user)" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
-              Borrar
+              <i class="fa-solid fa-trash"></i>
             </button>
+            <button type="button" (click)="showEditUser(user)" class="focus:outline-none text-white bg-yellow-500 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            @if (user.enabled) {
+              <button type="button" (click)="activateUser(user, false)" class="focus:outline-none text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-red-900">
+                <i class="fa-solid fa-eye-slash"></i>
+              </button>
+            } @else {
+              <button type="button" (click)="activateUser(user, true)" class="focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-green-900">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            }
           </td>
         </tr>
-      }
-    </tbody>
-  </table>
-  <div>
-    <button type="button" (click)="goToAddForm()" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
-      Añadir usuario
-    </button>
-  </div>
+    </ng-template>
+  </p-table>
 </div>
 
 <!-- Modal para confirmar si borrar el usuario -->
@@ -71,3 +95,14 @@
     </button>
   </div>
 </p-dialog>
+
+
+<p-sidebar [style]="{'width': '50%'}" [(visible)]="showCreate">
+  <app-add-user></app-add-user>
+</p-sidebar>
+
+<p-sidebar [style]="{'width': '35%'}" [(visible)]="showEdit" (onShow)="onShowEditForm()" (onHide)="onHideEditForm()">
+  <router-outlet></router-outlet>
+</p-sidebar>
+
+<app-toast></app-toast>

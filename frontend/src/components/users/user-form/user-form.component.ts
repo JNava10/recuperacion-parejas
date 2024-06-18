@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {CreateUserItem, RoleItem, UserItem} from "../../../interfaces/api/user/user";
+import {CreateUserItem, CreateUserResponse, RoleItem, UserItem} from "../../../interfaces/api/user/user";
 import {UserService} from "../../../services/api/user.service";
 import * as regex from "../../../utils/const/regex.constants";
 import * as customValidators from "../../../utils/validators/customValidators";
@@ -9,6 +9,9 @@ import {SelectRolesEditComponent} from "../../roles/select-roles/select-roles.co
 import {RoleBadgeComponent} from "../../roles/role-badge/role-badge.component";
 import {Message, MessageService} from "primeng/api";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
+import {getQueryToast, showQueryToast, validateFiles} from "../../../utils/common.utils";
+import {ProgressSpinnerModule} from "primeng/progressspinner";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-user-form',
@@ -18,7 +21,9 @@ import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
     NgIf,
     SelectRolesEditComponent,
     RoleBadgeComponent,
-    CustomToastComponent
+    CustomToastComponent,
+    ProgressSpinnerModule,
+    MatProgressSpinner
   ],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
@@ -27,6 +32,9 @@ export class UserFormComponent {
   constructor(private userService: UserService, private messageService: MessageService) {}
 
   @Input() roles: RoleItem[] = [];
+
+  protected picFile?: File;
+  loading = false;
 
   userForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -51,11 +59,25 @@ export class UserFormComponent {
 
     const user = this.getUserData();
 
-    this.userService.createUser(user).subscribe(res => {  const message: Message = {summary: res.message}
-      message.severity = res.data.executed ? "success" : "error"
+    this.userService.createUser(user).subscribe(res => {
+      this.loading = true
 
-      this.messageService.add(message);
+      if (this.picFile) {
+        this.changeUserAvatar(res.data.query.id, res)
+        this.loading = false
 
+      } else {
+        if (res.data.errors) {
+          res.data.errors.forEach(error => showQueryToast(res.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(res.data.executed, res.message, this.messageService)
+        }
+
+        this.loading = false
+        this.userForm.reset()
+        this.userForm.markAsUntouched()
+
+      }
     });
   };
 
@@ -69,10 +91,34 @@ export class UserFormComponent {
       nickname: formData.nickname!,
       email: formData.email!,
       password: formData.passwords!.password!,
-      picUrl: "https://www.mundodeportivo.com/files/image_449_220/files/fp/uploads/2024/05/24/6650bdf5b973a.r_d.2397-2343-902.jpeg",
       roleIds: [Number(formData.role)]
     }
 
     return user;
+  }
+
+  protected handleFile = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+
+    const file = input.files?.item(0);
+    if (file) {
+      const valid = validateFiles([file], {maxCount: 1, maxSizeMb: 1}, this.messageService)
+
+      if (!valid) return;
+
+      this.picFile = file
+    }
+  };
+
+  private changeUserAvatar = (id: number, createdRes: CreateUserResponse) => {
+    this.userService.updateUserAvatar(id, this.picFile!).subscribe(res => {
+      if (res.data.errors) {
+        res.data.errors.forEach(error => showQueryToast(res.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(res.data.executed, res.message, this.messageService)
+      }
+
+      this.loading = false
+    });
   }
 }

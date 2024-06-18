@@ -1,5 +1,6 @@
 import {ApiResponse} from "../apiResponse";
 import {EventItem} from "../event/event";
+import {PreferenceList} from "../preference/preferenceItem";
 
 export interface User {
   id: number
@@ -31,6 +32,11 @@ export interface UserItem {
   roleIds?: number[]
 }
 
+export interface PendingChatUserItem extends UserItem {
+  pendingCount: number
+}
+
+
 export interface CreateUserItem extends UserItem {
   password?: string
 }
@@ -45,22 +51,64 @@ export interface UserMessagesResponse extends ApiResponse {
 
 export interface GetUsersResponse extends ApiResponse {
   data: {
-    executed: true
-    query: UserItem[]
+    executed: boolean
+    query?: UserItem[]
+    errors?: string[]
   }
 }
 
-export interface GetUserResponse  extends ApiResponse{
+export interface GetPendingChatsResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
+    chats: ChatListResponse
+    errors?: string[]
+  }
+}
+
+export interface ChatListResponse extends ApiResponse {
+  notPending: UserItem[],
+  pending: PendingChatUserItem[]
+  errors?: string[]
+}
+
+export interface GetUserResponse extends ApiResponse {
+  data: {
+    executed: boolean
     query: UserItem
+    errors?: string[]
   }
 }
 
 export interface ManageUserResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
     query: boolean
+    errors?: string[]
+  }
+}
+
+export interface UpdateUserAvatar extends ApiResponse {
+  data: {
+    executed: boolean
+    avatarUrl?: string
+    errors?: string[]
+  }
+}
+
+export interface CrudEditResponse extends ApiResponse {
+  data: {
+    executed: boolean
+    errors?: string[]
+  }
+}
+
+export interface CreateUserResponse extends ApiResponse {
+  data: {
+    errors?: string[]
+    executed: true
+    query: {
+      id: number
+    }
   }
 }
 
@@ -72,14 +120,51 @@ export interface RoleItem {
 
 export interface GetRolesResponse extends ApiResponse {
   data: {
-    executed: true
+    executed: boolean
     query: RoleItem[]
+    errors?: string[]
   }
 }
 
-export interface DeleteUserResponse {
+export interface DeleteUserResponse extends ApiResponse {
   data: {
     executed: true
     query: boolean
+    errors?: string[]
+  }
+}
+
+export interface GetProfileResponse extends ApiResponse {
+  data: {
+    executed: boolean
+    query: {
+      user: UserItem,
+      preferences: PreferenceList
+    }
+    errors?: string[]
+  }
+}
+
+export interface GetCountResponse extends ApiResponse {
+  data: {
+    executed: boolean
+    errors?: string[]
+    count: number
+  }
+}
+
+export interface GetSelfRoles extends ApiResponse {
+  data: {
+    executed: boolean
+    roles: string[]
+    errors?: string[]
+  }
+}
+
+export interface GetSelfRoleNames extends ApiResponse {
+  data: {
+    executed: boolean
+    query: string[]
+    errors?: string[]
   }
 }

@@ -1,0 +1,13 @@
+<div class="flex flex-row gap-5 justify-content-center">
+  @if (userFetched) {
+    <section>
+      <app-edit-profile-data-form [user]="user"></app-edit-profile-data-form>
+    </section>
+    <section>
+      <app-profile-edit-preferences-form [preferences]="preferences"></app-profile-edit-preferences-form>
+<!--      <app-edit-user-preferences-form [references]="preferences"></app-edit-user-preferences-form>-->
+    </section>
+  }
+</div>
+
+<app-toast></app-toast>

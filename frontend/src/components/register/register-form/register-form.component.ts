@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import * as regex from "../../../utils/const/regex.constants";
@@ -12,6 +12,7 @@ import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {MessageService} from "primeng/api";
 import {MessageModule} from "primeng/message";
 import {tap} from "rxjs";
+import {getQueryToast, showQueryToast, validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-register-form',
@@ -61,21 +62,62 @@ export class RegisterFormComponent {
     }
 
     this.user = user;
-    this.showPicModal = true
+
+    this.sendData()
   };
 
+  registeredId?: number;
   user?: CreateUserItem
   showPicModal = false;
 
   sendData = () => {
     if (!this.user) return;
 
-    this.userService.registerUser(this.user!).subscribe(() => {
-      this.showPicModal = false;
+    this.userService.registerUser(this.user!).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
-      this.messageService.add({severity: 'success', summary: 'Se ha registrado el usuario correctamente'});
-
-      setTimeout(() => this.router.navigate(['login']), 1000)
+      if (body.data.executed) {
+        this.registeredId = body.data.query.id;
+        setTimeout(() => this.showPicModal = true, 350)
+      }
     });
+  };
+
+  finishRegister = async () => {
+    this.showPicModal = false;
+    await this.router.navigate(['login'])
+  };
+
+  @Input() userId?: number;
+
+  handleFiles = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+
+    const file = input.files?.item(0);
+
+    if (!file) {
+      this.showPicModal = false;
+      await this.finishRegister()
+    } else {
+      const valid = validateFiles([file], {maxCount: 4, maxSizeMb: 1}, this.messageService)
+
+      if (!valid) return;
+
+      this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
+        if (body.data.errors) {
+          body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(body.data.executed, body.message, this.messageService)
+        }
+
+        if (body.data.executed) {
+          this.finishRegister()
+        }
+      })
+    }
   };
 }

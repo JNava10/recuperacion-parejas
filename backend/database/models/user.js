@@ -29,6 +29,16 @@ module.exports = (sequelize) => {
         as: 'sendedMessages'
       })
 
+      this.hasMany(models.NewMatchNotification, {
+        foreignKey: 'from',
+        as: 'userFrom'
+      })
+
+      this.hasMany(models.NewMatchNotification, {
+        foreignKey: 'to',
+        as: 'userTo'
+      })
+
       // this.hasMany(models.Message, {
       //   foreignKey: 'receiver',
       //   as: 'receivedMessages'
@@ -96,6 +106,7 @@ module.exports = (sequelize) => {
     picUrl: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: process.env.DEFAULT_PROFILE_PIC_URL
     },
     lastLogin: {
       type: DataTypes.DATE,

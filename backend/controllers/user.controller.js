@@ -1,259 +1,194 @@
 
-const {sendStandardResponse} = require("../helpers/common.helper");
+const {hashPassword} = require("../helpers/common.helper");
 const UserQuery = require("../database/query/user.query");
-const bcrypt = require("bcrypt");
-const {generateToken} = require("../helpers/jwt.helper");
 const StdResponse = require("../classes/stdResponse");
-const QuerySuccess = require("../classes/QuerySuccess");
-const {findRecentChatMessages} = require("../database/query/message.query");
-const EventQuery = require("../database/query/event.query");
-const {el} = require("@faker-js/faker");
 const PreferenceQuery = require("../database/query/preference.query");
 const RecoverController = require("./recover.controller");
 const {sendEmail} = require("../helpers/mail.helper");
 const {getRecoverCodeMail} = require("../constants/mail.constants");
-const jwt = require("jsonwebtoken");
-const models = require("../database/models");
+const {uploadFiles} = require("../helpers/cloudinary.helper");
+const {roleNames} = require("../constants/seed.const");
+const CustomError = require("../classes/customError");
+const {generateToken} = require("../helpers/jwt.helper");
+const {compare} = require("bcrypt");
+const {tokenTypes} = require("../constants/common.constants");
+const RoleQuery = require("../database/query/role.query");
+const NotificationQuery = require("../database/query/notification.query");
 
 class UserController {
     static findUser = async (req, res) => {
-        const inputSearch = req.body.input;
-        const inputIsOneWord = inputSearch.split(" ").length > 1;
+       try {
+           const inputSearch = req.body.input;
+           const inputIsOneWord = inputSearch.split(" ").length > 1;
 
-        let results;
+           let results;
 
-        if (inputIsOneWord) results = await UserQuery.findUserLikeFullname(inputSearch);
-        else results = await UserQuery.findUserByNickOrName(inputSearch);
+           if (inputIsOneWord) results = await UserQuery.findUserLikeFullname(inputSearch);
+           else results = await UserQuery.findUserByNickOrName(inputSearch);
 
-        return res.status(200).json(
-            new StdResponse(
-                'Se ha iniciado sesión correctamente.',
-                {founded: results.length > 0, results}
-            )
-        )
+           return res.status(200).json(
+               new StdResponse(
+                   'Se ha iniciado sesión correctamente.',
+                   {founded: results.length > 0, results: results.query}
+               )
+           )
+       } catch (e) {
+           return res.status(203).json(
+               new StdResponse('Ha ocurrido un problema al actualizar al buscar los usuarios.',{executed: false, error: e.message})
+           )
+       }
     };
 
     static findById = async (req, res) => {
-        const withRoles = req.query.withRoles;
-        let options = {};
+        try {
+            const withRoles = req.query.withRoles;
+            const options = {};
 
-        if (withRoles) options.withRoles = true
+            if (withRoles) options.withRoles = true
 
-        const {message, executed, query, error} = await UserQuery.findById(req.params.id, options);
+            const {message, executed, query} = await UserQuery.findById(req.params.id, options);
 
-        if (executed) {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        }  catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al buscar los usuarios.',{executed: false, error: e.message})
             )
         }
     };
 
-    static getMessages = async (req, res) => {
-        const receiverId = req.params.receiver;
-        const emitterId = req.payload.userId;
-
-        const result = await findRecentChatMessages(emitterId, receiverId)
-
-        if (result instanceof QuerySuccess) return res.status(200).json(
-            new StdResponse(
-                'Se ha insertado el mensaje correctamente.',
-                result
-            )
-        )
-        else {
-            return res.status(500).json(
-                new StdResponse(
-                    'Error al ejecutar la consulta.',
-                    result
-                )
-            )
-        }
-    }
-
-    static pushMessage = async (req, res) => {
-        const receiverId = req.body.receiver;
-        const message = req.body.message;
-        const emitterId = req.payload.userId;
-
-        const result = await UserQuery.pushMessage(emitterId, receiverId, message)
-
-        if (result instanceof QuerySuccess) return res.status(200).json(
-            new StdResponse(
-                'Se ha insertado el mensaje correctamente.',
-                result
-            )
-        )
-        else {
-            return res.status(200).json(
-                new StdResponse(
-                    'Error al ejecutar la consulta.',
-                    result
-                )
-            )
-        }
-    }
-
     static getNotDeletedUsers = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getNotDeletedUsers();
+        try {
+            const {message, executed, query} = await UserQuery.getNotDeletedUsers(req.payload.userId);
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios.',{executed: false, error: e.message})
             )
         }
     };
 
     static getNotDeletedUsersWithRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.getNotDeletedWithRoles();
+        try {
+            const {message, executed, query} = await UserQuery.getNotDeletedWithRoles(req.payload.userId);
 
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+            if (executed) {
+                return res.status(200).json(
+                    new StdResponse(message,{executed, query})
+                )
+            }
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios.',{executed: false, error: e.message})
             )
         }
     };
 
     static createUser = async (req, res) => {
-        const user = req.body;
+        try {
+            const user = req.body;
 
-        const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar al middleware
+            const emailExists = (await UserQuery.checkIfEmailExists(user.email)).query; // TODO: Pasar a validator
 
-        if (emailExists) return res.status(200).json(
-            new StdResponse("El correo indicado ya existe",{executed: false})
-        )
+            if (emailExists) return res.status(200).json(
+                new StdResponse("El correo indicado ya existe",{executed: false})
+            )
 
-        const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al middleware
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(user.nickname)).query; // TODO: Pasar al validator
 
-        if (nicknameExists) return res.status(200).json(
-            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
-        )
+            if (nicknameExists) return res.status(200).json(
+                new StdResponse(nicknameExists.message,{executed: false})
+            )
 
-        const {message, executed, query, error} = await UserQuery.createUser(user);
+            const {message, executed, query} = await UserQuery.createUser(user);
 
-        if (executed) {
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        }  catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear el usuario.',{executed: false, error: e.message})
             )
         }
+
     };
 
     static updateUserData = async (req, res) => {
-        const newUserData = req.body;
+        try {
+            const newUserData = req.body;
 
-        const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar al middleware
+            const emailExists = await UserQuery.checkIfNewEmailIsValid(req.body.email, req.params.id);
+            const nicknameExists = await UserQuery.checkIfNewNicknameIsValid(req.body.nickname, req.params.id)
+            const errors = []
 
-        if (nicknameExists) return res.status(409).json(
-            new StdResponse("El nick del usuario indicado ya existe",{executed: false})
-        )
+            if (emailExists.query) {
+                errors.push(emailExists.message)
+            }
 
-        const {message, executed, query, error} = await UserQuery.updateUserData(newUserData, req.params.id);
+            if (nicknameExists.query) {
+                errors.push(nicknameExists.message)
+            }
 
-        if (executed) {
+            if (errors.length > 0)  return res.status(400).json(
+                new StdResponse("Algunos campos introducidos ya existen",{executed: false, errors})
+            )
+
+            const {message, executed, query} = await UserQuery.updateUserData(newUserData, req.params.id);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
-    };
-
-    static addUserRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.insertUserRoles(req.body.roles, req.params.id);
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
-            )
-        }
-    };
-
-    static deleteUserRoles = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
-
-        if (executed) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el usuario.',{executed: false, error: e.message})
             )
         }
     };
 
     static updateUserPassword = async (req, res) => {
-        const password = await bcrypt.hash(req.body.password, process.env.PASSWORD_HASH_SALT);
+        try {
+            const password = await hashPassword(req.body.password);
 
-        const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
+            const userExists = (await UserQuery.checkIfIdExists(req.params.id)).query // TODO: Validator
 
-        if (executed) {
+            if (userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
+
+            const {message, executed, query} = await UserQuery.updateUserPassword(password, req.params.id);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
-            return res.status(200).json(
-                new StdResponse(message,{executed, query})
-            )
-        } else if (!query) {
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse(e.message,{executed: false})
             )
         }
     };
 
     static registerUser = async (req, res) => {
         try {
-            if (!req.body.picUrl) req.body.picUrl = process.env.DEFAULT_PROFILE_PIC_URL;
+            const emailExists = (await UserQuery.checkIfEmailExists(req.body.email)).query; // TODO: Validator
+            const nicknameExists = (await UserQuery.checkIfNicknameExists(req.body.nickname)).query; // TODO: Validator
+
+            if (emailExists && nicknameExists) return res.status(200).json(
+                new StdResponse("El email y nombre de usuario introducidos ya existen",{executed: false})
+            )
+            else if (emailExists) return res.status(200).json(
+                new StdResponse("El email ya existe",{executed: false})
+            )
+            else if (nicknameExists) return res.status(200).json(
+                new StdResponse("El nombre de usuario ya existe",{executed: false})
+            )
 
             const {message, query, executed} = await UserQuery.registerUser(req.body);
 
@@ -261,7 +196,7 @@ class UserController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
+            return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
             )
         }
@@ -271,15 +206,7 @@ class UserController {
         try {
             const {email} = req.body
 
-            const emailExists = await UserQuery.checkIfEmailExists(email);
-
-            if (!emailExists.query)  return res.status(200).json(
-                new StdResponse(emailExists.message,{executed: emailExists.executed, query: emailExists.query})
-            )
-
             const {recoverCode, expiresAt} = RecoverController.set(email);
-
-            console.log(recoverCode)
 
             sendEmail(
                 email,
@@ -291,11 +218,9 @@ class UserController {
             return res.status(200).json(
                 new StdResponse('Se ha enviado el correo correctamente',{executed: true})
             )
-        } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+        }  catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al enviar el email de recuperación.',{executed: false, error: e.message})
             )
         }
     };
@@ -310,10 +235,8 @@ class UserController {
                 new StdResponse(message,{isValid, token})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al comprobar el codigo de recuperación.',{executed: false, error: e.message})
             )
         }
     };
@@ -323,7 +246,7 @@ class UserController {
             const {password} = req.body
             const {recovertoken} = req.headers
 
-            const validatingData = await RecoverController.validateToken(recovertoken); // TODO: Middleware
+            const validatingData = await RecoverController.validateToken(recovertoken);
 
             if (!validatingData.email) return res.status(200).json(
                 new StdResponse(validatingData.message,{executed: false})
@@ -335,84 +258,8 @@ class UserController {
                 new StdResponse(message,{executed})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
-            )
-        }
-    };
-
-    static getPossibleMatches = async (req, res) => {
-        try {
-            const userId = req.payload.userId;
-
-            // 1. Obtener preferencias del usuario
-            const userPreferences = await UserQuery.getUserPreferences(userId);
-
-            if (!userPreferences.executed) return res.status(400).json(
-                new StdResponse(userPreferences.error,{executed: false})
-            )
-
-            // 2. Obtener usuarios con algunos de mismos valores de preferencias de eleccion que el usuario
-            let choiceAffineUsers = await UserQuery.getUsersByChoicePrefs(userPreferences.query.choices, userId);
-
-            choiceAffineUsers = choiceAffineUsers.query.map(item => item.user);
-            choiceAffineUsers = [...new Set(choiceAffineUsers)] // Haciendo un Set a partir de los valores, podemos quitar elementos repetidos.
-
-            // 3. Obtener valores de las preferencias de valor de los usuarios obtenidos en el paso anterior
-
-            let rangeAffineUsers = (await UserQuery.getValuesOfUserRangePrefs(choiceAffineUsers)).query;
-
-            // 4. Obtener las preferencias cuyos valores se acerquen los valores minimo y maximo de preferencias de rango del usuario.
-
-            // Al utilizar reduce, podemos iterar sobre el array y descartar los valores que no sean el que queremos de forma sencilla.
-            const userMaxPreferenceValue = userPreferences.query.values.reduce((previous, current) =>
-                previous && previous.value > current.value ? previous : current
-            ).value;
-
-            const userMinPreferenceValue = userPreferences.query.values.reduce((previous, current) =>
-                previous && previous.value < current.value ? previous : current
-            ).value;
-
-            // Estas serán las preferencias que se tendrán en cuenta a la hora de buscar usuarios (los usuarios dentro de rangeAffineUsers).
-            const userMaxPreferences = userPreferences.query.values.filter(item => item.value > userMaxPreferenceValue * 0.85);
-            const userMinPreferences = userPreferences.query.values.filter(item => item.value < userMinPreferenceValue * 1.15);
-
-            // 5. Obtener los IDs de los usuarios cuyos valores de preferencia se acerquen a las de userMaxPreferences y userMinPreferences.
-
-            const matchableUserIds = [];
-            // Borramos las preferencias repetidas, introduciendolas en un map.
-            const preferencesForFind = new Map([...userMaxPreferences, ...userMinPreferences].map(item => [item.preference, item.value]));
-
-            preferencesForFind.forEach((value, preference) => {
-                rangeAffineUsers.forEach(user => {
-                    const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.75 && prefItem.value < value * 1.35))
-
-                    if (matchedPreference) matchableUserIds.push(user.user)
-                });
-            });
-
-            if (matchableUserIds.length === 0) {
-                preferencesForFind.forEach((value, preference) => {
-                    rangeAffineUsers.forEach(user => {
-                        const matchedPreference = user.preferences.find(prefItem => prefItem.preference === preference && (prefItem.value > value * 0.45 && prefItem.value < value * 1.65))
-
-                        if (matchedPreference) matchableUserIds.push(user.user)
-                    });
-                });
-            }
-
-            const {message, query} = await UserQuery.getUsersById(matchableUserIds)
-
-            return res.status(200).json(
-                new StdResponse(message,{executed: query !== null, query})
-            )
-        } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al cambiar la contraseña.',{executed: false, error: e.message})
             )
         }
     };
@@ -422,35 +269,283 @@ class UserController {
             const {userId} = req.params;
             const {enabled} = req.body;
 
+            const userExists = (await UserQuery.checkIfIdExists(userId)).query // TODO: Validator
+
+            if (userExists.query) return res.status(200).json(
+                new StdResponse(userExists.message, {
+                    executed: false
+                })
+            );
+
             const {query, message, executed} = await UserQuery.enableOrDisableUser(userId, enabled);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            console.log(e)
-
-            return res.status(500).json(
-                new StdResponse(e.message,{executed: false})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el estado del usuario.',{executed: false, error: e.message})
             )
         }
     };
 
     static deleteUser = async (req, res) => {
-        const {message, executed, query, error} = await UserQuery.deleteUser(req.params.id);
+        try {
+            let userId = req.params.userId;
+            const isAdmin = await UserQuery.userHasRole(userId, roleNames.admin.name);
+            const adminUsersRemaining = await UserQuery.getRoleUsersRemaining(roleNames.admin.name);
 
-        if (executed) {
+            if (isAdmin.query && adminUsersRemaining.query === 1) return res.status(200).json(
+                new StdResponse("Solo existe un unico administrador en el sistema, por lo que no es posible borrar mas.",{executed: false})
+            )
+
+            if (userId === req.payload.userId) return res.status(200).json(
+                new StdResponse("No puedes borrarte a tí mismo.",{executed: false})
+            )
+
+            const {message, executed, query} = await UserQuery.deleteUser(userId);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!executed && query) {
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al borrar el usuario.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static editProfileData = async (req, res) => {
+        try {
+            const emailExists = await UserQuery.checkIfNewEmailIsValid(req.body.email, req.payload.userId);
+            const nicknameExists = await UserQuery.checkIfNewNicknameIsValid(req.body.nickname, req.payload.userId)
+            const errors = []
+
+            if (emailExists.query) {
+                errors.push(emailExists.message)
+            }
+
+            if (nicknameExists.query) {
+                errors.push(nicknameExists.message)
+            }
+
+            if (errors.length > 0)  return res.status(400).json(
+                new StdResponse("Algunos campos introducidos ya existen",{executed: false, errors})
+            )
+
+            const {message, executed, query} = await UserQuery.editProfileData(req.payload.userId, req.body);
+
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
-        } else if (!query) {
-            console.log(error);
-            return res.status(500).json(
-                new StdResponse(message,{executed, error})
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el perfil del usuario.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static getEditableProfileData = async (req, res) => {
+        try {
+            const {userId} = req.payload;
+
+            const userData = (await UserQuery.getUsersById([userId])).query[0];
+            const userPreferences = (await PreferenceQuery.getUserPreferences(userId)).query;
+
+            return res.status(200).json(
+                new StdResponse(
+                    "Se han obtenido los datos editables correctamente",
+                    {
+                        executed: true,
+                        query: {
+                            user: userData,
+                            preferences: userPreferences
+                        }
+                    })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el perfil del usuario.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static updateUserAvatar = async (req, res) => {
+        try {
+            const key = 'avatar'
+            const {userId} = req.params;
+
+            if (!req.files[key]) return res.status(400).json( // TODO: Middleware
+                new StdResponse(
+                    "No se ha subido ningun archivo.",
+                    {
+                        executed: false,
+                    })
+            );
+
+            const uploadedNames = await uploadFiles(req.files, {dir: '/avatar', fileExtension: ['jpg', 'png', 'jpeg']});
+
+            const avatarUrl = uploadedNames.get(key).secure_url;
+
+            const {message, query, executed} = await UserQuery.editUserAvatar(userId, avatarUrl)
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    avatarUrl
+                })
+            );
+        } catch (e) {
+            if (e instanceof CustomError) {
+                return res.status(400).json(
+                    new StdResponse(e.message,{executed: false})
+                )
+            }
+
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al actualizar el avatar del usuario.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static getRoleUsersRemaining = async (req, res) => {
+        try {
+            const roleName = req.params.role;
+
+            const roleExists = (await RoleQuery.roleNameExists(roleName)).query; // TODO: Validator
+
+            if (!roleExists) return res.status(404).json(
+                new StdResponse("El rol buscado no existe", {
+                    executed: false,
+                })
+            );
+
+            const remaining = (await UserQuery.getRoleUsersRemaining(roleName)).query
+
+            return res.status(200).json(
+                new StdResponse("Se ha obtenido la cantidad de usuarios correctamente.", {
+                    executed: true,
+                    count: remaining
+                })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener los usuarios.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static getSelfNotifications = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            const notifications = await NotificationQuery.getUserNotifications(userId);
+
+            return res.status(200).json(
+                new StdResponse(notifications.message, {
+                    executed: notifications.executed,
+                    query: notifications.query
+                })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las notificaciones.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static readUserNotifications = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            const notifications = await NotificationQuery.readUserNotifications(userId);
+
+            return res.status(200).json(
+                new StdResponse(notifications.message, {
+                    executed: notifications.executed,
+                    query: notifications.query
+                })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al leer las notificaciones del usuario.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static updateUserPreferences = async (req, res) => {
+        try {
+            const userId = req.params.userId || req.payload.userId;
+
+            if (req.params.id) {
+                const userExists = (await UserQuery.checkIfIdExists(req.params.id)).query // TODO: Validator
+
+                if (userExists.query) return res.status(200).json(
+                    new StdResponse(userExists.message, {
+                        executed: false
+                    })
+                );
+            }
+
+            const {message, executed} = await UserQuery.setUserPreferences(userId, req.body.preferences);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse("Ha ocurrido un problema al actualizar las preferencias",{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static login = async (req, res) => {
+        try {
+            const email = req.body.email;
+            const password = req.body.password;
+
+            const user = (await UserQuery.findUserByEmail(email)).query;
+
+            if (!user) {
+                return res.status(203).json(
+                    new StdResponse(
+                        'Credenciales invalidas. Vuelve a intentarlo.',
+                        {logged: false}
+                    )
+                )
+            }
+            const passwordsMatch = await compare(password, user.password);
+
+            if (!passwordsMatch) {
+                return res.status(203).json(
+                    new StdResponse(
+                        'Credenciales invalidas. Vuelve a intentarlo.',
+                        {logged: false}
+                    )
+                )
+            }
+
+            const apiToken = generateToken({userId: user.id, userEmail: email, type: tokenTypes.api});
+            const socketToken = generateToken({userId: user.id, type: tokenTypes.socket});
+
+            const needToStart = (await UserQuery.needToStart(user.id)).query;
+
+            await UserQuery.updateUserLogin(user.id)
+
+            console.info(`Se ha logueado un usuario ${user.email} correctamente.`)
+
+            return res.status(200).json(
+                new StdResponse(
+                    'Se ha iniciado sesión correctamente.',
+                    {logged: true, token: apiToken, socketToken, firstLogin: needToStart}
+                )
+            )
+        } catch (e) {
+            console.error(e)
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al iniciar sesión.',{logged: false, error: e.message})
             )
         }
     };

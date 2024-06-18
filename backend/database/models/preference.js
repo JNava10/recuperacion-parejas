@@ -26,7 +26,11 @@ module.exports = (sequelize) => {
       this.hasMany(models.PreferenceOption,  {
         foreignKey: 'preference',
         as: 'options'
+      });
 
+      this.hasMany(models.UserPreference,  {
+        foreignKey: 'preference',
+        as: 'userValues'
       });
 
       this.belongsTo(models.PreferenceType, {as: 'type'});

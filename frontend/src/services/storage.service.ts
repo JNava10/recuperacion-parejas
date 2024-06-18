@@ -22,4 +22,8 @@ export class StorageService {
   remove = (key: string)  => {
     return localStorage.removeItem(key)
   }
+
+  removeAll = ()  => {
+    return localStorage.clear()
+  }
 }

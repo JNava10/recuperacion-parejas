@@ -20,6 +20,12 @@ const getRandomFromRange = (min, max) => {
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
 
+const removeAccentMarks = (text) => {
+    // Con normalize podemos convertir un string a distintos formatos. En este caso, convertimos el string a caracteres unicode.
+    // Y replace se utiliza aqui para reemplazar algunos caracteres raros que tiene unicode a ''.
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 /**
  *
  * @param response
@@ -45,11 +51,20 @@ function generateSecureInt(min, max) {
     return crypto.randomInt(min, max);
 }
 
+const getEventCloseDate = (scheduledDate) => {
+    const multiplier = (24 * 60 * 60 * 1000);
+    const closeOffset = 1; // Numero de dias antes de la fecha del evento hasta que caduque el evento.
+
+    return new Date(scheduledDate - (closeOffset * multiplier));
+};
+
 module.exports = {
     hashPassword,
     getRandomItem,
     getRandomFromRange,
     sendStandardResponse,
     generateSecureHex,
-    generateSecureInt
-}
+    generateSecureInt,
+    getEventCloseDate,
+    removeAccentMarks
+};

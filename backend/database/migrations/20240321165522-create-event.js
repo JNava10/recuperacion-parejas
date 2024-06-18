@@ -36,6 +36,10 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      close_date_time: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
       latitude: {
         type: DataTypes.DECIMAL(10, 8),
         allowNull: false,
@@ -46,11 +50,13 @@ module.exports = {
       },
       created_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue: new Date(Date.now())
       },
       updated_at: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue: new Date(Date.now())
       },
       deleted_at: {
         allowNull: true,

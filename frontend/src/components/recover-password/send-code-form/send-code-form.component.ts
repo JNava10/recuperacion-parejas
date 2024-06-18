@@ -34,8 +34,8 @@ export class SendCodeFormComponent implements OnInit {
 
     const {code} = this.codeForm.value;
 
-    this.userService.sendRecoverCode(code!, this.email!).subscribe(async data  => {
-      this.storageService.save('recover-token', data.token);
+    this.userService.sendRecoverCode(code!, this.email!).subscribe(async res  => {
+      this.storageService.save('recover-token', res.data.token);
       await this.router.navigate(['recover-password/password'])
     });
   };

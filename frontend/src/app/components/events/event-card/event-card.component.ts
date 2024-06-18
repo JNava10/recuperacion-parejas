@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {EventItem} from "../../../../interfaces/api/event/event";
+import {EventItem, SummaryFile} from "../../../../interfaces/api/event/event";
 import {DatePipe, NgIf} from "@angular/common";
 import {CreateEventComponent} from "../../../../components/events/create-event/create-event.component";
 import {DialogModule} from "primeng/dialog";
@@ -11,6 +11,10 @@ import {
   ConfirmDeleteEventComponent
 } from "../../../../components/events/confirm-delete-event/confirm-delete-event.component";
 import {EventService} from "../../../../services/api/event.service";
+import {SidebarModule} from "primeng/sidebar";
+import {
+  ManageEventMembersFormComponent
+} from "../../../../components/events/manage-event-members-form/manage-event-members-form.component";
 
 @Component({
   selector: 'app-event-card',
@@ -22,7 +26,9 @@ import {EventService} from "../../../../services/api/event.service";
     ReactiveFormsModule,
     NgIf,
     EditEventComponent,
-    ConfirmDeleteEventComponent
+    ConfirmDeleteEventComponent,
+    SidebarModule,
+    ManageEventMembersFormComponent
   ],
   templateUrl: './event-card.component.html',
   styleUrl: './event-card.component.css'
@@ -31,12 +37,16 @@ export class EventCardComponent {
 
   constructor(private eventService: EventService) {}
 
-  @Input() event?: EventItem;
+  protected readonly Date = Date;
 
+  @Input() event?: EventItem;
   @Output() refresh = new EventEmitter<null>();
 
   protected editingEvent = false;
   protected deletingEvent = false;
+  protected showMembers = false;
+
+  summaryFile?: SummaryFile
 
   protected showEditEvent = () => {
     this.editingEvent = true;
@@ -52,5 +62,14 @@ export class EventCardComponent {
     this.eventService.deleteEvent(this.event!).subscribe(() => {
       this.refresh.emit()
     })
+  };
+  getSummaryFile = (event: EventItem) => {
+    this.eventService.getSummaryFile(event).subscribe((body) => {
+      this.summaryFile = body.data.file;
+    })
+  };
+
+  showMembersSidebar = () => {
+    this.showMembers = true
   };
 }

@@ -2,13 +2,22 @@ import {ApiResponse} from "../apiResponse";
 
 export interface GetPreferenceResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: PreferenceItemWithType[]
   }
 }
 
+export interface SavePreferenceResponse extends ApiResponse {
+  data: {
+    errors?: string[]
+    executed: true
+  }
+}
+
 export interface GetPreferencesResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: PreferenceList
   }
@@ -17,6 +26,7 @@ export interface GetPreferencesResponse extends ApiResponse {
 
 export interface CreatePreferencesResponse extends ApiResponse {
   data: {
+    errors?: string[]
     executed: true
     query: boolean
   }
@@ -36,6 +46,12 @@ export interface PreferenceList {
   choice: ChoicePreference[],
   range: RangePreference[],
 }
+
+export interface PreferenceValueFormItem {
+  preference: number,
+  value: number
+}
+
 
 export interface CreatePreferenceItem {
   name?: string,
@@ -58,14 +74,14 @@ export interface PreferenceItemWithType extends PreferenceItem {
 }
 
 
-export interface ChoicePreference {
-  id: number
-  name?: string
-  description?: string
-  type?: {
-    text?: string
-  }
+export interface ChoicePreference extends Preference {
   options?: Option[]
+  optionSelected?: string
+}
+
+export interface PreferenceControl extends Preference {
+  label?: string,
+  required?: string,
 }
 
 export interface Option {
@@ -74,19 +90,28 @@ export interface Option {
   option_value: number
 }
 
-export interface RangePreference {
-  id: number
+export interface Preference {
+  id?: number
   name?: string
   description?: string
   type?: {
     text?: string
   }
+  userValues?: UserValue[]
+}
+
+export interface RangePreference extends Preference {
   values?: PreferenceValue
 }
+
 export interface PreferenceValue {
   preference?: number
   min_value?: number
   max_value?: number
+}
+
+export interface UserValue {
+  value?: number
 }
 
 export interface UserPreferenceItem {

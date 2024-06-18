@@ -18,10 +18,12 @@ export class EditUserComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute, private userService: UserService, private roleService: RoleService) {}
 
   ngOnInit(): void {
-    const userId = this.activatedRoute.snapshot.queryParams['id'];
+    const userId = Number(this.activatedRoute.snapshot.queryParams['id']);
 
-    this.userService.findUserById(userId).subscribe(user => {
-      this.user = user
+    if (!userId) return;
+
+    this.userService.findUserById(userId).subscribe(body => {
+      this.user = body.data.query
     });
 
     this.roleService.getAllRoles().subscribe(roles => {

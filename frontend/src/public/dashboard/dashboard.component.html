@@ -1,25 +1,41 @@
-<section class="max-w-md">
-  <app-find-members/>
-  <app-registered-events></app-registered-events>
-</section>
-
-@if (likableUsers) {
-  <app-users-to-match-list [users]="likableUsers" (isMatch)="handleMatch($event)"></app-users-to-match-list>
-}
-
-<section>
-  <h3>Matches establecidos</h3>
-  <app-matches-list [matches]="matches"></app-matches-list>
-</section>
-
-<p-dialog header="¡Has hecho una nueva amistad!" [modal]="true" [(visible)]="isMatch">
-  <div>
-    {{matchedUser?.nickname}}
+<section class="w-screen h-screen">
+  <div class="flex justify-center items-center">
+    <app-find-members class="mt-0"/>
+  </div>
+  <div class="w-screen h-screen grid grid-cols-3">
     <div>
-      <button (click)="goToChat(this.matchedUser!)" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        <i class="fa-solid fa-envelope"></i>
-      </button>
+      <div>
+        <div>
+          <span>Usuarios conectados: {{this.usersConnected}}</span>
+        </div>
+        <div>
+          <app-registered-events></app-registered-events>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center justify-center h-full">
+      @if (likableUsers) {
+        <app-users-to-match-list class="my-auto" [users]="likableUsers" (isMatch)="handleMatch($event)"></app-users-to-match-list>
+      }
+    </div>
+    <div>
+      <h3>Matches establecidos</h3>
+      <app-matches-list [matches]="matches"></app-matches-list>
     </div>
   </div>
-</p-dialog>
+
+  <p-dialog header="¡Has hecho una nueva amistad!" [modal]="true" [(visible)]="isMatch">
+    <div>
+      {{matchedUser?.nickname}}
+      <div>
+        <button (click)="goToChat(this.matchedUser!)" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          <i class="fa-solid fa-envelope"></i>
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+
+
+  <app-toast></app-toast>
+</section>
 

@@ -1,11 +1,22 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {SelectRolesEditComponent} from "../../../components/roles/select-roles/select-roles.component";
 import {UserService} from "../../../services/api/user.service";
-import {CreateUserItem, RoleItem, UserItem} from "../../../interfaces/api/user/user";
+import {
+  CreateUserItem,
+  CreateUserResponse,
+  CrudEditResponse,
+  RoleItem,
+  UserItem
+} from "../../../interfaces/api/user/user";
 import * as regex from "../../../utils/const/regex.constants";
 import * as customValidators from "../../../utils/validators/customValidators";
+import {CustomToastComponent} from "../../../components/custom-toast/custom-toast.component";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {Message, MessageService} from "primeng/api";
+import {FileValidationOptions} from "../../../interfaces/fileValidation";
+import {showQueryToast, validateFiles} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-edit-user-form',
@@ -14,13 +25,15 @@ import * as customValidators from "../../../utils/validators/customValidators";
     FormsModule,
     NgIf,
     ReactiveFormsModule,
-    SelectRolesEditComponent
+    SelectRolesEditComponent,
+    CustomToastComponent,
+    MatProgressSpinner
   ],
   templateUrl: './edit-user-form.component.html',
   styleUrl: './edit-user-form.component.css'
 })
 export class EditUserFormComponent implements OnInit {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private messageService: MessageService) {}
 
  ngOnInit() {
    this.setUserData()
@@ -28,6 +41,10 @@ export class EditUserFormComponent implements OnInit {
 
   @Input() roles?: RoleItem[];
   @Input() user?: UserItem;
+  @Output() edited = new EventEmitter<null>();
+
+  protected picFile?: File;
+  loading = false;
 
   userDataForm = new FormGroup({
     name: new FormControl('', Validators.pattern(regex.user.name)),
@@ -35,7 +52,6 @@ export class EditUserFormComponent implements OnInit {
     secondLastname: new FormControl('', Validators.pattern(regex.user.secondLastname)),
     email: new FormControl('', Validators.pattern(regex.user.email)),
     nickname: new FormControl('', Validators.pattern(regex.user.nickname)),
-    roles: new FormControl(new Array<RoleItem>(), Validators.required)
   },);
 
   passwordsForm = new FormGroup({
@@ -46,19 +62,43 @@ export class EditUserFormComponent implements OnInit {
   }, {  validators: [customValidators.passwordsMatch('password', 'confirmPassword')], updateOn: "submit"});
 
   editUser = (event: SubmitEvent) => {
+
     if (this.userDataForm.invalid) return
 
     event.preventDefault();
 
     const user = this.getUserData();
 
-    this.userService.editUserData(user!, this.user?.id!).subscribe();
+    this.userService.editUserData(user!, this.user?.id!).subscribe(body => {
+      this.loading = true
+
+      if (this.picFile) {
+        this.changeUserAvatar(this.user?.id!, body)
+      }
+
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+
+      this.loading = false
+    });
   };
 
-  private getRolesData = () => {
-    const roles = this.userDataForm.value.roles;
-    return roles?.map(role => role.id!);
-  }
+  protected handleFile = async ($event: Event) => {
+    const input = $event.target as HTMLInputElement;
+
+    const file = input.files?.item(0);
+
+    if (file) {
+      const valid = validateFiles([file], {maxSizeMb: 1, maxCount: 1}, this.messageService);
+
+      if (!valid) return;
+
+      this.picFile = file
+    }
+  };
 
   private getUserData = () => {
     const formData = this.userDataForm.value;
@@ -74,21 +114,41 @@ export class EditUserFormComponent implements OnInit {
     return user;
   }
 
-  setUserData() {
+  setUserData = () => {
     this.userDataForm.patchValue({
       name: this.user!.name!,
       firstLastname: this.user!.firstSurname!,
-      secondLastname: this.user!.firstSurname!,
+      secondLastname: this.user!.secondSurname!,
       nickname: this.user!.nickname!,
       email: this.user!.email!,
     })
-  }
+  };
 
   handleSubmitPassword = () => {
     if (this.passwordsForm.invalid) return;
 
     const password = this.passwordsForm.value.passwords?.password;
 
-    this.userService.updatePassword(this.user?.id!, password!).subscribe();
+    this.userService.updatePassword(this.user?.id!, password!).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+    });
   };
+
+  private changeUserAvatar = (id: number, res: CrudEditResponse) => {
+    this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
+
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+
+      this.loading = false
+    });
+  }
+
 }

@@ -1,23 +1,18 @@
 
-const UserQuery = require("../database/query/user.query");
 const StdResponse = require("../classes/stdResponse");
-const {el} = require("@faker-js/faker");
-const FriendshipQuery = require("../database/query/friendship.query");
 const PreferenceQuery = require("../database/query/preference.query");
 
 class PreferenceController {
-    static getActivatedPreferences = async (req, res) => {
+    static getNotDeletedPreferences = async (req, res) => {
         try {
-            const {message, query} = await PreferenceQuery.getActivatedPreferences();
-
-            console.log(query)
+            const {message, query} = await PreferenceQuery.getNotDeletedPreferences();
 
             return res.status(200).json(
                 new StdResponse(message,{executed: true, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las preferencias activadas',{executed: false, error: e.message})
             )
         }
     };
@@ -30,8 +25,8 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear la preferencia de elección.',{executed: false, error: e.message})
             )
         }
     };
@@ -44,36 +39,70 @@ class PreferenceController {
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear la preferencia de rango.',{executed: false, error: e.message})
             )
         }
     };
 
     static getAllPreferences = async (req, res) => {
         try {
-            const {message, query, executed} = await PreferenceQuery.getAllPreferences(req.body);
+            const {message, query, executed} = await PreferenceQuery.getAllPreferences();
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las preferencias.',{executed: false, error: e.message})
             )
         }
     };
 
     static createUserPreferences = async (req, res) => {
         try {
+            const userHasPreferences = await PreferenceQuery.userHasPreferences(req.payload.userId)
+
+            if (userHasPreferences.query) return res.status(400).json(
+                new StdResponse(userHasPreferences.message,{executed: false})
+            )
+
             const {message, query, executed} = await PreferenceQuery.createUserPreferences(req.body, req.payload.userId);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
-            return res.status(500).json(
-                new StdResponse('Ha ocurrido un problema al insertar el like.',{executed: false, error: e.toString()})
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al crear la preferencias del usuario.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static getOwnPreferences = async (req, res) => {
+        try {
+            const {message, query, executed} = await PreferenceQuery.getUserPreferences(req.payload.userId);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener las preferencias.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static deletePreference = async (req, res) => {
+        try {
+            const {message, executed, query} = await PreferenceQuery.deletePreference(req.params.id);
+
+            return res.status(200).json(
+                new StdResponse(message,{executed, query})
+            )
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al borrar la preferencia.',{executed: false, error: e.message})
             )
         }
     };

@@ -5,6 +5,7 @@ const {events} = require("../constants/socket.const");
 const SocketController = require("../controllers/socket.controller");
 const {verifyToken} = require("../helpers/jwt.helper");
 const {authMiddleware} = require("../middlewares/socket.middleware");
+const fileUpload = require('express-fileupload');
 
 class Server {
 
@@ -16,6 +17,12 @@ class Server {
         this.rolesPath = `/${process.env.API_ROOT_ENDPOINT}/roles`;
         this.friendshipPath = `/${process.env.API_ROOT_ENDPOINT}/friendship`;
         this.preferencePath = `/${process.env.API_ROOT_ENDPOINT}/preference`;
+
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/',
+            createParentPath: true
+        }));
 
         this.server = require('http').createServer(this.app);
         this.io = require('socket.io')(this.server, {
