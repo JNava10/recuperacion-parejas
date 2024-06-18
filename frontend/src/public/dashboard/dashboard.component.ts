@@ -61,26 +61,6 @@ export class DashboardComponent implements OnInit {
       this.matches = matches;
     })
 
-    this.socketService.listenFriendConnected((params: onFriendConnectParams) => {
-      const friendId = params.id;
-
-      const friend = this.matches?.find(user => user.id === friendId)!
-      const friendIndex = this.matches?.indexOf(friend);
-
-      this.matches![friendIndex!].connected = true
-
-      console.log(this.matches![friendIndex!].connected)
-    })
-
-    this.socketService.listenFriendDisconnected((params: onFriendConnectParams) => {
-      const friendId = params.id;
-
-      const friend = this.matches?.find(user => user.id === friendId)!
-      const friendIndex = this.matches?.indexOf(friend);
-
-      this.matches![friendIndex!].connected = false
-    })
-
     this.userService.getChats().subscribe(body => {
       body.data.chats.notPending.forEach((user) => {
         this.notPending.set(user.id!, user!)

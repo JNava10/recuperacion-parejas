@@ -52,7 +52,7 @@ class SocketController {
             const connectedFriends = SocketController.findUsersById(friends)
 
             connectedFriends.forEach(([friendId, friendSocket]) => {
-                friendSocket.emit('friend-connected', {id: ownId})
+                friendSocket.emit('friend-connected', {id: ownId, connected: true})
             })
 
             // Listeners
