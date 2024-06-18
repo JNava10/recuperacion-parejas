@@ -38,8 +38,6 @@ class RoleController {
         try {
             let roles = req.body.roles;
 
-            const rolesAlreadyInserted = await RoleQuery.checkIfRoleInserted(roles, req.params.id);
-
             const {message, executed, query} = await UserQuery.insertUserRoles(roles, req.params.id);
 
             return res.status(200).json(
@@ -57,6 +55,25 @@ class RoleController {
             const userId = req.payload.userId;
 
             const {query, message, executed} = await RoleQuery.getUserRolesWithItems(userId);
+
+            return res.status(200).json(
+                new StdResponse(message, {
+                    executed,
+                    query
+                })
+            );
+        } catch (e) {
+            return res.status(203).json(
+                new StdResponse('Ha ocurrido un problema al obtener el evento.',{executed: false, error: e.message})
+            )
+        }
+    };
+
+    static getSelfRoleNames = async (req, res) => {
+        try {
+            const userId = req.payload.userId;
+
+            const {query, message, executed} = await RoleQuery.getUserRoleNames(userId);
 
             return res.status(200).json(
                 new StdResponse(message, {

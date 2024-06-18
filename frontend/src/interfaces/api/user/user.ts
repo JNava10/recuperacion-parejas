@@ -87,6 +87,14 @@ export interface ManageUserResponse extends ApiResponse {
   }
 }
 
+export interface UpdateUserAvatar extends ApiResponse {
+  data: {
+    executed: boolean
+    avatarUrl?: string
+    errors?: string[]
+  }
+}
+
 export interface CrudEditResponse extends ApiResponse {
   data: {
     executed: boolean
@@ -149,6 +157,14 @@ export interface GetSelfRoles extends ApiResponse {
   data: {
     executed: boolean
     roles: string[]
+    errors?: string[]
+  }
+}
+
+export interface GetSelfRoleNames extends ApiResponse {
+  data: {
+    executed: boolean
+    query: string[]
     errors?: string[]
   }
 }

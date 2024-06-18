@@ -375,15 +375,7 @@ class UserController {
             const key = 'avatar'
             const {userId} = req.params;
 
-            const userExists = (await UserQuery.checkIfIdExists(userId)).query // TODO: Validator
-
-            if (userExists.query) return res.status(200).json(
-                new StdResponse(userExists.message, {
-                    executed: false
-                })
-            );
-
-            if (!req.files || !req.files[key]) return res.status(400).json( // TODO: Middleware
+            if (!req.files[key]) return res.status(400).json( // TODO: Middleware
                 new StdResponse(
                     "No se ha subido ningun archivo.",
                     {
@@ -395,12 +387,12 @@ class UserController {
 
             const avatarUrl = uploadedNames.get(key).secure_url;
 
-            const {message, query, executed} = await UserQuery.editProfileAvatar(userId, avatarUrl)
+            const {message, query, executed} = await UserQuery.editUserAvatar(userId, avatarUrl)
 
             return res.status(200).json(
                 new StdResponse(message, {
                     executed,
-                    query
+                    avatarUrl
                 })
             );
         } catch (e) {

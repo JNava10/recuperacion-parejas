@@ -89,16 +89,16 @@ export class DashboardComponent implements OnInit {
       body.data.chats.pending.forEach((user) => {
         this.pending.set(user.id!, user!)
       })
+    })
 
-      this.router.events.subscribe((event) => {
-        if (event instanceof NavigationEnd) {
-          this.socketService.removeAllListeners();
-        }
-      });
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.socketService.removeAllListeners();
+      }
+    });
 
-      this.socketService.onDisconnect(() => {
-        this.usersConnected = 0;
-      })
+    this.socketService.onDisconnect(() => {
+      this.usersConnected = 0;
     })
 
     this.socketService.listenNewMesages((args: NewMessageArgs) => {

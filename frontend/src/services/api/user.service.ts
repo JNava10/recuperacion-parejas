@@ -11,7 +11,7 @@ import {
   GetUsersResponse,
   ManageUserResponse,
   CreateUserResponse,
-  UserItem, GetCountResponse, CrudEditResponse, GetSelfRoles
+  UserItem, GetCountResponse, CrudEditResponse, GetSelfRoles, GetSelfRoleNames, UpdateUserAvatar
 } from "../../interfaces/api/user/user";
 import {sendTokenParam} from "../../utils/const/url.constants";
 import {catchError, map, of} from "rxjs";
@@ -234,6 +234,16 @@ export class UserService {
     )
   }
 
+  getSelfRoleNames = () => {
+    return this.http.get<GetSelfRoleNames>(`${environment.apiUrl}/user/roles/name`, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetSelfRoleNames;
+
+        return of(error);
+      })
+    )
+  }
+
   updateUserAvatar = (id: number, file: File) => {
     const fileKey = 'avatar';
 
@@ -242,9 +252,9 @@ export class UserService {
 
     console.log(id)
 
-    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/avatar/${id}`, formData, {params: {...sendTokenParam}}).pipe(
+    return this.http.put<UpdateUserAvatar>(`${environment.apiUrl}/user/avatar/${id}`, formData, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
-        const error = res.error as ManageUserResponse;
+        const error = res.error as UpdateUserAvatar;
 
         return of(error);
       })
@@ -272,7 +282,6 @@ export class UserService {
     )
   }
 
-  // TODO: Mover a NotificationApiService
   readAllNotifications = () => {
     return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/notifications/read`, {}, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
@@ -283,9 +292,18 @@ export class UserService {
     )
   }
 
-  // TODO: Mover a PreferenceApiService
   updateOwnPreferences = (preferences: PreferenceValueFormItem[]) => {
     return this.http.put<CrudEditResponse>(`${environment.apiUrl}/user/preferences/`,{preferences}, {params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CrudEditResponse;
+
+        return of(error);
+      })
+    );
+  }
+
+  logout = () => {
+    return this.http.post<CrudEditResponse>(`${environment.apiUrl}/user/logout/`,{}, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
         const error = res.error as CrudEditResponse;
 

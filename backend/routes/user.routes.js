@@ -102,6 +102,7 @@ router.get('/notifications', [validateToken], UserController.getSelfNotification
 router.put('/notifications/read', [validateToken], UserController.readUserNotifications)
 
 router.get('/roles', [validateToken], RoleController.getSelfRoles)
+router.get('/roles/name', [validateToken], RoleController.getSelfRoleNames)
 
 router.put('/avatar/:userId', [
     validateToken,

@@ -1,4 +1,5 @@
-import {MenuItem} from "primeng/api";
+import {MenuItem, MenuItemCommandEvent} from "primeng/api";
+import {MenuService} from "../../services/menu.service";
 
 export const adminItems: MenuItem[] = [
   {label: 'Usuarios', icon: 'fa-solid fa-user', routerLink: './users'},
@@ -6,87 +7,24 @@ export const adminItems: MenuItem[] = [
   {label: 'Eventos', icon: 'fa-solid fa-street-view', routerLink: './events'}
 ]
 
-
-export const userMenuItems: MenuItem[] = [
+export const adminMenuItems: MenuItem[] = [
   {
-    separator: true
-  },
-  {
-    label: 'Documents',
+    label: 'Admin',
     items: [
-      {
-        label: 'New',
-        icon: 'pi pi-plus',
-      },
-      {
-        label: 'Search',
-        icon: 'pi pi-search',
-      }
+      {label: 'Usuarios', icon: 'fa-solid fa-user', routerLink: '/admin/users'},
+      {label: 'Preferencias', icon: 'fa-solid fa-heart', routerLink: '/admin/preferences'},
+      {label: 'Eventos', icon: 'fa-solid fa-street-view', routerLink: '/admin/events'}
     ]
-  },
-  {
-    label: 'Profile',
-    items: [
-      {
-        label: 'Settings',
-        icon: 'pi pi-cog',
-        shortcut: '⌘+O'
-      },
-      {
-        label: 'Messages',
-        icon: 'pi pi-inbox',
-        badge: '2'
-      },
-      {
-        label: 'Logout',
-        icon: 'pi pi-sign-out',
-      }
-    ]
-  },
-  {
-    separator: true
   }
 ];
 
-
-
 export const memberMenuItems: MenuItem[] = [
   {
-    separator: true
-  },
-  {
-    label: 'Documents',
+    label: 'Dashboard',
     items: [
-      {
-        label: 'New',
-        icon: 'pi pi-plus',
-      },
-      {
-        label: 'Search',
-        icon: 'pi pi-search',
-      }
+      {label: 'Buscar amigos', icon: 'fa-solid fa-user', routerLink: '/dashboard'},
+      {label: 'Eventos disponibles', icon: 'fa-solid fa-heart', routerLink: '/available-events'},
+      {label: 'Chats', icon: 'fa-solid fa-comments', routerLink: '/pending-chats'}
     ]
-  },
-  {
-    label: 'Profile',
-    items: [
-      {
-        label: 'Settings',
-        icon: 'pi pi-cog',
-        shortcut: '⌘+O'
-      },
-      {
-        label: 'Messages',
-        icon: 'pi pi-inbox',
-        badge: '2'
-      },
-      {
-        label: 'Logout',
-        icon: 'pi pi-sign-out',
-      }
-    ]
-  },
-  {
-    separator: true
   }
 ];

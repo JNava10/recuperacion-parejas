@@ -527,7 +527,7 @@ class UserQuery {
         }
     };
 
-    static editProfileAvatar = async (id, picUrl) => {
+    static editUserAvatar = async (id, picUrl) => {
         try {
             const userExists = models.User.findOne({where: {id}}) // TODO: Validator
 

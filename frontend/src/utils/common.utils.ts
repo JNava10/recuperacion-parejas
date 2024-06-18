@@ -33,10 +33,6 @@ export const getTimeAgo = (timestamp: number) => {
   return timeAgo.format(date)
 }
 
-export const getUserMenuItems = () => {
-
-}
-
 export const userPreferencesToFormGroup = (preferences: Preference[]) => {
   const group: any = {};
 
