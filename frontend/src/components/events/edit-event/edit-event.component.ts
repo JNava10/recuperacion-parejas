@@ -5,7 +5,7 @@ import * as regex from "../../../utils/const/regex.constants";
 import {DatePipe, NgIf} from "@angular/common";
 import {PaginatorModule} from "primeng/paginator";
 import {GoogleMap, GoogleMapsModule} from '@angular/google-maps'
-import {CreateEventItem, EventItem} from "../../../interfaces/api/event/event";
+import {CreateEventItem, EventItem, EventResponse} from "../../../interfaces/api/event/event";
 import {EventService} from "../../../services/api/event.service";
 import {MapEventMarkerComponent} from "../map-event-marker/map-event-marker.component";
 
@@ -100,15 +100,25 @@ export class EditEventComponent implements OnInit {
 
     this.eventService.editEventDetails(eventDetails).subscribe(body => {
       this.loading = true;
-      const message: Message = getQueryToast(body.data.executed, body.message)
+
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (this.picFile) {
-        this.updatePic(message);
+        this.updatePic();
       } else {
+        if (body.data.errors) {
+          body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(body.data.executed, body.message, this.messageService)
+        }
+
         this.edited.emit(body.data.executed);
-        this.messageService.add(message);
+
       }
-      this.edited.emit(body.data.executed)
     });
   }
 
@@ -142,13 +152,22 @@ export class EditEventComponent implements OnInit {
     const eventDetails: EventItem = {id: this.event?.id, latitude: latLng?.lat, longitude: latLng?.lng};
 
     this.eventService.editEventPlace(eventDetails).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService);
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
     });
   };
 
-  private updatePic(message: Message) {
+  private updatePic() {
     this.eventService.updateEventPic(this.event?.id!, this.picFile!).subscribe(body => {
-      this.messageService.add(message);
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+
       this.edited.emit(body.data.executed);
     })
   }

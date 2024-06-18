@@ -75,8 +75,13 @@ export class EditUserFormComponent implements OnInit {
         this.changeUserAvatar(this.user?.id!, body)
       }
 
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
+      this.loading = false
     });
   };
 
@@ -123,12 +128,23 @@ export class EditUserFormComponent implements OnInit {
 
     const password = this.passwordsForm.value.passwords?.password;
 
-    this.userService.updatePassword(this.user?.id!, password!).subscribe();
+    this.userService.updatePassword(this.user?.id!, password!).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
+    });
   };
 
   private changeUserAvatar = (id: number, res: CrudEditResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       this.loading = false
     });

@@ -21,7 +21,7 @@
   <div class="relative p-4 w-full max-w-2xl max-h-full">
     <!-- Modal content -->
     <div class="relative bg-white rounded-lg shadow dark:bg-gray-800 p-3">
-      <app-create-event></app-create-event>
+      <app-create-event (created)="getAllEvents()"></app-create-event>
     </div>
   </div>
 </p-dialog>

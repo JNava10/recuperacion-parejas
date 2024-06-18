@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MessageInputComponent} from "../message-input/message-input.component";
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {UserService} from "../../../services/api/user.service";
 import {User} from "../../../interfaces/api/user/user";
 import {ChatService} from "../../../services/api/chat.service";
@@ -15,8 +15,8 @@ import {
 import {MessagesComponent} from "../messages/messages.component";
 import {SocketService} from "../../../services/socket.service";
 import {ChatJoin, MessagesRead} from "../../../interfaces/socket/chat";
-import {StorageService} from "../../../services/storage.service";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
+import {AvatarModule} from "primeng/avatar";
 
 @Component({
   selector: 'app-chat',
@@ -25,7 +25,9 @@ import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
     ReactiveFormsModule,
     MessageInputComponent,
     MessagesComponent,
-    CustomToastComponent
+    CustomToastComponent,
+    AvatarModule,
+    RouterLink
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
@@ -40,12 +42,10 @@ export class ChatComponent implements OnInit {
 
     this.socketService.listenMessages((message: Message) => {
       this.pushMessage(message)
-      console.log(message)
       this.socketService.sendMessageRead(this.partnerId!);
     })
 
     this.socketService.listenFileMessages((fileMessage: FileMessage) => {
-      console.log(fileMessage.message)
       this.pushMessage(fileMessage.message)
       this.socketService.sendMessageRead(this.partnerId!);
     });

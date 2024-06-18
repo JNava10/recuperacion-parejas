@@ -41,6 +41,7 @@ export class FindMembersComponent {
   }
 
   private showResults = (body: SearchResponse) => {
+    console.log(body)
     this.members = body.data.results;
   };
 }

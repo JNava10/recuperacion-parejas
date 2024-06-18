@@ -27,11 +27,29 @@ class RoleQuery {
         }
     };
 
-    static roleExists = async (name) => {
+    static roleNameExists = async (name) => {
         try {
             const role = (await models.Role.findOne(
                 {
                     where: {name},
+                    raw: true
+                }
+            )) !== null;
+
+            const message = role ? 'El rol indicado existe' : 'El rol indicado no existe.';
+
+            return new QuerySuccess(true, message, role);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
+    static roleIdExists = async (id) => {
+        try {
+            const role = (await models.Role.findOne(
+                {
+                    where: {id},
                     raw: true
                 }
             )) !== null;

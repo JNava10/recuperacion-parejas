@@ -11,6 +11,7 @@ import {Router, RouterLink} from "@angular/router";
 import {CustomToastComponent} from "../custom-toast/custom-toast.component";
 import {ignoreElements} from "rxjs";
 import {LoginResponseData} from "../../interfaces/api/auth/login";
+import {showQueryToast} from "../../utils/common.utils";
 
 @Component({
   selector: 'app-login-form',
@@ -54,7 +55,11 @@ export class LoginFormComponent {
       if (res.data.logged) {
         await this.handleLogin(res.data);
       } else {
-        this.messageService.add({summary: 'Error', detail: res.message, severity: 'error'})
+        if (res.data.errors) {
+          res.data.errors.forEach(error => showQueryToast(res.data.logged, error, this.messageService))
+        } else {
+          showQueryToast(res.data.logged, res.message, this.messageService)
+        }
       }
     })
   }

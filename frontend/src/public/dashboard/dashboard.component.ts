@@ -115,7 +115,7 @@ export class DashboardComponent implements OnInit {
     })
 
     this.socketService.listenNewMatch((args: NewMatchArgs) => {
-      this.userService.findUserById(args.from).subscribe(user => this.notifyNewMatch(user))
+      this.userService.findUserById(args.from).subscribe(body => this.notifyNewMatch(body.data.query))
     })
   }
 
@@ -133,10 +133,10 @@ export class DashboardComponent implements OnInit {
   }
 
   private getNewSender(args: NewMessageArgs) {
-    this.userService.findUserById(args.from).subscribe(user => {
-      const pendingUser: PendingChatUserItem = {...user, pendingCount: 1}
+    this.userService.findUserById(args.from).subscribe(body => {
+      const pendingUser: PendingChatUserItem = {...body, pendingCount: 1}
 
-      return this.pending.set(user.id!, pendingUser);
+      return this.pending.set(body.data.query.id!, pendingUser);
     })
   }
 

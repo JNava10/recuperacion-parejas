@@ -1,3 +1,6 @@
+const EventQuery = require("../../database/query/event.query");
+const CustomError = require("../../classes/customError");
+
 const eventMustExist = async (eventId) => {
     try {
         const eventExists = await EventQuery.eventExists(eventId);

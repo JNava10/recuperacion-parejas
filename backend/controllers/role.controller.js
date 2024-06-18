@@ -40,7 +40,6 @@ class RoleController {
 
             const rolesAlreadyInserted = await RoleQuery.checkIfRoleInserted(roles, req.params.id);
 
-
             const {message, executed, query} = await UserQuery.insertUserRoles(roles, req.params.id);
 
             return res.status(200).json(
@@ -74,18 +73,13 @@ class RoleController {
 
     static deleteUserRoles = async (req, res) => {
         try {
-            // const adminsRemaining = (await UserQuery.getRoleUsersRemaining('admin')).query; // TODO: Validator
-            //
-            // if (adminsRemaining >= 1) return res.status(200).json(
-            //     new StdResponse('No se pueden borrar mas administradores.',{executed: false})
-            // )
-
             const {message, executed, query} = await UserQuery.deleteUserRoles(req.body.roles, req.params.id);
 
             return res.status(200).json(
                 new StdResponse(message,{executed, query})
             )
         } catch (e) {
+            console.log(e)
             return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al obtener el evento.',{executed: false, error: e.message})
             )

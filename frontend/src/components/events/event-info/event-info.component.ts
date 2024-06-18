@@ -5,7 +5,7 @@ import {EventItem} from "../../../interfaces/api/event/event";
 import {concatWith} from "rxjs";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {Message, MessageService} from "primeng/api";
-import {getQueryToast} from "../../../utils/common.utils";
+import {getQueryToast, showQueryToast} from "../../../utils/common.utils";
 
 @Component({
   selector: 'app-event-info',
@@ -40,14 +40,11 @@ export class EventInfoComponent implements OnInit {
 
   joinEvent = () => {
     this.eventService.registerSelfToEvent(this.event!).subscribe(body => {
-      const message: Message = getQueryToast(body.data.executed, body.message);
-
-      if (body.data.executed) {
-        message.severity = body.data.closed ? 'warn' : 'success'
-        message.summary = body.data.closed ? '¡Ojo!' : 'Exito'
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
       }
-
-      this.messageService.add(message)
 
       if (!body.data.closed) {
         this.isSubscribed = body.data.executed;
@@ -57,11 +54,11 @@ export class EventInfoComponent implements OnInit {
 
   withdrawFromEvent() {
     this.eventService.withdrawSelfFromEvent(this.event!).subscribe(body => {
-      const message = getQueryToast(body.data.executed, body.message)
-
-      if (body.data.executed) message.severity = 'info';
-
-      this.messageService.add(message)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       return this.isSubscribed = !body.data.executed;
     })

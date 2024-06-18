@@ -29,39 +29,42 @@ class SocketController {
      * @param io
      */
     static onConnect = async (socket, io) => {
-        SocketController.io = io;
+        try {
+            SocketController.io = io;
 
-        let ownId = socket.user.userId;
-        SocketController.usersConnected.set(ownId, socket)
+            let ownId = socket.user.userId;
+            SocketController.usersConnected.set(ownId, socket)
 
-        io.emit('user-connected', {count: SocketController.usersConnected.size});
+            io.emit('user-connected', {count: SocketController.usersConnected.size});
 
-        const query = (await FriendshipQuery.getMatchedUsersIds(ownId)).query
+            const query = (await FriendshipQuery.getMatchedUsersIds(ownId)).query
 
+            // Sacamos los amigos de la BD para decirles que el usuario se ha conectado.
+            let friends = [];
 
-        // Sacamos los amigos de la BD para decirles que el usuario se ha conectado.
-        let friends = [];
+            query.forEach(model => {
+                if (model.userMatch.id === ownId) friends.push(model.userMatched)
+                else if (model.userMatched.id === ownId) friends.push(model.userMatch)
+            });
 
-        query.forEach(model => {
-            if (model.userMatch.id === ownId) friends.push(model.userMatched)
-            else if (model.userMatched.id === ownId) friends.push(model.userMatch)
-        });
+            friends = friends.map(user => user.id)
 
-        friends = friends.map(user => user.id)
+            const connectedFriends = SocketController.findUsersById(friends)
 
-        const connectedFriends = SocketController.findUsersById(friends)
+            connectedFriends.forEach(([friendId, friendSocket]) => {
+                friendSocket.emit('friend-connected', {id: ownId})
+            })
 
-        connectedFriends.forEach(([friendId, friendSocket]) => {
-            friendSocket.emit('friend-connected', {id: ownId})
-        })
-
-        // Listeners
-        socket.on('disconnect', () => SocketController.onDisconnect(socket))
-        socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
-        socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
-        socket.on('leave-chat', async (params) => await SocketController.onLeaveChat(socket, params))
-        socket.on('message-read', async (params) => await SocketController.onMessageRead(socket, params))
-        socket.on('new-match', async (params) => await SocketController.onNewMatch(socket, params))
+            // Listeners
+            socket.on('disconnect', () => SocketController.onDisconnect(socket))
+            socket.on('msg', async (params) => await SocketController.onMessage(socket, params))
+            socket.on('join-chat', async (params) => await SocketController.onJoinChat(socket, params, io))
+            socket.on('leave-chat', async (params) => await SocketController.onLeaveChat(socket, params))
+            socket.on('message-read', async (params) => await SocketController.onMessageRead(socket, params))
+            socket.on('new-match', async (params) => await SocketController.onNewMatch(socket, params))
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     static onDisconnect = (socket) => {

@@ -166,6 +166,8 @@ class EventQuery {
 
             return new QuerySuccess(true, 'Se ha retirado del evento correctamente.', query);
         } catch (e) {
+            console.log('error aqui')
+
             console.error(e)
             throw e
         }
@@ -211,7 +213,6 @@ class EventQuery {
                     ]
                 }
             }) !== null
-
 
             const message = query ? 'El evento está cerrado.' : 'El evento aun está abierto a inscripciones.'
 

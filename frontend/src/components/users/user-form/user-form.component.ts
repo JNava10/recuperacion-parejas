@@ -62,18 +62,17 @@ export class UserFormComponent {
     this.userService.createUser(user).subscribe(res => {
       this.loading = true
 
-      if (!res.data.executed) {
-        showQueryToast(res.data.executed, res.message, this.messageService)
-      }
-
       if (this.picFile) {
         this.changeUserAvatar(res.data.query.id, res)
         this.loading = false
 
       } else {
-        showQueryToast(res.data.executed, res.message, this.messageService)
+        if (res.data.errors) {
+          res.data.errors.forEach(error => showQueryToast(res.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(res.data.executed, res.message, this.messageService)
+        }
         this.loading = false
-
       }
     });
   };
@@ -109,7 +108,11 @@ export class UserFormComponent {
 
   private changeUserAvatar = (id: number, createdRes: CreateUserResponse) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(res => {
-      showQueryToast(res.data.executed, res.message, this.messageService)
+      if (res.data.errors) {
+        res.data.errors.forEach(error => showQueryToast(res.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(res.data.executed, res.message, this.messageService)
+      }
 
       this.loading = false
     });

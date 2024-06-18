@@ -108,8 +108,11 @@ export class RegisterFormComponent {
       if (!valid) return;
 
       this.userService.updateUserAvatar(this.registeredId!, file!).subscribe(body => {
-        const message = getQueryToast(body.data.executed, body.message)
-        this.messageService.add(message)
+        if (body.data.errors) {
+          body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+        } else {
+          showQueryToast(body.data.executed, body.message, this.messageService)
+        }
 
         if (body.data.executed) {
           this.finishRegister()

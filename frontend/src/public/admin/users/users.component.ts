@@ -33,9 +33,9 @@ export class UsersComponent implements OnInit {
   }
 
   protected getUsers() {
-    this.userService.getNotDeletedWithRoles().subscribe(users => {
-      this.nonActivatedUsers = users?.filter(user => user.enabled === false)
-      this.activatedUsers = users?.filter(user => user.enabled === true)
+    this.userService.getNotDeletedWithRoles().subscribe(body => {
+      this.nonActivatedUsers = body.data.query?.filter(user => user.enabled === false)
+      this.activatedUsers = body.data.query?.filter(user => user.enabled === true)
       this.usersFetched = true;
     })
   }

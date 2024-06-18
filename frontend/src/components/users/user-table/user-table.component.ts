@@ -6,7 +6,7 @@ import {UserService} from "../../../services/api/user.service";
 import {DialogModule} from "primeng/dialog";
 import {CustomToastComponent} from "../../custom-toast/custom-toast.component";
 import {MessageService} from "primeng/api";
-import {getQueryToast} from "../../../utils/common.utils";
+import {getQueryToast, showQueryToast} from "../../../utils/common.utils";
 import {TableModule} from "primeng/table";
 import {StyleClassModule} from "primeng/styleclass";
 
@@ -46,8 +46,11 @@ export class UserTableComponent {
     if (!user) this.cancelDeleteUser()
 
     this.userService.deleteUser(user!).subscribe(body => {
-      const toast = getQueryToast(body.data.executed, body.message)
-      this.messageService.add(toast)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (body.data.executed) this.refresh.emit();
 

@@ -208,88 +208,11 @@ class EventController {
 
     };
 
-    static subscribeToEvent = async (req, res) => {
-      try {
-          const eventExists = await EventQuery.eventExists(req.params.eventId);// TODO: Validator
-
-          if (!eventExists.query) return res.status(200).json(
-              new StdResponse(eventExists.message, {
-                  executed: false
-              })
-          );
-
-          const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));// TODO: Validator
-
-          if (isClosed.query) return res.status(200).json(
-              new StdResponse(isClosed.message, {
-                  executed: true,
-                  closed: true
-              })
-          );
-
-          const userId = req.params.userId || req.payload.userId;
-
-          if (req.params.userId) {
-              const userExists = (await UserQuery.checkIfIdExists(id)).query // TODO: Validator
-
-              if (userExists.query) return res.status(404).json(
-                  new StdResponse(userExists.message, {
-                      executed: false
-                  })
-              );
-          }
-
-          // TODO: Comprobar si el usuario está suscrito
-
-          const {message, executed} = await EventQuery.subscribeToEvent(req.params.eventId, userId);
-
-          return res.status(200).json(
-              new StdResponse(message, {
-                  executed,
-                  closed: false
-              })
-          );
-      } catch (e) {
-          return res.status(203).json(
-              new StdResponse('Ha ocurrido un problema al suscribirse al evento.',{executed: false, error: e.message})
-          )
-      }
-    };
-
     static withdrawEvent = async (req, res) => {
          try {
              const eventId = req.params.eventId
 
-             const eventExists = await EventQuery.eventExists(eventId);// TODO: Validator
-
-             if (!eventExists.query) return res.status(200).json(
-                 new StdResponse(eventExists.message, {
-                     executed: false
-                 })
-             );
-
-             const isClosed = (await EventQuery.eventIsClosed(eventId));// TODO: Middleware
-             if (isClosed.query) return res.status(200).json(
-                 new StdResponse(isClosed.message, {
-                     executed: true,
-                     closed: true
-                 })
-             );
-
              const userId = req.params.userId || req.payload.userId;
-
-             if (req.params.userId) {
-                 const userExists = (await UserQuery.checkIfIdExists(eventId)).query // TODO: Validator
-
-                 if (userExists.query) return res.status(404).json(
-                     new StdResponse(userExists.message, {
-                         executed: false
-                     })
-                 );
-             }
-
-             // TODO: Comprobar si el usuario está suscrito
-
 
              const {message, executed, query} = await EventQuery.withdrawFromEvent(eventId, userId);
 
@@ -305,16 +228,10 @@ class EventController {
 
     static getSummaryFile = async (req, res) => {
         try {
-            const eventExists = await EventQuery.eventExists(req.params.eventId); // TODO: Validator
-
-            if (!eventExists.query) return res.status(200).json(
-                new StdResponse(eventExists.message, {
-                    executed: false
-                })
-            );
+            const event = await EventQuery.getEvent(req.params.eventId);
 
             return res.status(200).json(
-                new StdResponse('Se ha creado correctamente el archivo', {file: {url: uploadedFile.secure_url}})
+                new StdResponse('Se ha obtenido correctamente el archivo', {file: {url: event.query.picUrl}})
             )
         } catch (e) {
             return res.status(203).json(
@@ -433,35 +350,7 @@ class EventController {
     static addMemberToEvent = async (req, res) => {
         try {
             const event = req.params.eventId;
-            const user = req.params.userId;
-
-            const eventExists = await EventQuery.eventExists(event); // TODO: Validator
-            const userExists = await UserQuery.checkIfIdExists(user); // TODO: Validator
-
-            if (!eventExists.query && !userExists.query) return res.status(200).json(
-                new StdResponse("No existen ni el usuario ni el evento indicados.", {
-                    executed: false
-                })
-            );
-            else if (!eventExists.query) return res.status(200).json(
-                new StdResponse(eventExists.message, {
-                    executed: false
-                })
-            );
-            else if (!userExists.query) return res.status(200).json(
-                new StdResponse(userExists.message, {
-                    executed: false
-                })
-            );
-
-            const isClosed = (await EventQuery.eventIsClosed(req.params.eventId));
-
-            if (isClosed.query) return res.status(200).json(
-                new StdResponse(isClosed.message, {
-                    executed: false,
-                    closed: true
-                })
-            );
+            const user = req.params.userId || req.payload.userId;
 
             const {message, query, executed} = await EventQuery.subscribeToEvent(event, user);
 
@@ -474,45 +363,6 @@ class EventController {
         } catch (e) {
             return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al añadir el miembro al evento.', {executed: false, error: e.message})
-            )
-        }
-    };
-
-    static removeFromEvent = async (req, res) => {
-        try {
-            const event = req.params.eventId;
-            const user = req.params.userId;
-
-            const eventExists = await EventQuery.eventExists(event);// TODO: Validator
-            const userExists = await UserQuery.checkIfIdExists(user);// TODO: Validator
-
-            if (!eventExists.query && !userExists.query) return res.status(404).json(
-                new StdResponse("No existen ni el usuario ni el evento indicados.", {
-                    executed: false
-                })
-            );
-            else if (!eventExists.query) return res.status(404).json(
-                new StdResponse(eventExists.message, {
-                    executed: false
-                })
-            );
-            else if (!userExists.query) return res.status(404).json(
-                new StdResponse(userExists.message, {
-                    executed: false
-                })
-            );
-
-            const {message, query, executed} = await EventQuery.withdrawFromEvent(event, user);
-
-            return res.status(200).json(
-                new StdResponse(message, {
-                    executed,
-                    query
-                })
-            );
-        } catch (e) {
-            return res.status(203).json(
-                new StdResponse('Ha ocurrido un problema al desapuntar al usuario.', {executed: false, error: e.message})
             )
         }
     };

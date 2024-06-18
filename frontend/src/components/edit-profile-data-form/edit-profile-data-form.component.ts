@@ -66,11 +66,15 @@ export class EditProfileDataFormComponent implements OnInit {
 
     const user = this.getUserData();
 
-    this.userService.editProfileData(user).subscribe(res => {
-      showQueryToast(res.data.executed, res.message, this.messageService)
+    this.userService.editProfileData(user).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       if (this.picFile) {
-        this.changeUserAvatar(this.user?.id!, res)
+        this.changeUserAvatar(this.user?.id!)
       }
 
       this.loading = false;
@@ -120,9 +124,13 @@ export class EditProfileDataFormComponent implements OnInit {
     return message.detail === undefined;
   }
 
-  private changeUserAvatar = (id: number, res: CrudEditResponse) => {
+  private changeUserAvatar = (id: number) => {
     this.userService.updateUserAvatar(id, this.picFile!).subscribe(body => {
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       this.loading = false
     });

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RoleItem, UserItem} from "../../../interfaces/api/user/user";
 import {UserService} from "../../../services/api/user.service";
-import {getQueryToast} from "../../../utils/common.utils";
+import {getQueryToast, showQueryToast} from "../../../utils/common.utils";
 import {MessageService} from "primeng/api";
 
 @Component({
@@ -47,18 +47,23 @@ export class SelectRolesEditComponent implements OnInit {
     this.rolesSelected.add(role.id!);
 
     this.userService.addRoles(this.user?.id!, [role?.id!]).subscribe(body => {
-      const message = getQueryToast(body.data.executed, body.message);
-
-      this.messageService.add(message)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
     })
   };
 
   private deleteRole(role: RoleItem) {
     this.rolesSelected.delete(role.id!)
-    this.userService.deleteRoles(this.user?.id!, [role?.id!]).subscribe(body => {
-      const message = getQueryToast(body.data.executed, body.message);
 
-      this.messageService.add(message);
+    this.userService.deleteRoles(this.user?.id!, [role?.id!]).subscribe(body => {
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
     })
 
     return;

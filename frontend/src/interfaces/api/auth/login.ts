@@ -9,7 +9,9 @@ export interface LoginResponseData {
   token: string,
   logged: boolean
   firstLogin: boolean,
+  errors?: string[]
   socketToken: string
+
 }
 
 export interface LoginResponse extends ApiResponse {

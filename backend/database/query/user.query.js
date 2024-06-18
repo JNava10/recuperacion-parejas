@@ -6,11 +6,8 @@ const QueryError = require("../../classes/QueryError");
 const RoleQuery = require("./role.query");
 const {roleNames, preferenceTypes} = require("../../constants/seed.const");
 const {hashPassword} = require("../../helpers/common.helper");
-const {tr, fa} = require("@faker-js/faker");
 
 class UserQuery {
-
-
     static findUserByNickOrName = async (input) => {
         try {
             const query = await models.sequelize.query(findUserByNameOrNick, {
@@ -21,7 +18,8 @@ class UserQuery {
 
             return new QuerySuccess(true, 'Se ha obtenido el usuario correctamente.', query);
         } catch (e) {
-
+            console.error(e)
+            throw e
         }
     }
 
@@ -106,6 +104,54 @@ class UserQuery {
         }
     };
 
+    static checkIfNewEmailIsValid = async (email, userId) => {
+        try {
+            const query = await models.User.findOne({where: {
+                    [Op.or]: [
+                        {
+                            [Op.and]: [
+                                {email},
+                                {[Op.not]: {id: userId}}
+                            ]
+                        },
+                    ]
+
+                }
+            }) !== null;
+
+            if (!query) return new QuerySuccess(true, 'No existe el correo introducido.', query);
+
+            return new QuerySuccess(true, 'El correo introducido ha sido encontrado.', query);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
+    static checkIfNewNicknameIsValid = async (nickname, userId) => {
+        try {
+            const query = await models.User.findOne({where: {
+                    [Op.or]: [
+                        {
+                            [Op.and]: [
+                                {nickname},
+                                {[Op.not]: {id: userId}}
+                            ]
+                        },
+                    ]
+
+                }
+            }) !== null;
+
+            if (!query) return new QuerySuccess(true, 'No existe el nombre de usuario introducido.', query);
+
+            return new QuerySuccess(true, 'El nombre de usuario introducido ha sido encontrado.', query);
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
     static checkIfIdExists = async (id) => {
         try {
             const query = await models.User.findOne({where: {id}}) !== null;
@@ -118,7 +164,6 @@ class UserQuery {
             throw e
         }
     };
-
 
     static checkIfNicknameExists = async (nickname) => {
         try {
@@ -247,7 +292,6 @@ class UserQuery {
         }
     };
 
-    // TODO: mover a RoleQuery
     static deleteUserRoles = async (roles, user) => {
         try {
             const deleted = await models.AssignedRole.destroy({where: {

@@ -34,29 +34,53 @@ export class UserService {
   searchMember = (input: string) => {
     const body = {input}
 
-    return this.http.post<SearchResponse>(`${environment.apiUrl}/user/member/search`, body);
+    return this.http.post<SearchResponse>(`${environment.apiUrl}/user/member/search`, body).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as SearchResponse;
+
+        return of(error);
+      })
+    );
   }
 
   findUserById = (id: number) => {
     return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/${id}`, {params: {...sendTokenParam, withRoles: true}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUserResponse;
+
+        return of(error);
+      })
     )
   }
 
   getAllUsers = () => {
     return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user`, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+
+        return of(error);
+      })
     )
   }
 
   getNotDeletedWithRoles = () => {
     return this.http.get<GetUsersResponse>(`${environment.apiUrl}/user/with-roles`, {params: {...sendTokenParam}}).pipe(
-      map(body => body.data.query)
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as GetUsersResponse;
+
+        return of(error);
+      })
     )
   }
 
   createUser = (user: CreateUserItem) => {
-    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}})
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user`, user,{params: {...sendTokenParam}}).pipe(
+      catchError((res: HttpErrorResponse) => {
+        const error = res.error as CreateUserResponse;
+
+        return of(error);
+      })
+    )
   }
 
   registerUser = (user: CreateUserItem) => {
@@ -161,7 +185,7 @@ export class UserService {
 
 
   editProfileData = (user: UserItem) => {
-    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/profile/data/${user.id}`, user, {params: {...sendTokenParam}}).pipe(
+    return this.http.put<ManageUserResponse>(`${environment.apiUrl}/user/profile/data/`, user, {params: {...sendTokenParam}}).pipe(
       catchError((res: HttpErrorResponse) => {
         const error = res.error as ManageUserResponse;
 

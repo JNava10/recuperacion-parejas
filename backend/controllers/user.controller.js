@@ -29,7 +29,7 @@ class UserController {
            return res.status(200).json(
                new StdResponse(
                    'Se ha iniciado sesión correctamente.',
-                   {founded: results.length > 0, results}
+                   {founded: results.length > 0, results: results.query}
                )
            )
        } catch (e) {
@@ -123,16 +123,20 @@ class UserController {
         try {
             const newUserData = req.body;
 
-            const emailExists = await UserQuery.checkIfEmailExists(newUserData.email).query; // TODO: Pasar a validator
+            const emailExists = await UserQuery.checkIfNewEmailIsValid(req.body.email, req.params.id);
+            const nicknameExists = await UserQuery.checkIfNewNicknameIsValid(req.body.nickname, req.params.id)
+            const errors = []
 
-            if (emailExists) return res.status(409).json(
-                new StdResponse("El correo del usuario indicado ya existe",{executed: false})
-            )
+            if (emailExists.query) {
+                errors.push(emailExists.message)
+            }
 
-            const nicknameExists = await UserQuery.checkIfEmailExists(newUserData.nickname).query; // TODO: Pasar a validator
+            if (nicknameExists.query) {
+                errors.push(nicknameExists.message)
+            }
 
-            if (nicknameExists) return res.status(409).json(
-                new StdResponse("El nick del usuario indicado ya existe",{executed: false})
+            if (errors.length > 0)  return res.status(400).json(
+                new StdResponse("Algunos campos introducidos ya existen",{executed: false, errors})
             )
 
             const {message, executed, query} = await UserQuery.updateUserData(newUserData, req.params.id);
@@ -313,6 +317,22 @@ class UserController {
 
     static editProfileData = async (req, res) => {
         try {
+            const emailExists = await UserQuery.checkIfNewEmailIsValid(req.body.email, req.payload.userId);
+            const nicknameExists = await UserQuery.checkIfNewNicknameIsValid(req.body.nickname, req.payload.userId)
+            const errors = []
+
+            if (emailExists.query) {
+                errors.push(emailExists.message)
+            }
+
+            if (nicknameExists.query) {
+                errors.push(nicknameExists.message)
+            }
+
+            if (errors.length > 0)  return res.status(400).json(
+                new StdResponse("Algunos campos introducidos ya existen",{executed: false, errors})
+            )
+
             const {message, executed, query} = await UserQuery.editProfileData(req.payload.userId, req.body);
 
             return res.status(200).json(
@@ -400,7 +420,7 @@ class UserController {
         try {
             const roleName = req.params.role;
 
-            const roleExists = (await RoleQuery.roleExists(roleName)).query; // TODO: Validator
+            const roleExists = (await RoleQuery.roleNameExists(roleName)).query; // TODO: Validator
 
             if (!roleExists) return res.status(404).json(
                 new StdResponse("El rol buscado no existe", {
@@ -504,7 +524,6 @@ class UserController {
                     )
                 )
             }
-
             const passwordsMatch = await compare(password, user.password);
 
             if (!passwordsMatch) {
@@ -516,10 +535,10 @@ class UserController {
                 )
             }
 
-            const apiToken = generateToken({userId: 1, userEmail: 's', type: tokenTypes.api});
+            const apiToken = generateToken({userId: user.id, userEmail: email, type: tokenTypes.api});
             const socketToken = generateToken({userId: user.id, type: tokenTypes.socket});
 
-            const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id); // TODO: Middleware
+            const isFirstUserLogin = await UserQuery.isFirstUserLogin(user.id);
 
             await UserQuery.updateUserLogin(user.id)
 

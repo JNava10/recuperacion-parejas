@@ -4,7 +4,7 @@ const {isAdmin, isMember} = require("../middlewares/userHasRole.middleware");
 const {validateToken} = require("../helpers/jwt.helper");
 const FriendshipController = require("../controllers/friendship.controller.js");
 const {check} = require("express-validator");
-const {roleMustExist} = require("../helpers/validators/role.validators");
+const {userMustExist} = require("../helpers/validators/user.validators");
 const router = Router();
 
 
@@ -14,7 +14,7 @@ router.get('/matched', [validateToken], FriendshipController.getOwnMatches);
 
 router.post('/like/:id', [
     validateToken,
-    check('role', 'El rol introducido no existe.').custom(roleMustExist),
+    check('id', 'El rol introducido no existe.').custom(userMustExist),
 ], FriendshipController.likeUser);
 
 module.exports = router;

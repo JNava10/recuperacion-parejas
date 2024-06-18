@@ -10,27 +10,50 @@ const {moreOneAdminRemaining} = require("../middlewares/role.middleware");
 const {check} = require("express-validator");
 const {emailMustNotExist, nicknameMustNotExist, userMustExist} = require("../helpers/validators/user.validators");
 const {checkFields} = require("../middlewares/checkFields.middleware");
-const {roleMustExist, rolesMustExist} = require("../helpers/validators/role.validators");
+const {roleMustExist, rolesMustExist, roleIdsMustExist, hasAdminId} = require("../helpers/validators/role.validators");
 const router = Router();
 
 router.post('/member/search', UserController.findUser);
-router.get('/member/messages/:receiver', [validateToken], ChatController.getMessages)
-router.put('/password/:id', [validateToken], UserController.updateUserPassword)
-router.put('/data/:id', [validateToken], UserController.updateUserData)
+
+router.get('/member/messages/:receiver', [
+    validateToken,
+    check('receiver', 'El usuario no existe.').custom(userMustExist),
+    checkFields
+], ChatController.getMessages)
+
+router.put('/password/:id', [
+    validateToken,
+    check('id', 'El usuario no existe').custom(userMustExist),
+    checkFields
+], UserController.updateUserPassword)
+
+router.put('/data/:id', [
+    validateToken,
+    check('id', 'El usuario no existe.').custom(userMustExist),
+    checkFields
+], UserController.updateUserData)
+
 router.get('/with-roles', [validateToken], UserController.getNotDeletedUsersWithRoles)
-router.post('/', [validateToken], UserController.createUser)
+
+router.post('/', [
+    validateToken,
+    check('nickname', 'El nombre de usuario ya existe.').custom(nicknameMustNotExist),
+    check('email', 'El email ya existe.').custom(emailMustNotExist),
+    checkFields
+], UserController.createUser)
 
 router.post('/roles/:id', [
+    validateToken,
     check('id', 'El usuario indicado no existe.').custom(userMustExist),
-    check('roles', 'Algunos o todos los roles indicados no existen.').custom(rolesMustExist),
+    check('roles', 'Algunos o todos los roles indicados no existen.').custom(roleIdsMustExist),
     checkFields
 ], RoleController.addUserRoles);
 
 router.post('/roles/delete/:id', [
     validateToken,
     moreOneAdminRemaining,
-    check('id', 'El usuario introducido no existe.').custom(userMustExist),
-    check('roles', 'Algunos o todos los roles indicados no existen.').custom(rolesMustExist),
+    check('id').custom(userMustExist),
+    check('roles').custom(roleIdsMustExist),
     checkFields
 ], RoleController.deleteUserRoles)
 
@@ -46,11 +69,11 @@ router.get('/role/:role', [validateToken], RoleController.getRoleUsers)
 router.put('/enable-or-disable/:userId', [
     validateToken,
     check('userId', 'El ID introducido no existe.').custom(userMustExist),
+    checkFields
 ], UserController.enableOrDisableUser)
 
-router.put('/profile/data/:userId', [
-    validateToken,
-    check('userId', 'El ID introducido no existe.').custom(userMustExist),
+router.put('/profile/data', [
+    validateToken
 ], UserController.editProfileData)
 
 router.get('/pending-chats', [validateToken], ChatController.getChats)
@@ -59,6 +82,7 @@ router.post('/member/messages/files/:receiver', [validateToken], ChatController.
 router.get('/role-users/:role', [
     validateToken,
     check('role', 'El rol introducido no existe.').custom(roleMustExist),
+    checkFields
 ], UserController.getRoleUsersRemaining)
 
 router.get('/profile', [validateToken], UserController.getEditableProfileData)
@@ -68,6 +92,7 @@ router.get('/', [validateToken], UserController.getNotDeletedUsers)
 router.put('/preferences/:userId?', [
     validateToken,
     check('userId', 'El ID introducido no existe.').custom(userMustExist),
+    checkFields
 ], UserController.updateUserPreferences)
 
 router.post('/logout', AuthController.logout)
@@ -81,16 +106,19 @@ router.get('/roles', [validateToken], RoleController.getSelfRoles)
 router.put('/avatar/:userId', [
     validateToken,
     check('userId', 'El ID introducido no existe.').custom(userMustExist),
+    checkFields
 ], UserController.updateUserAvatar)
 
 router.delete('/:userId', [
     validateToken,
     check('userId', 'El ID introducido no existe.').custom(userMustExist),
+    checkFields
 ], UserController.deleteUser)
 
 router.get('/:id', [
     validateToken,
-    check('userId', 'El ID introducido no existe.').custom(userMustExist),
+    check('id', 'El ID introducido no existe.').custom(userMustExist),
+    checkFields
 ], UserController.findById)
 
 router.post('/send-recover-email', UserController.sendRecoverEmail)

@@ -10,25 +10,20 @@ class ChatController {
             const receiverId = req.params.receiver;
             const emitterId = req.payload.userId;
 
-            const receiverExists = await UserQuery.checkIfIdExists(receiverId)
-
-            if (receiverExists) return res.status(400).json(
-                new StdResponse(
-                    'El usuario indicado para recibir el mensaje no existe.',
-                    {executed: false}
-                )
-            )
-
             const result = await findRecentChatMessages(emitterId, receiverId)
 
             return res.status(200).json(
                 new StdResponse(
-                    'Se ha insertado el mensaje correctamente.',
-                    result
+                    result.message,
+                    {
+                        query: result.query
+                    }
                 )
             )
         } catch (e) {
-            return res.status(500).json(
+            console.error(e)
+
+            return res.status(203).json(
                 new StdResponse('Ha ocurrido un problema al obtener los mensajes',{executed: false, error: e.message})
             )
         }

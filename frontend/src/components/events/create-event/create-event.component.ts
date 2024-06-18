@@ -36,8 +36,6 @@ export class CreateEventComponent {
 
   static modalId = "create-event-modal";
 
-  private mapMarker?: google.maps.Marker;
-
   // Esto es necesario para poder mostrar el mapa.
   map?: google.maps.Map;
   center: google.maps.LatLngLiteral = latLng;
@@ -97,7 +95,11 @@ export class CreateEventComponent {
         this.eventService.updateEventPic(body.data.query.id!, this.picFile!).subscribe(body => this.handleUpdatingPic(body));
       }
 
-      showQueryToast(body.data.executed, body.message, this.messageService)
+      if (body.data.errors) {
+        body.data.errors.forEach(error => showQueryToast(body.data.executed, error, this.messageService))
+      } else {
+        showQueryToast(body.data.executed, body.message, this.messageService)
+      }
 
       this.created.emit(body.data.executed)
     })

@@ -31,8 +31,8 @@ export class PreferencesComponent implements OnInit {
   constructor(private preferenceService: PreferenceService, private router: Router) {}
 
   ngOnInit() {
-    this.preferenceService.getActivatedPreferences().subscribe(preferences => {
-      this.preferences = preferences
+    this.preferenceService.getActivatedPreferences().subscribe(body=> {
+      this.preferences = body.data.query
       }
     )
   }

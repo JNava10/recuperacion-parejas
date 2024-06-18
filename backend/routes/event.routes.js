@@ -29,7 +29,7 @@ router.post('/subscribe/:eventId/:userId?', [
     check('eventId', 'El evento introducido no existe.').custom(eventMustExist),
     check('eventId', 'El evento está cerrado.').custom(eventMustNotClosed),
     check('userId', 'El usuario no existe.').custom(userMustExist),
-], EventController.subscribeToEvent);
+], EventController.addMemberToEvent);
 
 router.post('/withdraw/:eventId/:userId?', [
     validateToken,

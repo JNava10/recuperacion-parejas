@@ -8,6 +8,8 @@ const QueryError = require("../../classes/QueryError");
 class MessageQuery {
     static findRecentChatMessages = async (emitter, receiver) => {
         try {
+            console.log(emitter, receiver)
+
             const emitterUser = await models.User.findOne({where: {id: emitter}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
             const receiverUser = await models.User.findOne({where: {id: receiver}, attributes: ['id', 'email', 'nickname', 'pic_url', 'connected']});
 
@@ -33,7 +35,31 @@ class MessageQuery {
                 ]
             });
 
+            console.log(query)
+
             return new QuerySuccess(true, 'Se han obtenido los mensajes correctamente.', {emitterUser, receiverUser, messages: query});
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    };
+
+    static pushMessage = async (emitter, receiver, text) => {
+        try {
+            const data = {
+                emitter,
+                receiver,
+                text,
+                read: false,
+                created_at: new Date(),
+                updated_at: new Date(),
+            };
+
+            const query = await models.Message.create(data);
+
+            const message = query.get({plain: true})
+
+            return new QuerySuccess(true, 'Se ha pusheado el mensaje correctamente.', message);
         } catch (e) {
             console.error(e)
             throw e

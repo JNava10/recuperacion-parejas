@@ -19,8 +19,8 @@ export class StartComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.preferenceService.getAllPreferences().subscribe(preferences => {
-      this.preferences = preferences
+    this.preferenceService.getAllPreferences().subscribe(body => {
+      this.preferences = body.data.query
     })
   }
 
